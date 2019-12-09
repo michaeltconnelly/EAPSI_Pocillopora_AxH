@@ -23,10 +23,6 @@ EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1
 echo "These are the samples to be processed:"
 echo $EAPSIsamples
 
-#lets me know which files are being processed
-echo "These are the samples to be processed:"
-echo $EAPSIsamples
-
 #loop to automate generation of scripts to direct sequence file trimming
 for EAPSIsample in $EAPSIsamples
 do \

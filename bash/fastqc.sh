@@ -21,5 +21,5 @@ EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1
 
 module load java/1.8.0_60
 ${mcs}/programs/FastQC/fastqc \
-${coldir}/${exp}/zippedreads/[HW][wt][12]-[123456][abc].txt.gz \
---outdir ${coldir}/${exp}/fastqcs/
+${prodir}/data/zippedreads/[HW][wt][12]-[123456][abc].txt.gz \
+--outdir ${prodir}/outputs/fastqcs/
