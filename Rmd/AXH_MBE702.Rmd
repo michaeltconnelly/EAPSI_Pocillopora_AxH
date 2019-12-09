@@ -1,0 +1,568 @@
+---
+title: "AXH_MBE702"
+author: "Mike Connelly"
+date: "10/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("tidyverse")
+library("DESeq2")
+library(ggplot2)
+library(phyloseq)
+library(vegan)
+library(ape)
+library(DESeq2)
+library(edgeR)
+library(microbiome)
+library(RColorBrewer)
+library(ggpubr)
+library(grid)
+library(plyr)
+library(data.table)
+library(DT)
+library(ranacapa)
+```
+Set theme, colors and shapes for ggplot2 plotting
+```{r, warning=FALSE, message=FALSE}
+theme_set(theme_bw())
+#Treatment color and fill scheme
+condcolors <- c("#0000FF", "#00CCCC", "#FF6600", "#FFCC33", "#CC0033", "#FF66FF")
+condcolors_anti <- c("#00CCCC", "#0000FF")
+condcolors_heat <- c("#0000FF", "#FF6600")
+condcolors_anti.heat <- c("#FFCC33", "#0000FF")
+condcolors_antixheat <- c("blue", "#FF6600", "#00CCCC", "#FFCC33")
+condcolors_null <- c(rep("black", 4))
+###
+condfillcolors_antixheat <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
+###
+#Colony shape, color and fill scheme
+#colshapes <- c(18, 9, 16, 10, 15, 12, 17, 2)
+colshapes <- c(16, 17, 15, 18, 15, 12, 17, 2)
+colshapes_null <- c(rep(20, 8))
+colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#99CCFF", "#FFCCFF", "#FF99FF", "#CCCCFF", "#CC99FF")
+colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue", rep("grey", 4))
+```
+```{r}
+### Bacteria taxa
+## Phyla
+phyla_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/phyla_colors.csv", col_names = c("phylum", "color"))
+## Classes
+classes_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/classes_colors.csv", col_names = c("phylum", "class", "color"))
+## Orders
+orders_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/orders_colors.csv", col_names = c("phylum", "class", "order", "color"))
+## Families
+#families_colors <- read_csv("../taxa_colors/families_colors.csv", col_names = c("family", "color"))
+## Genera
+#genera_colors <- 
+## Specices
+#species_colors <- 
+```
+
+```{r, echo=FALSE}
+ggPCA_O_geno <- function(rld, samples, condcolors, ntop = 500,  pclab = c(1,2)) {
+  
+PCAtmtdata <- plotPCA.custom(rld, intgroup = c("Treatment", "Colony"), ntop = 500, returnData = TRUE,  pcs = c(pclab[1],pclab[2]))
+
+PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
+
+PCAplot <- ggplot(PCAtmtdata, aes(PCAtmtdata$PC1, PCAtmtdata$PC2, color=samples$Treatment, shape=samples$Colony, group=samples$Colony)) +
+    stat_ellipse(aes(fill = samples$Colony), geom = "polygon", type = "norm", alpha = 0.5) +
+  geom_point(size=6, show.legend = TRUE) + xlab(paste0( "PC", pclab[1], ": ", PCAtmtpercentVar[pclab[1]], "% variance")) + 
+  ylab(paste0( "PC", pclab[2], ": ", PCAtmtpercentVar[pclab[2]], "% variance")) + 
+  ggtitle("Principal Component Analysis")
+
+PCAplot + 
+  scale_color_manual(values=condcolors, name="Treatment") +
+  scale_fill_manual(values=colcolors, name="Colony") +
+  scale_shape_manual(values=colshapes, name="Colony") +
+  theme(legend.position = "right")
+}
+```
+### Figure 1: Gene Expression PCA
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures_MBE702/PCA_0_geno_AXH_blank.pdf", height = 5.25, width = 8)
+ggPCA_O_geno(rld_antixheat, stable_samples_antixheat, condcolors_antixheat, pclab = c(1,2)) +
+    #coord_fixed(ratio = 19/34) + 
+    ggtitle("PCA of coral gene expression, all samples") +
+    theme(plot.title = element_text(size = 22),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 16),
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 16))
+```
+
+### Figure 2: Bacteria Community PCoAs
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/PCoAs.ellipses.brayP.control.pdf", height = 5.25, width = 8)
+p1 <- plot_ordination(ps.stable.control.rel, ps.stable.control.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
+  geom_polygon(aes(fill = Colony), alpha = 0.5) +
+  geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
+  scale_color_manual(values = condcolors_null, name = "Treatment") +
+  scale_fill_manual(values = colcolors, name = "Colony") +
+  scale_shape_manual(values = colshapes, name = "Colony") + 
+  #coord_fixed(17.8/23.5) +
+  ggtitle("PCoA of bacteria community composition") +
+  xlab("PCo1: 40.6% variance") +
+  ylab("PCo2: 19.3% variance") +
+    theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 16),
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 16))
+print(p1)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/PCoAs.ellipses.brayP.AXH.pdf", height = 5.25, width = 8)
+p1 <- plot_ordination(ps.stable.AXH.rel, ps.stable.AXH.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
+  stat_ellipse(aes(color = Treatment, fill = Treatment), geom = "polygon", type = "norm", alpha = 0.1) + 
+  geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
+  scale_color_manual(values = condcolors_antixheat, name = "Treatment") +
+  scale_fill_manual(values = condcolors_antixheat, name = "Treatment") +
+  scale_shape_manual(values = colshapes, name = "Colony") + 
+  #coord_fixed(17.8/23.5) +
+  ggtitle("PCoA of bacteria community composition, all samples") +
+  xlab("PCo1: 23.5% variance") +
+  ylab("PCo2: 17.8% variance") +
+    theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 16),
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 16))
+print(p1)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/PCoAs.ellipses.brayP.AXH_colony_null.pdf", height = 5.25, width = 8)
+p1 <- plot_ordination(ps.stable.AXH, ps.stable.AXH.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
+  stat_ellipse(aes(fill = Colony), geom = "polygon", type = "norm", alpha = 0.6) + 
+  geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
+  scale_color_manual(values = condcolors_null, name="Treatment") +
+  scale_fill_manual(values = colcolors, name = "Colony") +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  #coord_fixed(1) +
+  ggtitle("Principal Coordinates Analysis") +
+  xlab("PCo1: 23.5% variance") +
+  ylab("PCo2: 17.8% variance") +
+    theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 16),
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 16))
+print(p1)
+```
+
+### Figure 3: Bacteria Community Diversity Boxplot Panel
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/richness_chao1_AXH.pdf", height = 5.25, width = 4.5)
+plot_richness(ps.stable.AXH, x="Treatment", measures=c("Chao1")) +
+  geom_boxplot(aes(fill = Treatment)) +
+  geom_point(aes(color = Treatment, shape = Colony), size = 6, alpha = 0.8) +
+  scale_color_manual(values = condcolors_antixheat) +
+  scale_fill_manual(values = condfillcolors_antixheat) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = NULL) +
+  ylim(c(0,100)) +
+  xlab(NULL) +
+  ylab("Chao1 ASV richness estimator") +
+  ggtitle("Bacteria community richness") +
+   theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/richness_shannon_AXH.pdf", height = 2.625, width = 3.5)
+plot_richness(ps.stable.AXH, x="Treatment", measures=c("Shannon")) +
+  geom_boxplot(aes(fill = Treatment)) +
+  geom_point(aes(color = Treatment, shape = Colony), size = 6, alpha = 0.8) +
+  scale_color_manual(values = condcolors_antixheat) +
+  scale_fill_manual(values = condfillcolors_antixheat) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = NULL) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01), limits = c(0,4)) +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle("") +
+   theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/richness_simpson_AXH.pdf", height = 2.65, width = 3.5)
+plot_richness(ps.stable.AXH, x="Treatment", measures=c("Simpson")) +
+  geom_boxplot(aes(fill = Treatment)) +
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  scale_color_manual(values = condcolors_antixheat) +
+  scale_fill_manual(values = condfillcolors_antixheat) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = NULL) +
+  ylim(c(0,1)) +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle("") +
+   theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+```
+
+### Figure 4: Bacteria Community Composition Barplot
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/barplot_phylum_AXH.pdf", height = 5.25, width = 8)
+### all samples
+p_phylum1 <- ggplot(data = ps.stable.AXH_phylum, aes(x = Sample, y = Abundance, fill = Phylum))
+p_phylum1 <- p_phylum1 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = phyla_colors$color) +
+  guides(fill=guide_legend(nrow = 4))
+p_phylum1 <- p_phylum1 +
+  ggtitle("") +
+   theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.text.x = element_text(angle = 300, size = 12), 
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 14), 
+        legend.position = "bottom")
+print(p_phylum1)
+
+### samples collapsed into colonies
+p_phylum2 <- ggplot(data = ps.stable.AXH_phylum, aes(x = Colony, y = Abundance, fill = Phylum))
+p_phylum2 <- p_phylum2 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  facet_grid(~Treatment) +
+  scale_fill_manual(values = phyla_colors$color) +
+  guides(fill=guide_legend(nrow = 4))
+p_phylum2 <- p_phylum2 +
+ggtitle("") +
+   theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 0, size = 12),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 14), legend.position = "bottom",
+        strip.text = element_text(size = 16),
+        strip.background = element_rect(fill = "light grey"))
+print(p_phylum2)
+g_phylum2 <- ggplot_gtable(ggplot_build(p_phylum2))
+strip_both <- which(grepl('strip-', g_phylum2$layout$name))
+k <- 1
+for (i in strip_both) {
+j <- which(grepl('rect', g_phylum2$grobs[[i]]$grobs[[1]]$childrenOrder))
+g_phylum2$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- condfillcolors_antixheat[k]
+k <- k+1
+}
+gp2 <- grid.draw(g_phylum2)
+print(gp2)
+```
+
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/barplot_class_AXH.pdf", height = 5.25, width = 8)
+### all samples
+p_class1 <- ggplot(data = ps.stable.AXH_class, aes(x = Sample, y = Abundance, fill = Class))
+p_class1 <- p_class1 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = classes_colors$color) +
+  guides(fill=guide_legend(nrow = 5))
+p_class1 <- p_class1 +
+  ggtitle("Bacteria Class Relative Abundance") +
+ theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.text.x = element_text(angle = 300, size = 12), 
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 12), 
+        legend.position = "bottom")
+print(p_class1)
+
+### samples collapsed into colonies
+p_class2 <- ggplot(data = ps.stable.AXH_class, aes(x = Colony, y = Abundance, fill = Class))
+p_class2 <- p_class2 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  facet_grid(~Treatment) +
+  scale_fill_manual(values = classes_colors$color) +
+  guides(fill=guide_legend(nrow = 5))
+p_class2 <- p_class2 +
+  ggtitle("Bacteria Class Relative Abundance") + 
+ theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 0, size = 12),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 12), legend.position = "bottom",
+        strip.text = element_text(size = 16),
+        strip.background = element_rect(fill = "light grey"))
+print(p_class2)
+g_class2 <- ggplot_gtable(ggplot_build(p_class2))
+strip_both <- which(grepl('strip-', g_class2$layout$name))
+k <- 1
+for (i in strip_both) {
+j <- which(grepl('rect', g_class2$grobs[[i]]$grobs[[1]]$childrenOrder))
+g_class2$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- condfillcolors_antixheat[k]
+k <- k+1
+}
+gc2 <- grid.draw(g_class2)
+print(gc2)
+```
+
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/barplot_order_AXH.pdf", height = 5.25, width = 8)
+### all samples
+p_order1 <- ggplot(data = ps.stable.AXH_order, aes(x = Sample, y = Abundance, fill = Order))
+p_order1 <- p_order1 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = orders_colors$color) +
+  guides(fill=guide_legend(nrow = 5))
+p_order1 <- p_order1 +
+  ggtitle("Bacteria Order Relative Abundance") +
+   theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.text.x = element_text(angle = 300, size = 12), 
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 12), 
+        legend.position = "bottom")
+print(p_order1)
+
+### samples collapsed into colonies
+p_order2 <- ggplot(data = ps.stable.AXH_order, aes(x = Colony, y = Abundance, fill = Order))
+p_order2 <- p_order2 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  facet_grid(~Treatment) +
+  scale_fill_manual(values = orders_colors$color) +
+  guides(fill=guide_legend(nrow = 5))
+p_order2 <- p_order2 +
+  ggtitle("Bacteria Order Relative Abundance") + 
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 0, size = 12),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 12), legend.position = "bottom",
+        strip.text = element_text(size = 16),
+        strip.background = element_rect(fill = "light grey"))
+print(p_order2)
+g_order2 <- ggplot_gtable(ggplot_build(p_order2))
+strip_both <- which(grepl('strip-', g_order2$layout$name))
+k <- 1
+for (i in strip_both) {
+j <- which(grepl('rect', g_order2$grobs[[i]]$grobs[[1]]$childrenOrder))
+g_order2$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- condfillcolors_antixheat[k]
+k <- k+1
+}
+gc2 <- grid.draw(g_order2)
+print(gc2)
+```
+
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/barplot_family_AXH.pdf", height = 5.25, width = 8)
+### all samples
+p_family1 <- ggplot(data = ps.stable.AXH_family, aes(x = Sample, y = Abundance, fill = Family))
+p_family1 <- p_family1 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = families_colors$color) +
+  guides(fill=guide_legend(nrow = 5)) +
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.text.x = element_text(angle = 300, size = 12), 
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 5), 
+        legend.position = "bottom")
+p_family1
+
+### samples collapsed into colonies
+p_family2 <- ggplot(data = ps.stable.AXH_family, aes(x = Colony, y = Abundance, fill = Family))
+p_family2 <- p_family2 +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  facet_grid(~Treatment) +
+### create custom color palette for 39 bacteria families
+  scale_fill_manual(values = families_colors$color) +
+  guides(fill=guide_legend(nrow = 5)) +
+  ggtitle("Bacteria Family Relative Abundance") +
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.text.x = element_text(angle = 0, size = 12),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8), legend.position = "bottom",
+        strip.text = element_text(size = 16),
+        strip.background = element_rect(fill = "light grey"))
+p_family2
+g_family2 <- ggplot_gtable(ggplot_build(p_family2))
+strip_both <- which(grepl('strip-', g_family2$layout$name))
+k <- 1
+for (i in strip_both) {
+j <- which(grepl('rect', g_family2$grobs[[i]]$grobs[[1]]$childrenOrder))
+g_family2$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- condfillcolors_antixheat[k]
+k <- k+1
+}
+gf2 <- grid.draw(g_family2)
+print(gf2)
+```
+
+
+### Figure 5: Colony-specific PCAs
+Genotype-specific DESeq models PCA plots
+```{r, echo=FALSE}
+ggPCA_col <- function(rld, samples, condcolors = condcolors_antixheat, ntop = 500,  pclab = c(1,2), colshapes = c(18, 9, 16, 10)) {
+  
+PCAtmtdata <- plotPCA.custom(rld, intgroup = c("Treatment"), ntop = 500, returnData = TRUE,  pcs = c(pclab[1],pclab[2]))
+
+PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
+
+PCAplot <- ggplot(PCAtmtdata, aes(PCAtmtdata$PC1, PCAtmtdata$PC2, color=samples$Treatment, shape=samples$Colony)) +
+    #coord_fixed(1) +
+  geom_point(size=6, show.legend = TRUE) + xlab(paste0( "PC", pclab[1], ": ", PCAtmtpercentVar[pclab[1]], "% variance")) + 
+  ylab(paste0( "PC", pclab[2], ": ", PCAtmtpercentVar[pclab[2]], "% variance"))
+
+PCAplot + 
+  scale_color_manual(values=condcolors, name = "Treatment") +
+        theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 16),
+        legend.title = element_text(size = 18),
+        legend.text = element_text(size = 16),
+        legend.position = "none")
+}
+```
+```{r, message=FALSE}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures_MBE702/PCAs_colony_AXH.pdf", height = 2.625, width = 6.25)
+gHW1 <- ggPCA_col(rld_HW1, stable_samples_HW1, pclab = c(1,2))
+ gHW1 + scale_shape_manual(values=colshapes[1], name = "Colony") +
+        ggtitle("")
+gHW2 <- ggPCA_col(rld_HW2, stable_samples_HW2, pclab = c(1,2))
+ gHW2 + scale_shape_manual(values=colshapes[2], name = "Colony") +
+        ggtitle("")
+gWT1 <- ggPCA_col(rld_WT1, stable_samples_WT1, pclab = c(1,2))
+ gWT1 + scale_shape_manual(values=colshapes[3], name = "Colony") +
+        ggtitle("")
+gWT2 <- ggPCA_col(rld_WT2, stable_samples_WT2, pclab = c(1,2))
+ gWT2 + scale_shape_manual(values=colshapes[4], name = "Colony") + 
+        ggtitle("")
+```
+
+### Figure 6: Volcano plots
+### Antibiotics vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti_ctrl$threshold <- ifelse(res_anti_ctrl$padj < 0.01 & res_anti_ctrl$log2FoldChange > 0, "Upregulated", ifelse(res_anti_ctrl$padj < 0.01 & res_anti_ctrl$log2FoldChange < 0, "Downregulated", "NA"))
+res_anti_ctrl$log10padj <- -log10(res_anti_ctrl$padj)
+dat_genes_anti_ctrl_ctrl <- data.frame(cbind(res_anti_ctrl$log2FoldChange, res_anti_ctrl$log10padj, res_anti_ctrl$threshold), stringsAsFactors = FALSE)
+colnames(dat_genes_anti_ctrl_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti_ctrl_ctrl) <- res_anti_ctrl$IDGeneInfo
+#dat_genes_anti_ctrl_ctrl <- dat_genes_anti_ctrl_ctrl[order(dat_genes_anti_ctrl_ctrl$log2FoldChange, decreasing = TRUE),]
+dat_genes_anti_ctrl_ctrl$log2FoldChange <- as.numeric(dat_genes_anti_ctrl_ctrl$log2FoldChange)
+dat_genes_anti_ctrl_ctrl$log10padj <- as.numeric(dat_genes_anti_ctrl_ctrl$log10padj)
+dat_genes_anti_ctrl_ctrl$threshold <- factor(dat_genes_anti_ctrl_ctrl$threshold, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+```
+```{r, warning = FALSE}
+DEGcolors <- c("red", "blue", "black")
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures_MBE702/Volcano_anti_ctrl-ctrl.pdf", height = 2.625, width = 4.25)
+gVolcano_anti_ctrl_ctrl <- ggplot(data=dat_genes_anti_ctrl_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_anti_ctrl_ctrl + geom_point(aes(color = threshold), alpha=0.7, size=2) +
+  scale_color_manual(values = DEGcolors) +
+  scale_x_continuous(limits = c(-15,15), breaks = seq(-15,15,5)) + 
+  ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_anti_ctrl_ctrl[1:15, ], aes(label = rownames(dat_genes_anti_ctrl_ctrl[1:15, ])), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+  theme_bw() +
+        theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        panel.background = element_rect(fill = alpha("#99FFFF", 0.5)),
+        panel.grid.major = element_line(size = 0.1, linetype = "solid", color = "dark grey"),
+        panel.grid.minor = element_blank()) +
+  ggtitle("Antibiotics vs. Control")
+```
+
+### Heat vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_heat_ctrl$threshold <- ifelse(res_heat_ctrl$padj < 0.01 & res_heat_ctrl$log2FoldChange > 0, "Upregulated", ifelse(res_heat_ctrl$padj < 0.01 & res_heat_ctrl$log2FoldChange < -0, "Downregulated", "NA"))
+res_heat_ctrl$log10padj <- -log10(res_heat_ctrl$padj)
+dat_genes_heat_ctrl_ctrl <- data.frame(cbind(res_heat_ctrl$log2FoldChange, res_heat_ctrl$log10padj, res_heat_ctrl$threshold), stringsAsFactors = FALSE)
+colnames(dat_genes_heat_ctrl_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_heat_ctrl_ctrl) <- res_heat_ctrl$IDGeneInfo
+#dat_genes_heat_ctrl_ctrl <- dat_genes_heat_ctrl_ctrl[order(dat_genes_heat_ctrl_ctrl$log2FoldChange, decreasing = TRUE),]
+dat_genes_heat_ctrl_ctrl$log2FoldChange <- as.numeric(dat_genes_heat_ctrl_ctrl$log2FoldChange)
+dat_genes_heat_ctrl_ctrl$log10padj <- as.numeric(dat_genes_heat_ctrl_ctrl$log10padj)
+dat_genes_heat_ctrl_ctrl$threshold <- factor(dat_genes_heat_ctrl_ctrl$threshold, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+```
+```{r, warning = FALSE}
+DEGcolors <- c("red", "blue", "black")
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures_MBE702/Volcano_heat_ctrl-ctrl.pdf", height = 2.625, width = 4.25)
+gVolcano_heat_ctrl_ctrl <- ggplot(data=dat_genes_heat_ctrl_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_heat_ctrl_ctrl + geom_point(aes(color = threshold), alpha=0.7, size=2) +
+  scale_color_manual(values = DEGcolors) +
+  scale_x_continuous(limits = c(-15,15), breaks = seq(-15,15,5)) + 
+  ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_heat_ctrl_ctrl[1:15, ], aes(label = rownames(dat_genes_heat_ctrl_ctrl[1:15, ])), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+  theme_bw() +
+        theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        panel.background = element_rect(fill = alpha("#FFCC99", 0.5)),
+        panel.grid.major = element_line(size = 0.1, linetype = "solid", color = "dark grey"),
+        panel.grid.minor = element_blank()) +
+  ggtitle("Heat vs. Control")
+```
+
+### Antibiotics.Heat vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat_ctrl$threshold <- ifelse(res_anti.heat_ctrl$padj < 0.01 & res_anti.heat_ctrl$log2FoldChange > 0, "Upregulated", ifelse(res_anti.heat_ctrl$padj < 0.01 & res_anti.heat_ctrl$log2FoldChange < 0, "Downregulated", "NA"))
+res_anti.heat_ctrl$log10padj <- -log10(res_anti.heat_ctrl$padj)
+dat_genes_anti.heat_ctrl_ctrl <- data.frame(cbind(res_anti.heat_ctrl$log2FoldChange, res_anti.heat_ctrl$log10padj, res_anti.heat_ctrl$threshold), stringsAsFactors = FALSE)
+colnames(dat_genes_anti.heat_ctrl_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat_ctrl_ctrl) <- res_anti.heat_ctrl$IDGeneInfo
+#dat_genes_anti.heat_ctrl_ctrl <- dat_genes_anti.heat_ctrl_ctrl[order(dat_genes_anti.heat_ctrl_ctrl$log2FoldChange, decreasing = TRUE),]
+dat_genes_anti.heat_ctrl_ctrl$log2FoldChange <- as.numeric(dat_genes_anti.heat_ctrl_ctrl$log2FoldChange)
+dat_genes_anti.heat_ctrl_ctrl$log10padj <- as.numeric(dat_genes_anti.heat_ctrl_ctrl$log10padj)
+dat_genes_anti.heat_ctrl_ctrl$threshold <- factor(dat_genes_anti.heat_ctrl_ctrl$threshold, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+```
+```{r, warning = FALSE}
+DEGcolors <- c("red", "blue", "black")
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures_MBE702/Volcano_anti.heat_ctrl-ctrl.pdf", height = 2.625, width = 4.25)
+gVolcano_anti.heat_ctrl_ctrl <- ggplot(data=dat_genes_anti.heat_ctrl_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat_ctrl_ctrl + geom_point(aes(color = threshold), alpha=0.7, size=2) +
+  scale_color_manual(values = DEGcolors) +
+  scale_x_continuous(limits = c(-15,15), breaks = seq(-15,15,5)) + 
+  ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_anti.heat_ctrl_ctrl[1:15, ], aes(label = rownames(dat_genes_anti.heat_ctrl_ctrl[1:15, ])), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+  theme_bw() +
+        theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 16),
+        legend.position = "none",
+        panel.background = element_rect(fill = alpha("#FFFF66", 0.5)),
+        panel.grid.major = element_line(size = 0.1, linetype = "solid", color = "dark grey"),
+        panel.grid.minor = element_blank()) +
+  ggtitle("Antibiotics.Heat vs. Control")
+```

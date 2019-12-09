@@ -1,0 +1,42 @@
+---
+title: "Stable_WGCNA-networks_Pdam"
+author: "Mike Connelly"
+date: "11/29/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Load packages and setup working directory
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(clusterProfiler)
+library(DOSE)
+library(org.Hs.eg.db)
+#library(biomaRt)
+library(genefilter)
+library(WGCNA)
+library(dynamicTreeCut)
+library(flashClust)
+options(stringsAsFactors = FALSE)
+allowWGCNAThreads(nThreads = 4)
+```
+```{r}
+??clusterProfiler
+??DOSE
+```
+```{r}
+clusterProfiler::groupGO()
+```
+```{r}
+data(geneList, package="DOSE")
+gene <- names(geneList)[abs(geneList) > 2]
+gene.df <- bitr(gene, fromType = "ENTREZID",
+        toType = c("ENSEMBL", "SYMBOL"),
+        OrgDb = org.Hs.eg.db)
+head(gene.df)
+```
+

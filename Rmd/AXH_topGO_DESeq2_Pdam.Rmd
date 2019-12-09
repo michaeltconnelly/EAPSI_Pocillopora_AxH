@@ -1,0 +1,201 @@
+---
+title: "AXH_topGO_DESeq2_Pdam"
+author: "Mike Connelly"
+date: "10/07/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_AntiXHeat-master")
+```
+## Setup packages and working directories
+```{r packages, error=FALSE, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("genefilter")
+library("topGO")
+library("GO.db")
+library("Rgraphviz")
+```
+## Input required *P. damicornis* GO annotation data and construct Gene-to-GO object for custom annotation mapping
+```{r, warning=FALSE}
+geneID_GO <- readMappings(file = "pdam_genome_genesGO.txt")
+str(head(geneID_GO))
+```
+## Construct GO-to-Gene object for GO term searches of interesting genes
+```{r}
+GO_geneID <- inverseList(geneID_GO)
+str(head(GO_geneID))
+```
+## Generate gene universe and GO universe from Gene-to-GO and GO-to-Gene objects
+```{r}
+geneNames <- names(geneID_GO)
+str(head(geneNames))
+```
+```{r}
+GONames <- names(GO_geneID)
+str(head(GONames))
+```
+
+## Input lists of positively and negatively differentially expressed genes after DESeq2 analysis
+Anti_Control (Up/Down)
+LPS_Control (Up/Down)
+Heat_Control (Up/Down)
+Anti+Heat_Control (Up/Down)
+Anti+Heat+LPS_Control (Up/Down)
+## Construct topGOdata object using *P. damicornis* gene models, differentially expressed gene lists and gene ontology annotations
+## Perform Fisher's exact test to identify enriched gene ontology terms
+## Perform Kolmogorov-Smirnov test to identify enriched gene ontology terms
+## Analyse highly-significant GO terms and corresponding p-values, then produce a table of results
+```{r}
+DElists <- list.files(path = "./DESeqresults_Pdam/lists", pattern = "_ID.txt", full.names = TRUE)
+```
+```{r}
+topGOanalyzeDE <- function(filename) {
+### Custom function for full topGO analysis and results table generation
+DEgenes <- read.delim(filename, header = FALSE, stringsAsFactors = FALSE)
+DEgenes <- as.data.frame(DEgenes)
+geneList <- factor(as.integer(geneNames %in% DEgenes$V1))
+names(geneList) <- geneNames
+#node size is used to prune the GO hierarchy from the terms which have less than that many annotated genes 
+Pdam_GOdata <- new("topGOdata",
+              description = DElist,
+              ontology = "BP",
+              allGenes = geneList,
+              nodeSize = 10,
+              annot = annFUN.gene2GO,
+              gene2GO = geneID_GO)
+resultFisher01 <- runTest(Pdam_GOdata, algorithm = "weight01", statistic = "fisher")
+resultFisher <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "fisher")
+resultKS <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "ks")
+resultKSelim <- runTest(Pdam_GOdata, algorithm = "elim", statistic = "ks")
+allRes <- GenTable(Pdam_GOdata, 
+                   elimKS = resultKSelim,
+                   classicKS = resultKS,
+                   classicFisher = resultFisher,
+                   weight01Fisher = resultFisher01,
+                   orderBy = "weight01Fisher", 
+                   ranksOf = "weight01Fisher", 
+                   topNodes = 50)
+print(allRes)
+resultfile <- paste(filename, "_topGO.csv", sep = "")
+write.csv(allRes, file = resultfile)
+}
+```
+
+```{r message=TRUE}
+for (DElist in DElists)
+{
+  print(DElist)
+  topGOanalyzeDE(DElist)
+}
+```
+```{bash}
+mv ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/*.csv ~/computing/scripts/EAPSI_AntiXHeat-master/DESEqresults_Pdam/topGO
+bash ./awk_REVIGO.sh
+mv ~/computing/scripts/EAPSI_AntiXHeat-master/DESEqresults_Pdam/topGO/*.txt ~/computing/scripts/EAPSI_AntiXHeat-master/DESEqresults_Pdam/REVIGO
+```
+```{bash}
+sed -i -e 's/"//g' ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/REVIGO/*.txt
+rm  ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/REVIGO/*.txt-e
+```
+
+
+```{r}
+genes <- read.csv("./DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+genes2 <- read.csv("./DESeqresults_Pdam/lists/res_anti_ctrl_up_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+genes3 <- read.csv("./DESeqresults_Pdam/lists/res_heat_ctrl_up_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+
+venngenes <- setdiff(genes$V1, genes2$V1)
+venngenes2 <- as.character(setdiff(venngenes, genes3$V1))
+write(venngenes2, "./DESeqresults_Pdam/genesets/unique_axh_up_ID.txt")
+
+genes <- read.csv("./DESeqresults_Pdam/lists/res_anti.heat_ctrl_dn_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+genes2 <- read.csv("./DESeqresults_Pdam/lists/res_anti_ctrl_dn_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+genes3 <- read.csv("./DESeqresults_Pdam/lists/res_heat_ctrl_dn_ID.txt", header = FALSE, stringsAsFactors = FALSE)
+
+venngenes <- setdiff(genes$V1, genes2$V1)
+venngenes2 <- as.character(setdiff(venngenes, genes3$V1))
+write(venngenes2, "./DESeqresults_Pdam/genesets/unique_axh_dn_ID.txt")
+length(venngenes2)
+
+```
+```{r}
+setlists <- list.files(path = "./DESeqresults_Pdam/genesets", pattern = "_ID.txt", full.names = TRUE)
+for (setlist in setlists)
+{
+  print(setlist)
+  topGOanalyzeDE(setlist)
+}
+```
+
+```{r}
+venn2DElists <- list.files(path = "./DESeqresults_Pdam/venn/double", pattern = "_ID.txt", full.names = TRUE)
+venn3DElists <- list.files(path = "./DESeqresults_Pdam/venn/triple", pattern = "_ID.txt", full.names = TRUE)
+vennuplists <- list.files(path = "./DESeqresults_Pdam/venn/up", pattern = "22.txt", full.names = TRUE)
+venndnlists <- list.files(path = "./DESeqresults_Pdam/venn/", pattern = "dn.txt", full.names = TRUE)
+```
+```{r}
+for (DElist in venn2DElists)
+{
+  print(DElist)
+  topGOanalyzeDE(DElist)
+}
+```
+```{r}
+for (DElist in venn3DElists)
+{
+  print(DElist)
+  topGOanalyzeDE(DElist)
+}
+```
+
+```{r}
+topGOanalyzeDEvenn <- function(filename) {
+### Custom function for full topGO analysis and results table generation
+DEgenes <- read.delim(filename, header = FALSE, stringsAsFactors = FALSE)
+DEgenes <- as.data.frame(DEgenes)
+geneList <- factor(as.integer(geneNames %in% DEgenes$V1))
+names(geneList) <- geneNames
+#node size is used to prune the GO hierarchy from the terms which have less than that many annotated genes 
+Pdam_GOdata <- new("topGOdata",
+              description = DElist,
+              ontology = "BP",
+              allGenes = geneList,
+              nodeSize = 10,
+              annot = annFUN.gene2GO,
+              gene2GO = geneID_GO)
+resultFisher01 <- runTest(Pdam_GOdata, algorithm = "weight01", statistic = "fisher")
+resultFisher <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "fisher")
+resultKS <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "ks")
+resultKSelim <- runTest(Pdam_GOdata, algorithm = "elim", statistic = "ks")
+allRes <- GenTable(Pdam_GOdata, 
+                   elimKS = resultKSelim,
+                   classicKS = resultKS,
+                   classicFisher = resultFisher,
+                   weight01Fisher = resultFisher01,
+                   orderBy = "weight01Fisher", 
+                   ranksOf = "weight01Fisher", 
+                   topNodes = 50)
+print(allRes)
+resultfile <- paste(filename, "_topGO.csv", sep = "")
+write.csv(allRes, file = resultfile)
+}
+```
+
+```{r}
+for (DElist in venndnlists)
+{
+  print(DElist)
+  topGOanalyzeDE(DElist)
+}
+```
+```{bash}
+mv ~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/lists/*.csv ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO
+bash ./awk_REVIGO.sh
+mv ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/REVIGO
+```
+```{bash}
+sed -i -e 's/"//g' ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt
+rm  ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt-e
+```

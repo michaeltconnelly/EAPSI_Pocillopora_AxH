@@ -1,0 +1,485 @@
+---
+title: "Stable_DESeq-contrasts_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+library(DESeq2)
+library(tidyverse)
+library(ggrepel)
+stringsAsFactors = FALSE
+```
+```{r}
+theme_set(theme_bw())
+DEGcolors <- c("grey", "blue", "red")
+```
+
+
+```{r}
+resultsNames(dds)
+```
+
+##Results contrasts between individual treatments and control samples
+
+### Antibiotics vs. Control
+```{r}
+res_anti_ctrl <- results(dds, contrast = c("Treatment", "Antibiotics", "control"))
+res_anti_ctrl$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti_ctrl$IDGeneInfo <- as.character(res_anti_ctrl$IDGeneInfo)
+ressig_anti_ctrl <- subset(res_anti_ctrl, padj<0.1)
+ressig_anti_ctrl_up <- subset(res_anti_ctrl, padj<0.1 & log2FoldChange>0.2)
+ressig_anti_ctrl_dn <- subset(res_anti_ctrl, padj<0.1 & log2FoldChange<0.2)
+##write.csv(as.data.frame(ressig_anti_ctrl[order(ressig_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti_ctrl.csv")
+##write.csv(as.data.frame(ressig_anti_ctrl_up[order(ressig_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti_ctrl_up.csv")
+##write.csv(as.data.frame(ressig_anti_ctrl_dn[order(ressig_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti_ctrl_dn.csv")
+colnames(res_anti_ctrl)
+summary(res_anti_ctrl)
+```
+
+
+### LPS vs. Control
+```{r}
+res_LPS_ctrl <- results(dds, contrast = c("Treatment", "LPS", "control"))
+res_LPS_ctrl$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_LPS_ctrl$IDGeneInfo <- as.character(res_LPS_ctrl$IDGeneInfo)
+#write.csv(as.data.frame(res_LPS_ctrl[order(res_LPS_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/all/res_LPS_ctrl.csv")
+ressig_LPS_ctrl <- subset(res_LPS_ctrl, padj<0.1)
+ressig_LPS_ctrl_up <- subset(res_LPS_ctrl, padj<0.1 & log2FoldChange>0.2)
+ressig_LPS_ctrl_dn <- subset(res_LPS_ctrl, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_LPS_ctrl[order(ressig_LPS_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_LPS_ctrl.csv")
+#write.csv(as.data.frame(ressig_LPS_ctrl_up[order(ressig_LPS_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_LPS_ctrl_up.csv")
+#write.csv(as.data.frame(ressig_LPS_ctrl_dn[order(ressig_LPS_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_LPS_ctrl_dn.csv")
+colnames(res_LPS_ctrl)
+summary(res_LPS_ctrl)
+```
+
+### Heat vs. Control
+```{r}
+res_heat_ctrl <- results(dds, contrast = c("Treatment", "Heat", "control"))
+res_heat_ctrl$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_heat_ctrl$IDGeneInfo <- as.character(res_heat_ctrl$IDGeneInfo)
+ressig_heat_ctrl <- subset(res_heat_ctrl, padj<0.1)
+ressig_heat_ctrl_up <- subset(res_heat_ctrl, padj<0.1 & log2FoldChange>0.2)
+ressig_heat_ctrl_dn <- subset(res_heat_ctrl, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_heat_ctrl[order(ressig_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_heat_ctrl.csv")
+#write.csv(as.data.frame(ressig_heat_ctrl_up[order(ressig_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_heat_ctrl_up.csv")
+#write.csv(as.data.frame(ressig_heat_ctrl_dn[order(ressig_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_heat_ctrl_dn.csv")
+colnames(res_heat_ctrl)
+summary(res_heat_ctrl)
+```
+
+### Antibiotics + Heat vs. Control
+```{r}
+res_anti.heat_ctrl <- results(dds, contrast = c("Treatment", "Antibiotics+Heat", "control"))
+res_anti.heat_ctrl$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat_ctrl$IDGeneInfo <- as.character(res_anti.heat_ctrl$IDGeneInfo)
+ressig_anti.heat_ctrl <- subset(res_anti.heat_ctrl, padj<0.1)
+ressig_anti.heat_ctrl_up <- subset(res_anti.heat_ctrl, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat_ctrl_dn <- subset(res_anti.heat_ctrl, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat_ctrl.csv")
+#write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat_ctrl_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat_ctrl_dn.csv")
+colnames(res_anti.heat_ctrl)
+summary(res_anti.heat_ctrl)
+```
+
+### Antibiotics + Heat + LPS vs. Control
+```{r}
+res_anti.heat.LPS_ctrl <- results(dds, contrast = c("Treatment", "Antibiotics+Heat+LPS", "control"))
+res_anti.heat.LPS_ctrl$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat.LPS_ctrl$IDGeneInfo <- as.character(res_anti.heat.LPS_ctrl$IDGeneInfo)
+ressig_anti.heat.LPS_ctrl <- subset(res_anti.heat.LPS_ctrl, padj<0.1)
+ressig_anti.heat.LPS_ctrl_up <- subset(res_anti.heat.LPS_ctrl, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat.LPS_ctrl_dn <- subset(res_anti.heat.LPS_ctrl, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat.LPS_ctrl[order(ressig_anti.heat.LPS_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat.LPS_ctrl.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_ctrl_up[order(ressig_anti.heat.LPS_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat.LPS_ctrl_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_ctrl_dn[order(ressig_anti.heat.LPS_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat.LPS_ctrl_dn.csv")
+colnames(res_anti.heat.LPS_ctrl)
+summary(res_anti.heat.LPS_ctrl)
+```
+
+### Antibiotics + Heat vs. Antibiotics
+```{r}
+res_anti.heat_anti <- results(dds, contrast = c("Treatment", "Antibiotics+Heat", "Antibiotics"))
+res_anti.heat_anti$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat_anti$IDGeneInfo <- as.character(res_anti.heat_anti$IDGeneInfo)
+ressig_anti.heat_anti <- subset(res_anti.heat_anti, padj<0.1)
+ressig_anti.heat_anti_up <- subset(res_anti.heat_anti, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat_anti_dn <- subset(res_anti.heat_anti, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat_anti[order(ressig_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat_anti.csv")
+#write.csv(as.data.frame(ressig_anti.heat_anti_up[order(ressig_anti.heat_anti_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat_anti_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat_anti_dn[order(ressig_anti.heat_anti_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat_anti_dn.csv")
+colnames(res_anti.heat_anti)
+summary(res_anti.heat_anti)
+```
+
+### Antibiotics + Heat vs. Heat
+```{r}
+res_anti.heat_heat <- results(dds, contrast = c("Treatment", "Antibiotics+Heat", "Heat"))
+res_anti.heat_heat$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat_heat$IDGeneInfo <- as.character(res_anti.heat_heat$IDGeneInfo)
+ressig_anti.heat_heat <- subset(res_anti.heat_heat, padj<0.1)
+ressig_anti.heat_heat_up <- subset(res_anti.heat_heat, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat_heat_dn <- subset(res_anti.heat_heat, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat_heat[order(ressig_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat_heat.csv")
+#write.csv(as.data.frame(ressig_anti.heat_heat_up[order(ressig_anti.heat_heat_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat_heat_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat_heat_dn[order(ressig_anti.heat_heat_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat_heat_dn.csv")
+colnames(res_anti.heat_heat)
+summary(res_anti.heat_heat)
+```
+
+### Antibiotics + Heat + LPS vs. Antibiotics
+```{r}
+res_anti.heat.LPS_anti <- results(dds, contrast = c("Treatment", "Antibiotics+Heat+LPS", "Antibiotics"))
+res_anti.heat.LPS_anti$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat.LPS_anti$IDGeneInfo <- as.character(res_anti.heat.LPS_anti$IDGeneInfo)
+ressig_anti.heat.LPS_anti <- subset(res_anti.heat.LPS_anti, padj<0.1)
+ressig_anti.heat.LPS_anti_up <- subset(res_anti.heat.LPS_anti, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat.LPS_anti_dn <- subset(res_anti.heat.LPS_anti, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti[order(ressig_anti.heat.LPS_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat.LPS_anti.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti_up[order(ressig_anti.heat.LPS_anti_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat.LPS_anti_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti_dn[order(ressig_anti.heat.LPS_anti_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat.LPS_anti_dn.csv")
+colnames(res_anti.heat.LPS_anti)
+summary(res_anti.heat.LPS_anti)
+```
+
+### Antibiotics + Heat + LPS vs. Heat
+```{r}
+res_anti.heat.LPS_heat <- results(dds, contrast = c("Treatment", "Antibiotics+Heat+LPS", "Heat"))
+res_anti.heat.LPS_heat$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat.LPS_heat$IDGeneInfo <- as.character(res_anti.heat.LPS_heat$IDGeneInfo)
+ressig_anti.heat.LPS_heat <- subset(res_anti.heat.LPS_heat, padj<0.1)
+ressig_anti.heat.LPS_heat_up <- subset(res_anti.heat.LPS_heat, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat.LPS_heat_dn <- subset(res_anti.heat.LPS_heat, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat.LPS_heat[order(ressig_anti.heat.LPS_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat.LPS_heat.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_heat_up[order(ressig_anti.heat.LPS_heat_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat.LPS_heat_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_heat_dn[order(ressig_anti.heat.LPS_heat_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat.LPS_heat_dn.csv")
+colnames(res_anti.heat.LPS_heat)
+summary(res_anti.heat.LPS_heat)
+```
+
+### Antibiotics + Heat + LPS vs. LPS
+```{r}
+res_anti.heat.LPS_LPS <- results(dds, contrast = c("Treatment", "Antibiotics+Heat+LPS", "LPS"))
+res_anti.heat.LPS_LPS$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat.LPS_LPS$IDGeneInfo <- as.character(res_anti.heat.LPS_LPS$IDGeneInfo)
+ressig_anti.heat.LPS_LPS <- subset(res_anti.heat.LPS_LPS, padj<0.1)
+ressig_anti.heat.LPS_LPS_up <- subset(res_anti.heat.LPS_LPS, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat.LPS_LPS_dn <- subset(res_anti.heat.LPS_LPS, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat.LPS_LPS[order(ressig_anti.heat.LPS_LPS$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat.LPS_LPS.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_LPS_up[order(ressig_anti.heat.LPS_LPS_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat.LPS_LPS_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_LPS_dn[order(ressig_anti.heat.LPS_LPS_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat.LPS_LPS_dn.csv")
+colnames(res_anti.heat.LPS_LPS)
+summary(res_anti.heat.LPS_LPS)
+```
+
+### Antibiotics + Heat + LPS vs. Antibiotics + Heat
+```{r}
+res_anti.heat.LPS_anti.heat <- results(dds, contrast = c("Treatment", "Antibiotics+Heat+LPS", "Antibiotics+Heat"))
+res_anti.heat.LPS_anti.heat$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti.heat.LPS_anti.heat$IDGeneInfo <- as.character(res_anti.heat.LPS_anti.heat$IDGeneInfo)
+ressig_anti.heat.LPS_anti.heat <- subset(res_anti.heat.LPS_anti.heat, padj<0.1)
+ressig_anti.heat.LPS_anti.heat_up <- subset(res_anti.heat.LPS_anti.heat, padj<0.1 & log2FoldChange>0.2)
+ressig_anti.heat.LPS_anti.heat_dn <- subset(res_anti.heat.LPS_anti.heat, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti.heat[order(ressig_anti.heat.LPS_anti.heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti.heat.LPS_anti.heat.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti.heat_up[order(ressig_anti.heat.LPS_anti.heat_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti.heat.LPS_anti.heat_up.csv")
+#write.csv(as.data.frame(ressig_anti.heat.LPS_anti.heat_dn[order(ressig_anti.heat.LPS_anti.heat_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti.heat.LPS_anti.heat_dn.csv")
+colnames(res_anti.heat.LPS_anti.heat)
+summary(res_anti.heat.LPS_anti.heat)
+```
+
+### Antibiotics vs. LPS
+```{r}
+res_anti_LPS <- results(dds, contrast = c("Treatment", "Antibiotics", "LPS"))
+res_anti_LPS$IDGeneInfo <- mcols(dds)$IDGeneInfo
+res_anti_LPS$IDGeneInfo <- as.character(res_anti_LPS$IDGeneInfo)
+ressig_anti_LPS <- subset(res_anti_LPS, padj<0.1)
+ressig_anti_LPS_up <- subset(res_anti_LPS, padj<0.1 & log2FoldChange>0.2)
+ressig_anti_LPS_dn <- subset(res_anti_LPS, padj<0.1 & log2FoldChange<0.2)
+#write.csv(as.data.frame(ressig_anti_LPS[order(ressig_anti_LPS$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/overall/res_anti_LPS.csv")
+#write.csv(as.data.frame(ressig_anti_LPS_up[order(ressig_anti_LPS_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/up/res_anti_LPS_up.csv")
+#write.csv(as.data.frame(ressig_anti_LPS_dn[order(ressig_anti_LPS_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/down/res_anti_LPS_dn.csv")
+colnames(res_anti_LPS)
+summary(res_anti_LPS)
+```
+
+## Assemble data frame with complete log-fold changes between treatment contrasts
+
+```{r}
+doubledf <- data.frame(cbind(res_LPS_ctrl$log2FoldChange, -log10(res_LPS_ctrl$padj),
+                             res_anti_ctrl$log2FoldChange, -log10(res_anti_ctrl$padj),
+                             res_heat_ctrl$log2FoldChange, -log10(res_heat_ctrl$padj),
+                             res_anti.heat_ctrl$log2FoldChange, -log10(res_anti.heat_ctrl$padj),
+                             res_anti.heat.LPS_ctrl$log2FoldChange, -log10(res_anti.heat.LPS_ctrl$padj)))
+colnames(doubledf) <- c("LFC_LPS", "padj_LPS",
+                        "LFC_Anti", "padj_Anti",
+                        "LFC_Heat", "padj_Heat",
+                        "LFC_AntiHeat", "padj_AntiHeat",
+                        "LFC_AntiHeatLPS", "padj_AntiHeatLPS")
+doubledf$ID <- rownames(res)
+doubledf <- doubledf[,c(11, 1:10)]
+doubledf$IDGeneInfo <- res$IDGeneInfo
+
+# Add DEG up/down columns for single treatments
+doubledf$DEG_LPS <- ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1, "Upregulated", 
+                           ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1, "Downregulated", "NA"))
+doubledf$DEG_LPS <- factor(doubledf$DEG_LPS, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+
+doubledf$DEG_Anti <- ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1, "Upregulated", 
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1, "Downregulated", "NA"))
+doubledf$DEG_Anti <- factor(doubledf$DEG_Anti, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+
+doubledf$DEG_Heat <- ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1, "Upregulated", 
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1, "Downregulated", "NA"))
+doubledf$DEG_Heat <- factor(doubledf$DEG_Heat, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+  
+doubledf$DEG_AntiHeat <- ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1, "Upregulated", 
+                                ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1, "Downregulated", "NA"))
+doubledf$DEG_AntiHeat <- factor(doubledf$DEG_AntiHeat, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+
+doubledf$DEG_AntiHeatLPS <-  ifelse(doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "Upregulated", 
+                                    ifelse(doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "Downregulated", "NA"))
+doubledf$DEG_AntiHeatLPS <- factor(doubledf$DEG_AntiHeatLPS, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+
+doubledf <- doubledf[,c(1,12,2:3,13,4:5,14,6:7,15,8:9,16,10:11,17)]
+
+# Add DEG threshold columns for two treatment consensus DEGs
+doubledf$cDEG_LPS.Anti <- ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1, "UP_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1, "UP_DN",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1, "DN_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_LPS.Heat <- ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1, "UP_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1, "UP_DN",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1, "DN_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_Anti.Heat <- ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1, "UP_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1, "UP_DN",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1, "DN_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_Anti.AntiHeat <- ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1, "UP_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1, "UP_DN",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1, "DN_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_Anti.AntiHeatLPS <- ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "UP_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "UP_DN",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "DN_UP",
+                            ifelse(doubledf$padj_Anti > 2 & doubledf$LFC_Anti < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_Heat.AntiHeat <- ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1, "UP_UP",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1, "UP_DN",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1, "DN_UP",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1 & 
+                            doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_Heat.AntiHeatLPS <- ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "UP_UP",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "UP_DN",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "DN_UP",
+                            ifelse(doubledf$padj_Heat > 2 & doubledf$LFC_Heat < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_LPS.AntiHeatLPS <- ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "UP_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "UP_DN",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "DN_UP",
+                            ifelse(doubledf$padj_LPS > 2 & doubledf$LFC_LPS < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "DN_DN", "AA"))))
+
+doubledf$cDEG_AntiHeat.AntiHeatLPS <- ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "UP_UP",
+                            ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat > 1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "UP_DN",
+                            ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS > 1, "DN_UP",
+                            ifelse(doubledf$padj_AntiHeat > 2 & doubledf$LFC_AntiHeat < -1 & 
+                            doubledf$padj_AntiHeatLPS > 2 & doubledf$LFC_AntiHeatLPS < -1, "DN_DN", "AA"))))
+
+write.csv(doubledf, file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/all/all_LFC-pdaj.csv")
+
+#doubledf <- doubledf %>% filter(DEG_Anti.AntiHeat!="NA") %>% filter(DEG_Heat.AntiHeat!="NA") %>% filter(DEG_Anti.Heat!="NA")
+```
+
+## Doubleplots
+
+### LPS vs. Antibiotics
+```{r}
+doubledf <- doubledf %>% arrange(cDEG_LPS.Anti)
+pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/doubleplots/double_LPS.Anti.pdf", height = 8, width = 8)
+dpg <- ggplot(doubledf, aes(LFC_LPS, LFC_Anti))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_LPS.Anti)) +
+  scale_colour_manual(values = DEGcolors) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_LPS.Anti=="UP_UP",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_LPS.Anti=="UP_UP"]), size = 1.5, box.padding = unit(0.25, "lines")) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_LPS.Anti=="DN_DN",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_LPS.Anti=="DN_DN"]), size = 1.5, box.padding = unit(0.25, "lines"))
+```
+
+### Antibiotics vs. Antibiotics + Heat
+```{r}
+doubledf <- doubledf %>% arrange(cDEG_Anti.AntiHeat)
+pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/double_Anti.AntiHeat.pdf", height = 8, width = 8)
+dpg <- ggplot(doubledf, aes(LFC_Anti, LFC_AntiHeat))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_Anti.AntiHeat)) +
+  scale_colour_manual(values = DEGcolors) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_Anti.AntiHeat=="UP_UP"[1:10],], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_Anti.AntiHeat=="UP_UP"[1:10]]), size = 1.5, box.padding = unit(0.25, "lines")) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_Anti.AntiHeat=="DN_DN"[1:10],], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_Anti.AntiHeat=="DN_DN"[1:10]]), size = 1.5, box.padding = unit(0.25, "lines"))
+```
+
+### Heat vs. Antibiotics + Heat
+```{r}
+doubledf <- doubledf %>% arrange(cDEG_Heat.AntiHeat)
+pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/double_Heat.AntiHeat.pdf", height = 8, width = 8)
+dpg <- ggplot(doubledf, aes(LFC_Heat, LFC_AntiHeat))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_Heat.AntiHeat)) +
+  scale_colour_manual(values = DEGcolors) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_Heat.AntiHeat=="UP_UP"[1:10],], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_Heat.AntiHeat=="UP_UP"[1:10]]), size = 1.5, box.padding = unit(0.25, "lines")) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_Heat.AntiHeat=="DN_DN"[1:10],], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_Heat.AntiHeat=="DN_DN"[1:10]]), size = 1.5, box.padding = unit(0.25, "lines"))
+```
+
+### LPS vs. Antibiotics + Heat + LPS
+```{r}
+doubledf <- doubledf %>% arrange(cDEG_LPS.AntiHeatLPS)
+pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/double_LPS.AntiHeatLPS.pdf", height = 8, width = 8)
+dpg <- ggplot(doubledf, aes(LFC_LPS, LFC_AntiHeatLPS))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_LPS.AntiHeatLPS)) +
+  scale_colour_manual(values = DEGcolors) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_LPS.AntiHeatLPS=="UP_UP",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_LPS.AntiHeatLPS=="UP_UP"]), size = 1.5, box.padding = unit(0.25, "lines")) +
+  geom_text_repel(data = doubledf[doubledf$cDEG_LPS.AntiHeatLPS=="DN_DN",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_LPS.AntiHeatLPS=="DN_DN"]), size = 1.5, box.padding = unit(0.25, "lines"))
+```
+
+### Antibiotics + Heat vs. Antibiotics + Heat + LPS
+```{r}
+doubledf <- doubledf %>% arrange(cDEG_AntiHeat.AntiHeatLPS)
+pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/double_AntiHeat.AntiHeatLPS.pdf", height = 8, width = 8)
+dpg <- ggplot(doubledf, aes(LFC_AntiHeat, LFC_AntiHeatLPS))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_AntiHeat.AntiHeatLPS)) +
+  scale_colour_manual(values = DEGcolors) 
+  #geom_text_repel(data = doubledf[doubledf$cDEG_AntiHeat.AntiHeatLPS=="UP_UP",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_AntiHeat.AntiHeatLPS=="UP_UP"]), size = 1.5, box.padding = unit(0.25, "lines")) +
+  #geom_text_repel(data = doubledf[doubledf$cDEG_AntiHeat.AntiHeatLPS=="DN_DN",], aes(label = doubledf$IDGeneInfo[doubledf$cDEG_AntiHeat.AntiHeatLPS=="DN_DN"]), size = 1.5, box.padding = unit(0.25, "lines"))
+```
+
+## Filter and select data frame for specific treatments
+
+### Antibiotics, Heat, Antibiotics + Heat
+```{r}
+anti_heat_doubledf <- doubledf %>% select(ID, IDGeneInfo, LFC_Anti, padj_Anti, DEG_Anti, LFC_Heat, padj_Heat, DEG_Heat, LFC_AntiHeat, padj_AntiHeat, DEG_AntiHeat, cDEG_Anti.Heat, cDEG_Anti.AntiHeat, cDEG_Heat.AntiHeat) %>% filter(DEG_Anti!="NA" | DEG_Heat!="NA" | DEG_AntiHeat!="NA") %>% filter(padj_Anti!="NA") %>% filter(padj_Heat!="NA") %>% filter(padj_AntiHeat!="NA")
+
+write.csv(anti_heat_doubledf, file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/tables/all/anti_heat_LFC-pdaj.csv")
+```
+
+### Antibiotics vs. Heat
+```{r}
+anti_heat_doubledf <- anti_heat_doubledf %>% arrange(cDEG_Anti.Heat)
+#pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/doubleplots/double_Anti.Heat.pdf", height = 8, width = 8)
+dpg <- ggplot(anti_heat_doubledf, aes(LFC_Anti, LFC_Heat))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_Anti.Heat)) +
+  scale_colour_manual(values = DEGcolors) 
+```
+
+### Antibiotics vs. Antibiotics + Heat
+```{r}
+anti_heat_doubledf <- anti_heat_doubledf %>% arrange(cDEG_Anti.AntiHeat)
+#pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/doubleplots/double_Anti.Heat.pdf", height = 8, width = 8)
+dpg <- ggplot(anti_heat_doubledf, aes(LFC_Anti, LFC_AntiHeat))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_Anti.AntiHeat)) +
+  scale_colour_manual(values = DEGcolors) 
+```
+
+### Heat vs. Antibiotics + Heat
+```{r}
+anti_heat_doubledf <- anti_heat_doubledf %>% arrange(cDEG_Heat.AntiHeat)
+#pdf(file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/figures/doubleplots/double_Anti.Heat.pdf", height = 8, width = 8)
+dpg <- ggplot(anti_heat_doubledf, aes(LFC_Heat, LFC_AntiHeat))
+dpg + 
+  geom_hline(yintercept = 0, color = "black", size = 0.2) +
+  geom_vline(xintercept = 0, color = "black", size = 0.2) +
+  geom_abline(intercept = 0, slope = 1, color = "black", size = 0.2, linetype = "dashed") +
+  scale_x_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  scale_y_continuous(limits = c(-10,10), breaks = seq(-10,10,2)) + 
+  geom_point(aes(color=cDEG_Heat.AntiHeat)) +
+  scale_colour_manual(values = DEGcolors) 
+```
+
+```{r}
+library(rgl)
+```
+
+```{r}
+plot3d(anti_heat_doubledf$LFC_Anti, anti_heat_doubledf$LFC_Heat, anti_heat_doubledf$LFC_AntiHeat, xlim = c(-10,10), xlab = "Anti", ylim = c(-10,10), ylab = "Heat", zlim = c(-10,10), zlab = "Anti + Heat")
+```
+

@@ -1,0 +1,88 @@
+---
+title: "Stable_CountNormalizationVST_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Load packages and setup working directory
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(DESeq2)
+```
+```{r, echo=FALSE}
+stable_samples <- read.table("EAPSIsamples_stable.txt", header = TRUE)
+```
+## Import counts data 
+```{r}
+countdata <- read.delim("alltreatments_Pdam.counts", comment.char="#")
+```
+## Tidy counts data
+  Set Gene ID's as row names
+  Remove first five columns (chr, start, end, strand, length)
+  Remove file prefixes and suffixes
+  Create condition factors and column data
+```{r, echo=FALSE}
+row.names(countdata) <- countdata$Geneid
+countdata <- countdata[ ,7:ncol(countdata)]
+  colnames(countdata) <- gsub("X.", "", colnames(countdata))
+  colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.sequences.EAPSI.", "", colnames(countdata))
+  colnames(countdata) <- gsub("houwanwanglitung.alltreatments.STARalign_Pdam.", "", colnames(countdata))
+  colnames(countdata) <- gsub("_PdamAligned.out.bam$", "", colnames(countdata))
+```
+### Make expression matrix sample names match metadata
+```{r}
+colnames(countdata) <- stable_samples$sample
+```
+## Import gene feature annotation information
+```{r}
+genefeatures <- read.delim(file = "/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDsnotes7.gff", header = F)
+colnames(genefeatures) <- c("IDGeneInfo")
+rownames(genefeatures) <- rownames(countdata)
+```
+## Check gene feature annotation and countdata rowname order coherence
+```{r}
+all(rownames(countdata) == rownames(genefeatures))
+```
+## Convert to matrix
+```{r, include=FALSE}
+      countdata <- as.matrix(countdata)
+```
+## Create DESeq data object
+```{r, message=FALSE}
+      dds <- DESeqDataSetFromMatrix(countData=countdata, colData=stable_samples, design= ~treatment + genotype)
+      dds$treatment <- factor(dds$treatment, levels=c("control", "Antibiotics", "Heat", "LPS", "Antibiotics.Heat", "Antibiotics.Heat.LPS"))
+relevel(dds$treatment, ref = "control")
+```
+## Normalize the full expression matrix and filter low counts (<10)
+```{r}
+dds <- estimateSizeFactors(dds)
+  keep <- rowSums(counts(dds)) >= 10
+  dds <- dds[keep,]
+```
+## Perform the variance-stabilizing transformation
+```{r}
+vsd <- vst(dds, blind = FALSE)
+```
+## Return normalized and variance-stabilized counts matrix
+```{r}
+norm_vst_countdata <- assay(vsd)
+```
+## Transpose
+```{r}
+Stable_datExpr <- t(norm_vst_countdata)
+```
+```{r}
+rownames(Stable_datExpr)
+ncol(Stable_datExpr)
+```
+This returns 22779 genes for network analysis
+## Save normalized and variance-stabilized matrix as data frame for loadig in to WGCNA analysis script
+```{r}
+write.csv(as.data.frame(norm_vst_countdata), file = "alltreatments_stable.norm.vst.counts.csv")
+```
+

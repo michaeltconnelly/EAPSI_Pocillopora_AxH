@@ -1,0 +1,320 @@
+---
+title: "AXH_DESeq_Pdam"
+author: "Mike Connelly"
+date: "9/18/2019"
+output: html_document
+---
+
+RMarkdown document containing scripts for DESeq2 modelling of differential gene expression between fragments of four *Pocillopora damicornis* genotypes collected at Wanglitung and Houwan reefs and placed in five experimental treatment groups and once control group during EAPSI Taiwan, summer 2017.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_AntiXHeat-master/")
+```
+## Setup packages and working directories
+```{r packages, error=FALSE, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("DESeq2")
+```
+## Import sample data
+```{r, echo=FALSE}
+stable_samples <- read.table("EAPSIsamples_stable.txt", header = TRUE)
+#stable_samples$treatment <- as.factor(stable_samples$treatment)
+#stable_samples$genotype <- as.factor(stable_samples$genotype)
+```
+## Import counts data 
+```{r}
+countdata <- read.delim("alltreatments_Pdam.counts", comment.char="#")
+```
+## Tidy counts data
+  Set Gene ID's as row names
+  Remove first five columns (chr, start, end, strand, length)
+  Remove file prefixes and suffixes
+  Create condition factors and column data
+```{r, echo=FALSE}
+row.names(countdata) <- countdata$Geneid
+countdata <- countdata[ ,7:ncol(countdata)]
+  colnames(countdata) <- gsub("X.", "", colnames(countdata))
+  colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.sequences.EAPSI.", "", colnames(countdata))
+  colnames(countdata) <- gsub("houwanwanglitung.alltreatments.STARalign_Pdam.", "", colnames(countdata))
+  colnames(countdata) <- gsub("_PdamAligned.out.bam$", "", colnames(countdata))
+```
+## Import gene feature annotation information
+```{r}
+genefeatures <- read.delim(file = "/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome_IDInfo.gff", header = F)
+colnames(genefeatures) <- c("IDGeneInfo")
+rownames(genefeatures) <- rownames(countdata)
+```
+## Check gene feature annotation and countdata rowname order coherence
+```{r}
+all(rownames(countdata) == rownames(genefeatures))
+```
+## Select which treatments to use in DESeq object construction
+anti: Control-Antibiotics
+heat: Control-Heat
+anti.heat: Control-Antibiotics.Heat
+antixheat: Control-Antibiotics-Heat-Antibiotics.Heat
+```{r}
+countdata_anti <- dplyr::select(countdata, matches("[HW][wt][12].[56]."))
+countdata_heat <- dplyr::select(countdata, matches("[HW][wt][12].[46]."))
+countdata_anti.heat <- dplyr::select(countdata, matches("[HW][wt][12].[16]."))
+###
+countdata_antixheat <- dplyr::select(countdata, matches("[HW][wt][12].[1456]."))
+```
+```{r}
+countdata_HW1 <- dplyr::select(countdata_antixheat, matches("Hw1.*"))
+countdata_HW2 <- dplyr::select(countdata_antixheat, matches("Hw2.*"))
+countdata_WT1 <- dplyr::select(countdata_antixheat, matches("Wt1.*"))
+countdata_WT2 <- dplyr::select(countdata_antixheat, matches("Wt2.*"))
+```
+
+```{r}
+stable_samples_anti <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics")
+stable_samples_heat <- filter(stable_samples, Treatment == "control" | Treatment == "Heat")
+###
+stable_samples_anti.heat <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics.Heat")
+###
+stable_samples_antixheat <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics" | Treatment == "Heat" | Treatment == "Antibiotics.Heat")
+```
+```{r}
+stable_samples_HW1 <- filter(stable_samples_antixheat, Colony == "HW1")# %>% select(-contains("W"), -contains("2"))
+stable_samples_HW2 <- filter(stable_samples_antixheat, Colony == "HW2")# %>% select(-contains("W"), -contains("1"))
+stable_samples_WT1 <- filter(stable_samples_antixheat, Colony == "WT1")# %>% select(-contains("H"), -contains("2"))
+stable_samples_WT2 <- filter(stable_samples_antixheat, Colony == "WT2")# %>% select(-contains("H"), -contains("1"))
+```
+## Convert to matrices 
+```{r, include=FALSE}
+      countdata_anti <- as.matrix(countdata_anti)
+      countdata_heat <- as.matrix(countdata_heat)
+      countdata_anti.heat <- as.matrix(countdata_anti.heat)
+      countdata_antixheat <- as.matrix(countdata_antixheat)
+```
+```{r, include=FALSE}
+      countdata_HW1 <- as.matrix(countdata_HW1)
+      countdata_HW2 <- as.matrix(countdata_HW2)
+      countdata_WT1 <- as.matrix(countdata_WT1)
+      countdata_WT2 <- as.matrix(countdata_WT2)
+```
+
+## Create DESeq data objects
+```{r, message=FALSE}
+      dds_anti <- DESeqDataSetFromMatrix(countData=countdata_anti, colData=stable_samples_anti, design= ~Batch + Colony + Treatment)
+      dds_anti$Treatment <- factor(dds_anti$Treatment, levels=c("control", "Antibiotics"))
+relevel(dds_anti$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_heat <- DESeqDataSetFromMatrix(countData=countdata_heat, colData=stable_samples_heat, design= ~Batch + Colony + Treatment)
+      dds_heat$Treatment <- factor(dds_heat$Treatment, levels=c("control", "Heat"))
+relevel(dds_heat$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_anti.heat <- DESeqDataSetFromMatrix(countData=countdata_anti.heat, colData=stable_samples_anti.heat, design= ~Batch + Colony + Treatment)
+      dds_anti.heat$Treatment <- factor(dds_anti.heat$Treatment, levels=c("control", "Antibiotics.Heat"))
+relevel(dds_anti.heat$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_antixheat <- DESeqDataSetFromMatrix(countData=countdata_antixheat, colData=stable_samples_antixheat, design= ~Batch + Colony + Treatment)
+      dds_antixheat$Treatment <- factor(dds_antixheat$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
+relevel(dds_antixheat$Treatment, ref = "control")
+```
+
+```{r, message=FALSE}
+      dds_HW1 <- DESeqDataSetFromMatrix(countData=countdata_HW1, colData=stable_samples_HW1, design= ~Treatment)
+### Batch effect encompasses Treatment
+      dds_HW1$Treatment <- factor(dds_HW1$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
+relevel(dds_HW1$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_HW2 <- DESeqDataSetFromMatrix(countData=countdata_HW2, colData=stable_samples_HW2, design= ~Batch + Treatment)
+      dds_HW2$Treatment <- factor(dds_HW2$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
+relevel(dds_HW2$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_WT1 <- DESeqDataSetFromMatrix(countData=countdata_WT1, colData=stable_samples_WT1, design= ~Batch + Treatment)
+      dds_WT1$Treatment <- factor(dds_WT1$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
+relevel(dds_WT1$Treatment, ref = "control")
+```
+```{r, message=FALSE}
+      dds_WT2 <- DESeqDataSetFromMatrix(countData=countdata_WT2, colData=stable_samples_WT2, design= ~Batch + Treatment)
+      dds_WT2$Treatment <- factor(dds_WT2$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
+relevel(dds_WT2$Treatment, ref = "control")
+```
+## Check annotation and dds object rowname order coherence
+```{r}
+all(rownames(dds_anti) == rownames(genefeatures))
+all(rownames(dds_heat) == rownames(genefeatures))
+all(rownames(dds_anti.heat) == rownames(genefeatures))
+all(rownames(dds_antixheat) == rownames(genefeatures))
+```
+```{r}
+all(rownames(dds_HW1) == rownames(genefeatures))
+all(rownames(dds_HW2) == rownames(genefeatures))
+all(rownames(dds_WT1) == rownames(genefeatures))
+all(rownames(dds_WT2) == rownames(genefeatures))
+```
+
+## Add gene feature annotation to DESeqDataSets
+```{r}
+mcols(dds_anti) <- cbind(mcols(dds_anti), genefeatures)
+mcols(dds_heat) <- cbind(mcols(dds_heat), genefeatures)
+mcols(dds_anti.heat) <- cbind(mcols(dds_anti.heat), genefeatures)
+mcols(dds_antixheat) <- cbind(mcols(dds_antixheat), genefeatures)
+names(mcols(dds_antixheat))
+```
+```{r}
+mcols(dds_HW1) <- cbind(mcols(dds_HW1), genefeatures)
+mcols(dds_HW2) <- cbind(mcols(dds_HW2), genefeatures)
+mcols(dds_WT1) <- cbind(mcols(dds_WT1), genefeatures)
+mcols(dds_WT2) <- cbind(mcols(dds_WT2), genefeatures)
+```
+
+## Perform DESeq2 analyses
+```{r, message=FALSE}
+      dds_anti <- DESeq(dds_anti)
+      dds_heat <- DESeq(dds_heat)
+      dds_anti.heat <- DESeq(dds_anti.heat)
+      dds_antixheat <- DESeq(dds_antixheat)
+```
+```{r, message=FALSE}
+      dds_HW1 <- DESeq(dds_HW1)
+      dds_HW2 <- DESeq(dds_HW2)
+      dds_WT1 <- DESeq(dds_WT1)
+      dds_WT2 <- DESeq(dds_WT2)
+```
+
+## Filter low counts
+```{r}
+      keep <- rowSums(counts(dds_antixheat), na.rm = TRUE) >= 10
+      dds_anti <- dds_anti[keep,]
+      dds_heat <- dds_heat[keep,]
+      dds_anti.heat <- dds_anti.heat[keep,]
+      dds_antixheat <- dds_antixheat[keep,]
+```
+```{r}
+      dds_HW1 <- dds_HW1[keep,]
+      dds_HW2 <- dds_HW2[keep,]
+      dds_WT1 <- dds_WT1[keep,]
+      dds_WT2 <- dds_WT2[keep,]
+```
+
+## Obtain DESeq results
+```{r}
+      res_anti <- results(dds_anti)
+      res_heat <- results(dds_heat)
+      res_anti.heat <- results(dds_anti.heat)
+      res_antixheat <- results(dds_antixheat)
+```
+```{r}
+      res_HW1 <- results(dds_HW1)
+      res_HW2 <- results(dds_HW2)
+      res_WT1 <- results(dds_WT1)
+      res_WT2 <- results(dds_WT2)
+```
+
+## Check output of Antibiotics DESeq2 analysis to ensure quality
+```{r}
+resultsNames(dds_anti)
+```
+```{r}
+summary(res_anti)
+```
+```{r}
+mcols(dds_anti)
+```
+```{r}
+rownames(dds_anti)
+```
+```{r}
+res_anti$IDGeneInfo <- mcols(dds_anti)$IDGeneInfo
+res_anti$IDGeneInfo <- as.character(res_anti$IDGeneInfo)
+```
+```{r}
+colnames(res_anti)
+```
+```{r}
+plotDispEsts(dds_anti)
+```
+```{r}
+plotMA(res_anti, ylim = c(-20, 20))
+```
+
+## Check output of Heat DESeq2 analysis to ensure quality
+```{r}
+resultsNames(dds_heat)
+```
+```{r}
+summary(res_heat)
+```
+```{r}
+mcols(dds_heat)
+```
+```{r}
+rownames(dds_heat)
+```
+```{r}
+res_heat$IDGeneInfo <- mcols(dds_heat)$IDGeneInfo
+res_heat$IDGeneInfo <- as.character(res_heat$IDGeneInfo)
+```
+```{r}
+colnames(res_heat)
+```
+```{r}
+plotDispEsts(dds_heat)
+```
+```{r}
+plotMA(res_heat, ylim = c(-20, 20))
+```
+
+## Check output of Antibiotics.Heat DESeq2 analysis to ensure quality
+```{r}
+resultsNames(dds_anti.heat)
+```
+```{r}
+summary(res_anti.heat)
+```
+```{r}
+mcols(dds_anti.heat)
+```
+```{r}
+rownames(dds_anti.heat)
+```
+```{r}
+res_anti.heat$IDGeneInfo <- mcols(dds_anti.heat)$IDGeneInfo
+res_anti.heat$IDGeneInfo <- as.character(res_anti.heat$IDGeneInfo)
+```
+```{r}
+colnames(res_anti.heat)
+```
+```{r}
+plotDispEsts(dds_anti.heat)
+```
+```{r}
+plotMA(res_anti.heat, ylim = c(-20, 20))
+```
+
+## Check output of AntibioticsXHeat DESeq2 analysis to ensure quality
+```{r}
+resultsNames(dds_antixheat)
+```
+```{r}
+summary(res_antixheat)
+```
+```{r}
+mcols(dds_antixheat)
+```
+```{r}
+rownames(dds_antixheat)
+```
+```{r}
+res_antixheat$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
+res_antixheat$IDGeneInfo <- as.character(res_antixheat$IDGeneInfo)
+```
+```{r}
+colnames(res_antixheat)
+```
+```{r}
+plotDispEsts(dds_antixheat)
+```
+```{r}
+plotMA(res_antixheat, ylim = c(-20, 20))
+```

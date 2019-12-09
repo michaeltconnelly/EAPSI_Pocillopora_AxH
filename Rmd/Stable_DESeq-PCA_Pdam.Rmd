@@ -1,0 +1,138 @@
+---
+title: "Stable_DESeq-PCA_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Regularized-log transformations
+```{r, include=FALSE}
+      rld <- rlogTransformation(dds, blind = TRUE)
+      rld_LPS <- rlogTransformation(dds_LPS, blind = TRUE)
+      rld_anti <- rlogTransformation(dds_anti, blind = TRUE)
+      rld_heat <- rlogTransformation(dds_heat, blind = TRUE)
+      rld_anti.heat <- rlogTransformation(dds_anti.heat, blind = TRUE)
+      rld_anti.heat.LPS <- rlogTransformation(dds_anti.heat.LPS, blind = TRUE)
+```
+```{r, include=FALSE}
+      rld_HW1 <- rlogTransformation(dds_HW1, blind = TRUE)
+      rld_HW2 <- rlogTransformation(dds_HW2, blind = TRUE)
+      rld_WT1 <- rlogTransformation(dds_WT1, blind = TRUE)
+      rld_WT2 <- rlogTransformation(dds_WT2, blind = TRUE)
+```
+```{r}
+condcolors <- c("#00CCCC", "#FFCC33", "#CC0033", "#0000FF", "#FF6600", "#FF66FF")
+condcolors_LPS <- c("#0000FF", "#FF66FF")
+condcolors_anti <- c("#00CCCC", "#0000FF")
+condcolors_heat <- c("#0000FF", "#FF6600")
+condcolors_anti.heat <- c("#FFCC33", "#0000FF")
+condcolors_anti.heat.LPS <- c("#CC0033", "#0000FF")
+```
+
+## PCA Plot
+ggplot2 PCA plot functions
+```{r, echo=FALSE}
+ggPCA <- function(rld, stable_samples) {
+PCAtmtdata <- plotPCA(rld, intgroup = c("treatment", "genotype"), ntop = 500, returnData = TRUE)
+PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
+condcolors <- c("#00CCCC", "#FFCC33", "#CC0033", "#0000FF", "#FF6600", "#FF66FF")
+colshapes <- c(18, 9, 16, 10)
+PCAplot <- ggplot(PCAtmtdata, aes(PCAtmtdata$PC1, PCAtmtdata$PC2, color=stable_samples$treatment, shape=stable_samples$genotype)) +
+  geom_point(size=4, show.legend = TRUE) + xlab(paste0( "PC1: ", PCAtmtpercentVar[1], "% variance")) + 
+  ylab(paste0( "PC2: ", PCAtmtpercentVar[2], "% variance")) + 
+  coord_fixed() + 
+  ggtitle("Principal Component Analysis", subtitle = "Overall transcriptome expression data")
+PCAplot + 
+  scale_color_manual(values=condcolors) + 
+  scale_shape_manual(values=colshapes) +
+  theme(legend.position = "right")
+}
+```
+```{r}
+#pdf(file = "./DEseqresults_Pdam/figures/PCA", width = 12, height = 6)
+ggPCA(rld, stable_samples)
+```
+
+```{r, echo=FALSE}
+#pdf(file = "./DEseqresults_Pdam/figures/PCA", width = 6, height = 6)
+ggPCA_contrast <- function(rld, stable_samples, condcolors) {
+PCAtmtdata <- plotPCA(rld, intgroup = c("Treatment", "Colony"), ntop = 500, returnData = TRUE)
+PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
+colshapes <- c(18, 9, 16, 10)
+PCAplot <- ggplot(PCAtmtdata, aes(PCAtmtdata$PC1, PCAtmtdata$PC2, color=stable_samples$Treatment, shape=stable_samples$genotype)) +
+  geom_point(size=4, show.legend = TRUE) + xlab(paste0( "PC1: ", PCAtmtpercentVar[1], "% variance")) + 
+  ylab(paste0( "PC2: ", PCAtmtpercentVar[2], "% variance")) + 
+  coord_fixed() + 
+  ggtitle("Principal Component Analysis", subtitle = "Overall transcriptome expression data")
+PCAplot + 
+  scale_color_manual(values=condcolors) + 
+  scale_shape_manual(values=colshapes) +
+  theme(legend.position = "right")
+}
+```
+```{r}
+ggPCA_contrast(rld_LPS, stable_samples_LPS, condcolors_LPS)
+```
+```{r}
+ggPCA_contrast(rld_anti, stable_samples_anti, condcolors_anti)
+```
+```{r}
+ggPCA_contrast(rld_heat, stable_samples_heat, condcolors_heat)
+```
+```{r}
+ggPCA_contrast(rld_anti.heat, stable_samples_anti.heat, condcolors_anti.heat)
+```
+```{r}
+ggPCA_contrast(rld_anti.heat.LPS, stable_samples_anti.heat.LPS, condcolors_anti.heat.LPS)
+```
+
+```{r, echo=FALSE}
+#pdf(file = "./DEseqresults_Pdam/figures/PCA", width = 6, height = 6)
+ggPCA_genotype <- function(rld, stable_samples) {
+PCAtmtdata <- plotPCA(rld, intgroup = c("treatment", "genotype"), ntop = 500, returnData = TRUE)
+PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
+condcolors <- c("#00CCCC", "#FFCC33", "#CC0033", "#0000FF", "#FF6600", "#FF66FF")
+PCAplot <- ggplot(PCAtmtdata, aes(PCAtmtdata$PC1, PCAtmtdata$PC2, color=stable_samples$treatment)) +
+  geom_point(size=4, show.legend = TRUE) + xlab(paste0( "PC1: ", PCAtmtpercentVar[1], "% variance")) + 
+  ylab(paste0( "PC2: ", PCAtmtpercentVar[2], "% variance")) + 
+  coord_fixed() + 
+  ggtitle("Principal Component Analysis", subtitle = "Overall transcriptome expression data")
+PCAplot + 
+  scale_color_manual(values=condcolors) + 
+  theme(legend.position = "right")
+}
+```
+```{r}
+ggPCA_genotype(rld_HW1, stable_samples_HW1)
+```
+```{r}
+ggPCA_genotype(rld_HW2, stable_samples_HW2)
+```
+```{r}
+ggPCA_genotype(rld_WT1, stable_samples_WT1)
+```
+```{r}
+ggPCA_genotype(rld_WT2, stable_samples_WT2)
+```
+```{r}
+rv <- rowVars(assay(rld))
+ntop <- 100
+# select the ntop genes by variance
+select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+# perform a PCA on the data in assay(x) for the selected genes
+pca <- prcomp(t(assay(dds)[select,]))
+PC1=pca$x[,1]
+PC2=pca$x[,2]
+PC3=pca$x[,3]
+PC4=pca$x[,4]
+PC5=pca$x[,5]
+```
+## Add additional principal coordinates axes, subset comparisons between closely grouped treatments
+```{r}
+PCAplot <- ggplot(PCAtmtdata, aes(PC4, PC5, color=stable_samples$treatment, shape=stable_samples$genotype)) + geom_point(size=4, show.legend = TRUE) + xlab(paste0( "PC1: ", PCAtmtpercentVar[1], "% variance")) + ylab(paste0( "PC2: ", PCAtmtpercentVar[2], "% variance")) + coord_fixed() + ggtitle("Principal Component Analysis", subtitle = "Overall transcriptome expression data")
+PCAplot + scale_color_manual(values=condcolors) + scale_shape_manual(values=colshapes)
+```

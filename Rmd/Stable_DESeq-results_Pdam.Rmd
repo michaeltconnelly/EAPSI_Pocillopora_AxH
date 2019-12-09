@@ -1,0 +1,46 @@
+---
+title: "Stable_DESeq-results_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Setup packages and working directories
+```{r packages, error=FALSE, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("ggplot2")
+library("ggrepel")
+library("DESeq2")
+```
+
+Inspect results tables to determine number of significant up- and down-regulated genes 
+      Significant DE genes a < 0.05
+      lFC > 1
+      lFC < -1
+      Down
+```{r, echo=FALSE}
+      sum(res$padj<0.05, na.rm=TRUE)
+      sum(res$padj<0.05 & res$log2FoldChange>=1, na.rm=TRUE)
+      sum(res$padj<0.05 & res$log2FoldChange<=(-1), na.rm=TRUE)
+```
+
+##Create data frame with DEG info
+```{r}
+DEGdf <- data.frame(cbind(res$baseMean, res$log2FoldChange, res$pvalue, res$padj, res$IDGeneInfo))
+colnames(DEGdf) <- c("baseMean", "log2FoldChange", "pvalue", "padj", "GeneInfo")
+rownames(DEGdf) <- rownames(res)
+DEGdf <- DEGdf[order(DEGdf$log2FoldChange, decreasing = TRUE),]
+```
+```{r}
+write.csv(as.data.frame(DEGdf), file = "~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/alltreatments_res.csv")
+```
+##Obtain overall DEG table with Gene IDs
+```{r}
+#See results contrasts and gene commands markdowns for more info
+ressig <- subset(res, padj<0.05)
+ressig <- ressig[order(ressig$log2FoldChange, decreasing = TRUE),]
+write.csv(as.data.frame(ressig), file="~/computing/scripts/EAPSI.HW-WT-master/DESeqresults_Pdam/alltreatments_res.csv")
+```

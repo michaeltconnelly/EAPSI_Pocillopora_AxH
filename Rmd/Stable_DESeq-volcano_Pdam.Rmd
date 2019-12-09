@@ -1,0 +1,315 @@
+---
+title: "Stable_DESeq-volcano_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+Volcano plots
+Overall
+Anti_Ctrl
+LPS_Ctrl
+Heat_Ctrl
+Anti+Heat_Ctrl
+Anti+Heat+LPS_Ctrl
+Anti+Heat_Anti
+Anti+Heat_Heat
+Anti+Heat+LPS_Anti
+Anti+Heat+LPS_Heat
+Anti+Heat+LPS_LPS
+Anti+Heat+LPS_Anti+Heat
+
+
+Anti_LPS
+Anti_Heat
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Setup packages and working directories
+```{r packages, error=FALSE, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("ggplot2")
+library("ggrepel")
+library("RColorBrewer")
+library("calibrate")
+```
+## ggplot2 Volcano Plots
+### Overall Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res$threshold <- as.numeric(abs(res$log2FoldChange) > 1 & res$padj < 0.01)
+res$log10padj <- -log10(res$padj)
+dat_genes <- data.frame(cbind(res$log2FoldChange, res$log10padj, res$threshold))
+colnames(dat_genes) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes) <- res$IDGeneInfo
+dat_genes <- dat_genes[order(dat_genes$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_Overall", height = 8, width = 10)
+gVolcano <- ggplot(data=dat_genes, aes(log2FoldChange, log10padj))
+gVolcano + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 100)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes[1:10, ], aes(label = rownames(dat_genes[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Overall Differential Expression")
+```
+### Antibiotics vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti_ctrl$threshold <- as.factor(abs(res_anti_ctrl$log2FoldChange) > 1 & res_anti_ctrl$padj < 0.01)
+res_anti_ctrl$log10padj <- -log10(res_anti_ctrl$padj)
+dat_genes_anti_ctrl <- data.frame(cbind(res_anti_ctrl$log2FoldChange, res_anti_ctrl$log10padj, res_anti_ctrl$threshold))
+colnames(dat_genes_anti_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti_ctrl) <- res_anti_ctrl$IDGeneInfo
+dat_genes_anti_ctrl <- dat_genes_anti_ctrl[order(dat_genes_anti_ctrl$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_Anti-ctrl", height = 8, width = 10)
+gVolcano_anti_ctrl <- ggplot(data=dat_genes_anti_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_anti_ctrl + geom_point(aes(color = threshold), alpha=0.4, size=3) +
+  xlim(c(-10, 10)) + ylim(c(0, 40)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_anti_ctrl[1:10, ], aes(label = rownames(dat_genes_anti_ctrl[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics vs. Control")
+```
+
+### LPS vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_LPS_ctrl$threshold <- as.factor(abs(res_LPS_ctrl$log2FoldChange) > 1 & res_LPS_ctrl$padj < 0.01)
+res_LPS_ctrl$log10padj <- -log10(res_LPS_ctrl$padj)
+dat_genes_LPS_ctrl <- data.frame(cbind(res_LPS_ctrl$log2FoldChange, res_LPS_ctrl$log10padj, res_LPS_ctrl$threshold))
+colnames(dat_genes_LPS_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_LPS_ctrl) <- res_LPS_ctrl$IDGeneInfo
+dat_genes_LPS_ctrl <- dat_genes_LPS_ctrl[order(dat_genes_LPS_ctrl$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_LPS-ctrl", height = 8, width = 10)
+gVolcano_LPS_ctrl <- ggplot(data=dat_genes_LPS_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_LPS_ctrl + geom_point(aes(color = threshold), alpha=0.4, size=3) +
+  xlim(c(-10, 10)) + ylim(c(0, 40)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_LPS_ctrl[1:10, ], aes(label = rownames(dat_genes_LPS_ctrl[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("LPS vs. Control")
+```
+### Heat vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_heat_ctrl$threshold <- as.factor(abs(res_heat_ctrl$log2FoldChange) > 1 & res_heat_ctrl$padj < 0.01)
+res_heat_ctrl$log10padj <- -log10(res_heat_ctrl$padj)
+dat_genes_heat_ctrl <- data.frame(cbind(res_heat_ctrl$log2FoldChange, res_heat_ctrl$log10padj, res_heat_ctrl$threshold))
+colnames(dat_genes_heat_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_heat_ctrl) <- res_heat_ctrl$IDGeneInfo
+dat_genes_heat_ctrl <- dat_genes_heat_ctrl[order(dat_genes_heat_ctrl$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_Heat-ctrl", height = 8, width = 10)
+gVolcano_heat_ctrl <- ggplot(data=dat_genes_heat_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_heat_ctrl + geom_point(aes(color = threshold), alpha=0.4, size=3) +
+  xlim(c(-10, 10)) + ylim(c(0, 40)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_heat_ctrl[1:10, ], aes(label = rownames(dat_genes_heat_ctrl[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Heat vs. Control")
+```
+### Antibiotics + Heat vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat_ctrl$threshold <- as.factor(abs(res_anti.heat_ctrl$log2FoldChange) > 1 & res_anti.heat_ctrl$padj < 0.01)
+res_anti.heat_ctrl$log10padj <- -log10(res_anti.heat_ctrl$padj)
+dat_genes_anti.heat_ctrl <- data.frame(cbind(res_anti.heat_ctrl$log2FoldChange, res_anti.heat_ctrl$log10padj, res_anti.heat_ctrl$threshold))
+colnames(dat_genes_anti.heat_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat_ctrl) <- res_anti.heat_ctrl$IDGeneInfo
+dat_genes_anti.heat_ctrl <- dat_genes_anti.heat_ctrl[order(dat_genes_anti.heat_ctrl$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeat-ctrl", height = 8, width = 10)
+gVolcano_anti.heat_ctrl <- ggplot(data=dat_genes_anti.heat_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat_ctrl + geom_point(aes(color = threshold), alpha=0.4, size=3) +
+  xlim(c(-10, 10)) + ylim(c(0, 40)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_anti.heat_ctrl[1:10, ], aes(label = rownames(dat_genes_anti.heat_ctrl[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat vs. Control")
+```
+### Antibiotics + Heat + LPS vs. Control Differential Expression
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat.LPS_ctrl$threshold <- as.factor(abs(res_anti.heat.LPS_ctrl$log2FoldChange) > 1 & res_anti.heat.LPS_ctrl$padj < 0.01)
+res_anti.heat.LPS_ctrl$log10padj <- -log10(res_anti.heat.LPS_ctrl$padj)
+dat_genes_anti.heat.LPS_ctrl <- data.frame(cbind(res_anti.heat.LPS_ctrl$log2FoldChange, res_anti.heat.LPS_ctrl$log10padj, res_anti.heat.LPS_ctrl$threshold))
+colnames(dat_genes_anti.heat.LPS_ctrl) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat.LPS_ctrl) <- res_anti.heat.LPS_ctrl$IDGeneInfo
+dat_genes_anti.heat.LPS_ctrl <- dat_genes_anti.heat.LPS_ctrl[order(dat_genes_anti.heat.LPS_ctrl$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeatLPS-ctrl", height = 8, width = 10)
+gVolcano_anti.heat.LPS_ctrl <- ggplot(data=dat_genes_anti.heat.LPS_ctrl, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat.LPS_ctrl + geom_point(aes(color = threshold), alpha=0.4, size=3) +
+  xlim(c(-10, 10)) + ylim(c(0, 40)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  #geom_text_repel(data = dat_genes_anti.heat.LPS_ctrl[1:10, ], aes(label = rownames(dat_genes_anti.heat.LPS_ctrl[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat + LPS vs. Control")
+```
+
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat_anti$threshold <- as.factor(abs(res_anti.heat_anti$log2FoldChange) > 1 & res_anti.heat_anti$padj < 0.01)
+res_anti.heat_anti$log10padj <- -log10(res_anti.heat_anti$padj)
+dat_genes_anti.heat_anti <- data.frame(cbind(res_anti.heat_anti$log2FoldChange, res_anti.heat_anti$log10padj, res_anti.heat_anti$threshold))
+colnames(dat_genes_anti.heat_anti) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat_anti) <- res_anti.heat_anti$IDGeneInfo
+dat_genes_anti.heat_anti <- dat_genes_anti.heat_anti[order(dat_genes_anti.heat_anti$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeat-Anti", height = 8, width = 10)
+gVolcano_anti.heat_anti <- ggplot(data=dat_genes_anti.heat_anti, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat_anti + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat_anti[1:10, ], aes(label = rownames(dat_genes_anti.heat_anti[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat vs. Antibiotics")
+```
+
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat_heat$threshold <- as.factor(abs(res_anti.heat_heat$log2FoldChange) > 1 & res_anti.heat_heat$padj < 0.01)
+res_anti.heat_heat$log10padj <- -log10(res_anti.heat_heat$padj)
+dat_genes_anti.heat_heat <- data.frame(cbind(res_anti.heat_heat$log2FoldChange, res_anti.heat_heat$log10padj, res_anti.heat_heat$threshold))
+colnames(dat_genes_anti.heat_heat) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat_heat) <- res_anti.heat_heat$IDGeneInfo
+dat_genes_anti.heat_heat <- dat_genes_anti.heat_heat[order(dat_genes_anti.heat_heat$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeat-Heat", height = 8, width = 10)
+gVolcano_anti.heat_heat <- ggplot(data=dat_genes_anti.heat_heat, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat_heat + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat_heat[1:10, ], aes(label = rownames(dat_genes_anti.heat_heat[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat vs. Heat")
+```
+
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat.LPS_anti$threshold <- as.factor(abs(res_anti.heat.LPS_anti$log2FoldChange) > 1 & res_anti.heat.LPS_anti$padj < 0.01)
+res_anti.heat.LPS_anti$log10padj <- -log10(res_anti.heat.LPS_anti$padj)
+dat_genes_anti.heat.LPS_anti <- data.frame(cbind(res_anti.heat.LPS_anti$log2FoldChange, res_anti.heat.LPS_anti$log10padj, res_anti.heat.LPS_anti$threshold))
+colnames(dat_genes_anti.heat.LPS_anti) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat.LPS_anti) <- res_anti.heat.LPS_anti$IDGeneInfo
+dat_genes_anti.heat.LPS_anti <- dat_genes_anti.heat.LPS_anti[order(dat_genes_anti.heat.LPS_anti$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeatLPS-Anti", height = 8, width = 10)
+gVolcano_anti.heat.LPS_anti <- ggplot(data=dat_genes_anti.heat.LPS_anti, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat.LPS_anti + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat.LPS_anti[1:10, ], aes(label = rownames(dat_genes_anti.heat.LPS_anti[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat + LPS vs. Antibiotics")
+```
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat.LPS_heat$threshold <- as.factor(abs(res_anti.heat.LPS_heat$log2FoldChange) > 1 & res_anti.heat.LPS_heat$padj < 0.01)
+res_anti.heat.LPS_heat$log10padj <- -log10(res_anti.heat.LPS_heat$padj)
+dat_genes_anti.heat.LPS_heat <- data.frame(cbind(res_anti.heat.LPS_heat$log2FoldChange, res_anti.heat.LPS_heat$log10padj, res_anti.heat.LPS_heat$threshold))
+colnames(dat_genes_anti.heat.LPS_heat) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat.LPS_heat) <- res_anti.heat.LPS_heat$IDGeneInfo
+dat_genes_anti.heat.LPS_heat <- dat_genes_anti.heat.LPS_heat[order(dat_genes_anti.heat.LPS_heat$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeatLPS-Heat", height = 8, width = 10)
+gVolcano_anti.heat.LPS_heat <- ggplot(data=dat_genes_anti.heat.LPS_heat, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat.LPS_heat + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat.LPS_heat[1:10, ], aes(label = rownames(dat_genes_anti.heat.LPS_heat[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat + LPS vs. Heat")
+```
+
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat.LPS_LPS$threshold <- as.factor(abs(res_anti.heat.LPS_LPS$log2FoldChange) > 1 & res_anti.heat.LPS_LPS$padj < 0.01)
+res_anti.heat.LPS_LPS$log10padj <- -log10(res_anti.heat.LPS_LPS$padj)
+dat_genes_anti.heat.LPS_LPS <- data.frame(cbind(res_anti.heat.LPS_LPS$log2FoldChange, res_anti.heat.LPS_LPS$log10padj, res_anti.heat.LPS_LPS$threshold))
+colnames(dat_genes_anti.heat.LPS_LPS) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat.LPS_LPS) <- res_anti.heat.LPS_LPS$IDGeneInfo
+dat_genes_anti.heat.LPS_LPS <- dat_genes_anti.heat.LPS_LPS[order(dat_genes_anti.heat.LPS_LPS$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeatLPS-LPS", height = 8, width = 10)
+gVolcano_anti.heat.LPS_LPS <- ggplot(data=dat_genes_anti.heat.LPS_LPS, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat.LPS_LPS + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat.LPS_LPS[1:10, ], aes(label = rownames(dat_genes_anti.heat.LPS_LPS[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat + LPS vs. LPS")
+```
+
+
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti.heat.LPS_anti.heat$threshold <- as.factor(abs(res_anti.heat.LPS_anti.heat$log2FoldChange) > 1 & res_anti.heat.LPS_anti.heat$padj < 0.01)
+res_anti.heat.LPS_anti.heat$log10padj <- -log10(res_anti.heat.LPS_anti.heat$padj)
+dat_genes_anti.heat.LPS_anti.heat <- data.frame(cbind(res_anti.heat.LPS_anti.heat$log2FoldChange, res_anti.heat.LPS_anti.heat$log10padj, res_anti.heat.LPS_anti.heat$threshold))
+colnames(dat_genes_anti.heat.LPS_anti.heat) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti.heat.LPS_anti.heat) <- res_anti.heat.LPS_anti.heat$IDGeneInfo
+dat_genes_anti.heat.LPS_anti.heat <- dat_genes_anti.heat.LPS_anti.heat[order(dat_genes_anti.heat.LPS_anti.heat$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_AntiHeatLPS-AntiHeat", height = 8, width = 10)
+gVolcano_anti.heat.LPS_anti.heat <- ggplot(data=dat_genes_anti.heat.LPS_anti.heat, aes(log2FoldChange, log10padj))
+gVolcano_anti.heat.LPS_anti.heat + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 30)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti.heat.LPS_anti.heat[1:10, ], aes(label = rownames(dat_genes_anti.heat.LPS_anti.heat[1:10, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics + Heat + LPS vs. Antibiotics + Heat")
+```
+```{r}
+##Highlight genes that have an absolute fold change > 2 and a padj < 0.01
+res_anti_LPS$threshold <- as.factor(abs(res_anti_LPS$log2FoldChange) > 1 & res_anti_LPS$padj < 0.01)
+res_anti_LPS$log10padj <- -log10(res_anti_LPS$padj)
+dat_genes_anti_LPS <- data.frame(cbind(res_anti_LPS$log2FoldChange, res_anti_LPS$log10padj, res_anti_LPS$threshold))
+colnames(dat_genes_anti_LPS) <- c("log2FoldChange", "log10padj", "threshold")
+row.names(dat_genes_anti_LPS) <- res_anti_LPS$IDGeneInfo
+dat_genes_anti_LPS <- dat_genes_anti_LPS[order(dat_genes_anti_LPS$log10padj, decreasing = TRUE),]
+```
+```{r, warning = FALSE}
+pdf(file = "./DESeqresults_Pdam/figures/Volcano_Anti-LPS", height = 8, width = 10)
+gVolcano_anti_LPS <- ggplot(data=dat_genes_anti_LPS, aes(log2FoldChange, log10padj))
+gVolcano_anti_LPS + geom_point(aes(color = threshold), alpha=0.4, size=1.5) +
+  xlim(c(-20, 20)) + ylim(c(0, 10)) +
+  xlab("log2 fold change") +
+  ylab("-log10 p-value") + 
+  geom_text_repel(data = dat_genes_anti_LPS[1:16, ], aes(label = rownames(dat_genes_anti_LPS[1:16, ])), color = "black", size = 2.5, box.padding = unit(0.5, "lines")) +
+  theme(legend.position = "none") +
+  ggtitle("Antibiotics vs. LPS")
+```

@@ -1,0 +1,189 @@
+---
+title: "Stable_WGCNA_Pdam"
+author: "Mike Connelly"
+date: "10/24/2018"
+output: html_document
+---
+RMarkdown document containing scripts for WGCNA modelling of differential gene expression between fragments of two *Pocillopora damicornis* genotypes collected at Wanglitung reef and placed in five experimental treatment groups and once control group during EAPSI Taiwan, summer 2017.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Load packages and setup working directory
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(genefilter)
+library(WGCNA)
+library(dynamicTreeCut)
+library(flashClust)
+options(stringsAsFactors = FALSE)
+allowWGCNAThreads(nThreads = 4)
+```
+## Import sample and trait metadata
+```{r, echo=FALSE}
+stable_samples <- read.table("EAPSIsamples_stable_meta.txt", header = TRUE)
+rownames(stable_samples) <- stable_samples$sample
+stable_samples$sample <- NULL
+```
+## Import counts data 
+```{r}
+countdata_vst <- read.delim("alltreatments_stable.norm.vst.counts.csv", sep = ",", comment.char="#")
+row.names(countdata_vst) <- countdata_vst$X
+countdata_vst <- select(countdata_vst, -X)
+#To select which treatments to use in network construction
+#countdata_vst <- select(countdata_vst, matches("[:alpha:]*[3,6]"))
+```
+### Make expression matrix sample names match metadata
+```{r}
+colnames(countdata_vst) <- stable_samples$sample
+```
+## Convert to matrix and transpose
+```{r}
+datExpr <- t(countdata_vst)
+```
+## Filter for expression
+```{r}
+datExpr <- datExpr[,apply(datExpr,2,mean)>4]
+```
+```{r}
+rownames(datExpr) <- rownames(stable_samples)
+ncol(datExpr)
+```
+This returns 17387 genes for network analysis
+ 
+## Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
+```{r}
+sft <- pickSoftThreshold(datExpr, verbose=5)
+```
+## Plot scale-free topology fit and mean connectivity as functions of the soft-thresholding power
+```{r}
+par(mfrow = c(1,2))
+powers <- c(c(1:10), seq(from = 12, to = 20, by = 2))
+cex1 = 0.9;
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], xlab="Soft Threshold (power)", ylab="Scale Free Topology Model Fit, signed R^2", type = "n", main = paste("Scale Independence"));
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], labels = powers, col = "red");
+abline(h=0.90, col = "red")
+plot(sft$fitIndices[,1], sft$fitIndices[,5], xlab="Soft Threshold (power)", ylab = "Mean Connectivity", type = "n", main = paste("Mean Connectivity"));
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels = powers, col = "red")
+```
+```{r}
+sft$powerEstimate
+```
+
+## Cluster genes into coexpressed modules
+"Base" clustering parameters
+  corType = "bicor"
+  networkType = "signed"
+  maxBlockSize = 27000
+  deepSplit = 2
+  detectCutHeight = 0.99
+  minModuleSize = 20
+  mergeCutHeight = 0.15
+Modify blocksizes
+```{r}
+net <- blockwiseModules(datExpr, 
+                          weights=NULL, 
+                          corType = "bicor",
+                          power=sft$powerEstimate,
+                          networkType = "signed",
+                          maxBlockSize = 20000,
+                          deepSplit = 2,
+                          detectCutHeight = 0.99,
+                          minModuleSize = min(20, ncol(datExpr)/2 ),
+                          mergeCutHeight = 0.15,
+                          TOMType = "signed",
+                          saveTOMs = FALSE,
+                          saveTOMFileBase = "EAPSI_TOM",
+                          numericLabels=T, 
+                          checkMissingData = TRUE, verbose=5)
+```
+## Inspect network results
+```{r}
+table(net$colors)
+```
+## Convert labels to standard WGCNA colors for plotting
+```{r}
+moduleColors <- labels2colors(net$colors, colorSeq = standardColors())
+colorstable <- as.data.frame(table(moduleColors))
+```
+## Save module assignment and eigengene information for subsequent analysis
+```{r}
+moduleLabels <- net$colors
+```
+```{r}
+MEs <- net$MEs
+rownames(MEs) <- rownames(stable_samples)
+```
+```{r}
+MEs <- orderMEs(MEs, greyLast = TRUE)
+```
+## Recalculate ME with color labels
+```{r}
+MEs1 <- moduleEigengenes(expr = datExpr, colors = moduleColors, softPower = sft$powerEstimate)$eigengenes
+rownames(MEs1) <- rownames(stable_samples)
+```
+```{r}
+MEs1 <- orderMEs(MEs1, greyLast = TRUE)
+```
+
+## Identify all unique and interesting modules based on trait correlations
+```{r}
+#Generate GeneIDs
+Genes <- colnames(datExpr)
+#Extract all unique modules
+uniqModules = setdiff(unique(moduleColors), "grey")
+uniqModules
+```
+
+## Output interesting module gene lists for GO enrichment tests
+```{r}
+setwd("./WGCNAmodules_Pdam/lists")
+for (module in uniqModules)
+{
+# Select module probes
+inModule <- (moduleColors==module)
+# Get their entrez ID codes
+modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
+# Write them into a file
+fileName = paste(module, "_ID", ".txt", sep="");
+write.table(as.data.frame(modGeneIDs), file = fileName,
+row.names = FALSE, col.names = FALSE)
+}
+```
+## Remove quotations from list gene IDs and search for gene notes 
+```{bash}
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam/lists/*_ID.txt
+rm ./WGCNAmodules_Pdam/lists/*_ID.txt-e
+```
+## Search module gene notes from ID lists
+```{bash}
+MODULES=./WGCNAmodules_Pdam/lists/*_ID.txt
+for module in $MODULES
+do
+  grep -f $module ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ${module}_notes.txt
+done
+mv ./WGCNAmodules_Pdam/lists/*_notes.txt ./WGCNAmodules_Pdam/notes
+```
+## Choose top hub gene in each module
+```{r}
+hubs <- chooseTopHubInEachModule(datExpr = datExpr, colorh = moduleColors, power = sft$powerEstimate, type = "signed")
+hubs <- as.data.frame(hubs)
+write.csv(hubs, file = "./WGCNAmodules_Pdam/hubgenes/hubs.csv")
+```
+## Search module gene notes from ID lists
+```{bash}
+awk -F "," '{print $2}' ./WGCNAmodules_Pdam/hubgenes/hubs.csv > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam/hubgenes/*.txt
+grep -f ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt
+sed -i -e 's/ID=//g' ./WGCNAmodules_Pdam/hubgenes/*notes.txt
+awk -F " Note=" '{print $1"\t"$2}' ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt > ./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt
+rm ./WGCNAmodules_Pdam/hubgenes/*txt-e
+```
+```{r}
+hubs_IDsnotes <- read.delim("./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt", header=FALSE)
+hubs$notes <- hubs_IDsnotes$V2[match(hubs$hubs, hubs_IDsnotes$V1)]
+write.csv(hubs, file = "./WGCNAmodules_Pdam/hubgenes/modulehubs.csv")
+```
+

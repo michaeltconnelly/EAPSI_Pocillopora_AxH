@@ -1,0 +1,77 @@
+---
+title: "Stable_REVIGO_figures"
+author: "Mike Connelly"
+date: "1/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Load packages and setup working directory
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(scales)
+library(colorspace)
+```
+```{r}
+REVIGOs <- list.files(path = "./DESeqresults_Pdam/REVIGO/REVIGOres", pattern = "REVIGO", full.names = TRUE)
+```
+```{r}
+REVIGOs[1]
+```
+```{r}
+revigo.data <- read.csv(REVIGOs[1]) %>% dplyr::select(-representative, -eliminated)
+revigo.data.frame <- data.frame(revigo.data)
+revigo.data.frame.clean <- revigo.data.frame [(revigo.data.frame$plot_X != "null" & revigo.data.frame$plot_Y != "null"), ]
+```
+
+```{r}
+REVIGOplot <- function(revigo) {
+plotTitle <- as.character(revigo)
+revigo.names <- c("term_ID","description","frequency","plot_X","plot_Y","plot_size","log10_p_value","uniqueness","dispensability");
+revigo.data <- read.csv(revigo) %>% dplyr::select(-representative, -eliminated)
+one.data <- data.frame(revigo.data);
+names(one.data) <- revigo.names;
+one.data <- one.data [(one.data$plot_X != "null" & one.data$plot_Y != "null"), ];
+one.data$plot_X <- as.numeric( as.character(one.data$plot_X) );
+one.data$plot_Y <- as.numeric( as.character(one.data$plot_Y) );
+one.data$plot_size <- as.numeric( as.character(one.data$plot_size) );
+one.data$log10_p_value <- as.numeric( as.character(one.data$log10_p_value) );
+#one.data$frequency <- as.numeric( as.character(one.data$frequency) );
+one.data$uniqueness <- as.numeric( as.character(one.data$uniqueness) );
+one.data$dispensability <- as.numeric( as.character(one.data$dispensability) );
+#view(one.data)
+# --------------------------------------------------------------------------
+# Names of the axes, sizes of the numbers and letters, names of the columns, etc. can be changed below
+p1 <- ggplot( data = one.data )
+p1 <- p1 + 
+  geom_point( aes(plot_X, plot_Y, colour = log10_p_value, size = plot_size), alpha = I(0.6) ) + 
+  geom_point( aes(plot_X, plot_Y, size = plot_size), shape = 21, fill = "transparent", colour = I (alpha ("black", 0.6) )) + 
+  scale_color_gradientn(colors = c("blue", "green", "yellow", "red"), limits = c(min(one.data$log10_p_value), 0)) +
+  scale_size_area() + 
+  scale_size(range=c(5, 30)) + 
+  scale_fill_gradientn(colours = heat_hcl(7), limits = c(-300, 0)) +
+  ggtitle(plotTitle) +
+  theme(plot.title = element_text(size=12));
+ex <- one.data [ one.data$dispensability < 0.15, ]; 
+p1 <- p1 + geom_text( data = ex, aes(plot_X, plot_Y, label = description), colour = I(alpha("black", 0.85)), size = 3 ) + 
+  labs (y = "semantic space x", x = "semantic space y") + theme(legend.key = element_blank())
+one.x_range = max(one.data$plot_X) - min(one.data$plot_X);
+one.y_range = max(one.data$plot_Y) - min(one.data$plot_Y);
+p1 <- p1 + xlim(min(one.data$plot_X)-one.x_range/10,max(one.data$plot_X)+one.x_range/10) +
+  ylim(min(one.data$plot_Y)-one.y_range/10,max(one.data$plot_Y)+one.y_range/10);
+# --------------------------------------------------------------------------
+print(p1)
+}
+```
+
+```{r, message=FALSE}
+#pdf(file = "./DESeqresults_Pdam/figures/REVIGObubbles", width = 11, height=8.5)
+for (i in REVIGOs)
+{
+  REVIGOplot(i)
+}
+```

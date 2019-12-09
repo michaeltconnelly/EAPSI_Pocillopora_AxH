@@ -1,0 +1,977 @@
+---
+title: "Stable_WGCNA-networks_Pdam"
+author: "Mike Connelly"
+date: "11/29/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Load packages and setup working directory
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(genefilter)
+library(WGCNA)
+library(dynamicTreeCut)
+library(flashClust)
+options(stringsAsFactors = FALSE)
+allowWGCNAThreads(nThreads = 4)
+```
+## Import sample and trait metadata
+```{r, echo=FALSE}
+stable_samples <- read.table("EAPSIsamples_stable_meta_combo.txt", header = TRUE)
+rownames(stable_samples) <- stable_samples$sample
+stable_samples$sample <- NULL
+```
+## Import counts data 
+```{r}
+countdata_vst <- read.delim("alltreatments_stable.norm.vst.counts.csv", sep = ",", comment.char="#")
+row.names(countdata_vst) <- countdata_vst$X
+countdata_vst <- select(countdata_vst, -X)
+```
+## Select which treatments to use in network construction
+LPS: Control-LPS
+anti: Control-Antibiotics
+heat: Control-Heat
+anti.heat: Control-Antibiotics.Heat
+anti.heat.LPS: Control-Antibiotics.Heat.LPS
+antixLPS: Control-Antibiotics-LPS
+antixheat: Control-Antibiotics-Heat-Antibiotics.Heat
+all: All treatments
+```{r}
+countdata_vst_LPS <- select(countdata_vst, matches("[HW][wt][12].[36]."))
+countdata_vst_anti <- select(countdata_vst, matches("[HW][wt][12].[56]."))
+countdata_vst_heat <- select(countdata_vst, matches("[HW][wt][12].[46]."))
+###
+countdata_vst_anti.heat <- select(countdata_vst, matches("[HW][wt][12].[16]."))
+countdata_vst_anti.heat.LPS <- select(countdata_vst, matches("[HW][wt][12].[26]."))
+###
+countdata_vst_antixLPS <- select(countdata_vst, matches("[HW][wt][12].[356]."))
+countdata_vst_antixheat <- select(countdata_vst, matches("[HW][wt][12].[1456]."))
+countdata_vst_all <- select(countdata_vst, matches("[HW][wt][12].[123456]."))
+```
+```{r}
+countdata_vst_HW1 <- select(countdata_vst, matches("Hw1.*"))
+countdata_vst_HW2 <- select(countdata_vst, matches("Hw2.*"))
+countdata_vst_WT1 <- select(countdata_vst, matches("Wt1.*"))
+countdata_vst_WT2 <- select(countdata_vst, matches("Wt2.*"))
+```
+
+```{r}
+stable_samples_LPS <- filter(stable_samples, treatment == "control" | treatment == "LPS")
+stable_samples_anti <- filter(stable_samples, treatment == "control" | treatment == "Antibiotics")
+stable_samples_heat <- filter(stable_samples, treatment == "control" | treatment == "Heat")
+###
+stable_samples_anti.heat <- filter(stable_samples, treatment == "control" | treatment == "Antibiotics.Heat")
+stable_samples_anti.heat.LPS <- filter(stable_samples, treatment == "control" | treatment == "Antibiotics.Heat.LPS")
+###
+stable_samples_antixLPS <- filter(stable_samples, treatment == "control" | treatment == "Antibiotics"| treatment == "LPS")
+stable_samples_antixheat <- filter(stable_samples, treatment == "control" | treatment == "Antibiotics" | treatment == "Heat" | treatment == "Antibiotics.Heat")
+stable_samples_all <- stable_samples
+```
+```{r}
+stable_samples_HW1 <- filter(stable_samples, genotype == "Houwan1")# %>% select(-contains("W"), -contains("2"))
+stable_samples_HW2 <- filter(stable_samples, genotype == "Houwan2")# %>% select(-contains("W"), -contains("1"))
+stable_samples_WT1 <- filter(stable_samples, genotype == "Wanglitung1")# %>% select(-contains("H"), -contains("2"))
+stable_samples_WT2 <- filter(stable_samples, genotype == "Wanglitung2")# %>% select(-contains("H"), -contains("1"))
+```
+
+### Make expression matrix sample names match metadata
+## Convert to matrix and transpose
+## Filter for expression
+```{r}
+matExpr <- function(countdata, samples) {
+colnames(countdata) <- samples$sample
+datExpr <- t(countdata)
+datExpr <- datExpr[,apply(datExpr,2,mean)>4]
+rownames(datExpr) <- rownames(samples)
+datExpr
+}
+```
+```{r}
+datExpr_LPS <- matExpr(countdata_vst_LPS, stable_samples_LPS)
+datExpr_anti <- matExpr(countdata_vst_anti, stable_samples_anti)
+datExpr_heat <- matExpr(countdata_vst_heat, stable_samples_heat)
+###
+datExpr_anti.heat <- matExpr(countdata_vst_anti.heat, stable_samples_anti.heat)
+datExpr_anti.heat.LPS <- matExpr(countdata_vst_anti.heat.LPS, stable_samples_anti.heat.LPS)
+###
+datExpr_antixLPS <- matExpr(countdata_vst_antixLPS, stable_samples_antixLPS)
+datExpr_antixheat <- matExpr(countdata_vst_antixheat, stable_samples_antixheat)
+datExpr_all <- matExpr(countdata_vst_all, stable_samples_all)
+```
+```{r}
+ncol(datExpr_LPS)
+ncol(datExpr_anti)
+ncol(datExpr_heat)
+###
+
+
+###
+ncol(datExpr_antixLPS)
+```
+```{r}
+datExpr_HW1 <- matExpr(countdata_vst_HW1, stable_samples_HW1)
+datExpr_HW2 <- matExpr(countdata_vst_HW2, stable_samples_HW2)
+datExpr_WT1 <- matExpr(countdata_vst_WT1, stable_samples_WT1)
+datExpr_WT2 <- matExpr(countdata_vst_WT2, stable_samples_WT2)
+```
+
+## Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
+```{r}
+sft_LPS <- pickSoftThreshold(datExpr_LPS, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_anti <- pickSoftThreshold(datExpr_anti, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_heat <- pickSoftThreshold(datExpr_heat, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+###
+sft_anti.heat <- pickSoftThreshold(datExpr_anti.heat, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_anti.heat.LPS <- pickSoftThreshold(datExpr_anti.heat.LPS, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+###
+sft_antixLPS <- pickSoftThreshold(datExpr_antixLPS, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_antixheat <- pickSoftThreshold(datExpr_anti.heat, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_all <- pickSoftThreshold(datExpr_all, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+```
+```{r}
+sft_HW1 <- pickSoftThreshold(datExpr_HW1, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_HW2 <- pickSoftThreshold(datExpr_HW2, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_WT1 <- pickSoftThreshold(datExpr_WT1, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+sft_WT2 <- pickSoftThreshold(datExpr_WT2, powerVector = c(seq(1, 10, by = 1), seq(12, 26, by = 2)))
+```
+```{r}
+sft_HW1$powerEstimate
+sft_HW2$powerEstimate
+sft_WT1$powerEstimate
+sft_WT2$powerEstimate
+```
+
+## Cluster genes into coexpressed modules
+"Base" clustering parameters
+  corType = "bicor"
+  networkType = "signed"
+  maxBlockSize = 27000
+  deepSplit = 2
+  detectCutHeight = 0.99
+  minModuleSize = 20
+  mergeCutHeight = 0.15
+```{r}
+netbuild <- function(datExpr, sft) {
+net <- blockwiseModules(datExpr, 
+                          weights=NULL, 
+                          corType = "bicor",
+                          power=sft$powerEstimate,
+                          networkType = "signed",
+                          maxBlockSize = 20000,
+                          deepSplit = 2,
+                          detectCutHeight = 0.99,
+                          minModuleSize = min(20, ncol(datExpr)/2 ),
+                          mergeCutHeight = 0.15,
+                          TOMType = "signed",
+                          saveTOMs = FALSE,
+                          saveTOMFileBase = "EAPSI_TOM",
+                          numericLabels=T, 
+                          checkMissingData = TRUE, verbose=1)
+net
+}
+```
+```{r}
+net_LPS <- netbuild(datExpr_LPS, sft_LPS)
+net_anti <- netbuild(datExpr_anti, sft_anti)
+net_heat <- netbuild(datExpr_heat, sft_heat)
+###
+net_anti.heat <- netbuild(datExpr_anti.heat, sft_anti.heat)
+net_anti.heat.LPS <- netbuild(datExpr_anti.heat.LPS, sft_anti.heat.LPS)
+###
+net_antixLPS <- netbuild(datExpr_antixLPS, sft_antixLPS)
+net_antixheat <- netbuild(datExpr_antixheat, sft_antixheat)
+net_all <- netbuild(datExpr_all, sft_all)
+```
+```{r}
+net_HW1 <- netbuild(datExpr_HW1, sft_HW1)
+net_HW2 <- netbuild(datExpr_HW2, sft_HW2)
+net_WT1 <- netbuild(datExpr_WT1, sft_WT1)
+net_WT2 <- netbuild(datExpr_WT2, sft_WT2)
+```
+
+## Inspect network results
+```{r}
+table(net_LPS$colors)
+```
+```{r}
+table(net_anti$colors)
+```
+```{r}
+table(net_heat$colors)
+```
+```{r}
+table(net_anti.heat.LPS$colors)
+```
+```{r}
+table(net_antixLPS$colors)
+```
+```{r}
+table(net_all$colors)
+```
+```{r}
+table(net_HW1$colors)
+```
+```{r}
+table(net_HW2$colors)
+```
+```{r}
+table(net_WT1$colors)
+```
+```{r}
+table(net_WT2$colors)
+```
+
+## Convert labels to standard WGCNA colors for plotting, extract all unique modules
+```{r}
+netmods <- function(net) {
+moduleColors <- labels2colors(net$colors, colorSeq = standardColors(), zeroIsGrey = TRUE)
+moduleColors
+}
+```
+```{r}
+moduleColors_LPS <- netmods(net_LPS)
+moduleColors_anti <- netmods(net_anti)
+moduleColors_heat <- netmods(net_heat)
+###
+moduleColors_anti.heat <- netmods(net_anti.heat)
+moduleColors_anti.heat.LPS <- netmods(net_anti.heat.LPS)
+###
+moduleColors_antixLPS <- netmods(net_antixLPS)
+moduleColors_antixheat <- netmods(net_antixheat)
+moduleColors_all <- netmods(net_all)
+```
+```{r}
+moduleColors_HW1 <- netmods(net_HW1)
+moduleColors_HW2 <- netmods(net_HW2)
+moduleColors_WT1 <- netmods(net_WT1)
+moduleColors_WT2 <- netmods(net_WT2)
+```
+```{r}
+unimods <- function(moduleColors) {
+uniqModules = setdiff(unique(moduleColors), "grey")
+uniqModules
+}
+```
+```{r}
+unimods_LPS <- unimods(moduleColors_LPS)
+unimods_anti <- unimods(moduleColors_anti)
+unimods_heat <- unimods(moduleColors_heat)
+###
+unimods_anti.heat <- unimods(moduleColors_anti.heat)
+unimods_anti.heat.LPS <- unimods(moduleColors_anti.heat.LPS)
+###
+unimods_antixLPS <- unimods(moduleColors_antiXLPS)
+unimods_antixheat <- unimods(moduleColors_antixheat)
+unimods_all <- unimods(moduleColors_all)
+```
+```{r}
+unimods_HW1 <- unimods(moduleColors_HW1)
+unimods_HW2 <- unimods(moduleColors_HW2)
+unimods_WT1 <- unimods(moduleColors_WT1)
+unimods_WT2 <- unimods(moduleColors_WT2)
+```
+
+## Output interesting module gene lists for GO enrichment tests
+```{r}
+modgeneIDs <- function(datExpr, moduleColors, unimods) {
+#Generate GeneIDs
+Genes <- colnames(datExpr)
+#Output module gene lists
+for (module in unimods)
+{
+# Select module probes
+inModule <- (moduleColors==module)
+# Get gene ID codes
+modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
+# Write them into a file
+fileName = paste(module, "_ID", ".txt", sep="");
+write.table(as.data.frame(modGeneIDs), file = fileName,
+row.names = FALSE, col.names = FALSE)
+}
+}
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-LPS/lists")
+modgeneIDs(datExpr_LPS, moduleColors_LPS, unimods_LPS)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-anti/lists")
+modgeneIDs(datExpr_anti, moduleColors_anti, unimods_anti)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-heat/lists")
+modgeneIDs(datExpr_heat, moduleColors_heat, unimods_heat)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-anti.heat/lists")
+modgeneIDs(datExpr_anti.heat, moduleColors_anti.heat, unimods_anti.heat)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-anti.heat.LPS/lists")
+modgeneIDs(datExpr_anti.heat.LPS, moduleColors_anti.heat.LPS, unimods_anti.heat.LPS)
+```
+
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-anti-LPS/lists")
+modgeneIDs(datExpr_antixLPS, moduleColors_antixLPS, unimods_antixLPS)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/lists")
+modgeneIDs(datExpr_antixheat, moduleColors_antixheat, unimods_antixheat)
+```
+
+```{r}
+setwd("./WGCNAmodules_Pdam_all/lists")
+modgeneIDs(datExpr_all, moduleColors_all, unimods_all)
+```
+
+
+```{r}
+setwd("./WGCNAmodules_Pdam_HW1/lists")
+modgeneIDs(datExpr_HW1, moduleColors_HW1, unimods_HW1)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_HW2/lists")
+modgeneIDs(datExpr_HW2, moduleColors_HW2, unimods_HW2)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_WT1/lists")
+modgeneIDs(datExpr_WT1, moduleColors_WT1, unimods_WT1)
+```
+```{r}
+setwd("./WGCNAmodules_Pdam_WT2/lists")
+modgeneIDs(datExpr_WT2, moduleColors_WT2, unimods_WT2)
+```
+
+## Remove quotations from list gene IDs and search for gene notes 
+```{bash}
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam*/lists/*_ID.txt
+rm ./WGCNAmodules_Pdam*/lists/*_ID.txt-e
+```
+## Search module gene notes from ID lists
+```{bash}
+MODULES=./WGCNAmodules_Pdam_*/lists/*_ID.txt
+for module in $MODULES
+do
+  grep -f $module ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ${module}_notes.txt
+done
+#mv ./WGCNAmodules_Pdam_WT*/lists/*_notes.txt ./WGCNAmodules_Pdam_*/notes
+```
+
+## Save module assignment and eigengene information for subsequent analysis
+```{r}
+netMEs <- function(net, samples) {
+MEs <- net$MEs
+rownames(MEs) <- rownames(samples)
+MEs <- orderMEs(MEs, greyLast = TRUE)
+MEs
+}
+```
+```{r}
+MEs_LPS <- netMEs(net_LPS, stable_samples_LPS)
+MEs_anti <- netMEs(net_anti, stable_samples_anti)
+MEs_heat <- netMEs(net_heat, stable_samples_heat)
+###
+MEs_anti.heat <- netMEs(net_anti.heat, stable_samples_anti.heat)
+MEs_anti.heat.LPS <- netMEs(net_anti.heat.LPS, stable_samples_anti.heat.LPS)
+###
+MEs_antixLPS <- netMEs(net_antixLPS, stable_samples_antixLPS)
+MEs_antixheat <- netMEs(net_antixheat, stable_samples_antixheat)
+MEs_all <- netMEs(net_all, stable_samples_all)
+```
+```{r}
+MEs_HW1 <- netMEs(net_HW1, stable_samples_HW1)
+MEs_HW2 <- netMEs(net_HW2, stable_samples_HW2)
+MEs_WT1 <- netMEs(net_WT1, stable_samples_WT1)
+MEs_WT2 <- netMEs(net_WT2, stable_samples_WT2)
+```
+
+## Recalculate ME with color labels
+```{r}
+netMEs1 <- function(datExpr, moduleColors, sft, samples) {
+MEs1 <- moduleEigengenes(expr = datExpr, colors = moduleColors, softPower = sft$powerEstimate)$eigengenes
+rownames(MEs1) <- rownames(samples)
+MEs1 <- orderMEs(MEs1, greyLast = TRUE)
+MEs1
+}
+```
+```{r}
+MEs1_LPS <- netMEs1(datExpr_LPS, moduleColors_LPS, sft_LPS, stable_samples_LPS)
+MEs1_anti <- netMEs1(datExpr_anti, moduleColors_anti, sft_anti, stable_samples_anti)
+MEs1_heat <- netMEs1(datExpr_heat, moduleColors_heat, sft_heat, stable_samples_heat)
+###
+MEs1_anti.heat <- netMEs1(datExpr_anti.heat, moduleColors_anti.heat, sft_anti.heat, stable_samples_anti.heat)
+MEs1_anti.heat.LPS <- netMEs1(datExpr_anti.heat.LPS, moduleColors_anti.heat.LPS, sft_anti.heat.LPS, stable_samples_anti.heat.LPS)
+###
+MEs1_antixLPS <- netMEs1(datExpr_antixLPS, moduleColors_antiXLPS, sft_antixLPS, stable_samples_antixLPS)
+MEs1_antixheat <- netMEs1(datExpr_antixheat, moduleColors_antixheat, sft_antixheat, stable_samples_antixheat)
+MEs1_all <- netMEs1(datExpr_all, moduleColors_all, sft_all, stable_samples_all)
+```
+```{r}
+MEs1_HW1 <- netMEs1(datExpr_HW1, moduleColors_HW1, sft_HW1, stable_samples_HW1)
+MEs1_HW2 <- netMEs1(datExpr_HW2, moduleColors_HW2, sft_HW2, stable_samples_HW2)
+MEs1_WT1 <- netMEs1(datExpr_WT1, moduleColors_WT1, sft_WT1, stable_samples_WT1)
+MEs1_WT2 <- netMEs1(datExpr_WT2, moduleColors_WT2, sft_WT2, stable_samples_WT2)
+```
+
+## Create trait correlation data frames
+```{r}
+datTraits_LPS <- select(stable_samples_LPS, -treatment, -genotype, -Houwan, -Wanglitung, -contains("anti"), -contains("heat"), -contains("all"))
+
+datTraits_anti <- select(stable_samples_anti, -treatment, -genotype, -Houwan, -Wanglitung, -contains("heat"), -contains("lps"), -contains("all"))
+
+datTraits_heat <- select(stable_samples_heat, -treatment, -genotype, -Houwan, -Wanglitung, -contains("anti"), -contains("lps"), -contains("all"))
+
+###
+datTraits_anti.heat <- select(stable_samples_anti.heat, -treatment, -genotype, -anti, -lps, -heat, -anti.heat.lps, -allheat, -allanti, -alllps, -Wanglitung, -Houwan)
+
+datTraits_anti.heat.LPS <- select(stable_samples_anti.heat.LPS, -treatment, -genotype, -anti, -lps, -anti.heat, -heat, -allheat, -allanti, -alllps, -Wanglitung, -Houwan)
+
+###
+datTraits_antixLPS <- select(stable_samples_antixLPS, -treatment, -genotype, -heat, -anti.heat, -anti.heat.lps, -allheat, -allanti, -alllps, -Wanglitung, -Houwan)
+
+datTraits_antixheat <- select(stable_samples_antixheat, -treatment, -genotype, -lps, -anti.heat.lps, -allheat, -allanti, -alllps, -Wanglitung, -Houwan)
+
+datTraits_all <- select(stable_samples_all, -treatment, -genotype, -Wanglitung, -Houwan)
+
+```
+```{r}
+datTraits_HW1 <- select(stable_samples_HW1, -treatment, -genotype, -Houwan, -Wanglitung, -contains("H1"), -contains("H2"), -contains("W1"), -contains("W2"))
+
+datTraits_HW2 <- select(stable_samples_HW2, -treatment, -genotype, -Houwan, -Wanglitung, -contains("H1"), -contains("H2"), -contains("W1"), -contains("W2"))
+
+datTraits_WT1 <- select(stable_samples_WT1, -treatment, -genotype, -Houwan, -Wanglitung, -contains("H1"), -contains("H2"), -contains("W1"), -contains("W2"))
+
+datTraits_WT2 <- select(stable_samples_WT2, -treatment, -genotype, -Houwan, -Wanglitung, -contains("H1"), -contains("H2"), -contains("W1"), -contains("W2"))
+```
+
+## Quantify module-trait associations
+## Correlate module eigengene-trait associations
+## Create ME-trait heatmaps
+```{r}
+modcorsplot <- function(datExpr, datTraits, MEs1, title) {
+#Define numbers of genes and samples
+nGenes <- ncol(datExpr)
+nSamples <- nrow(datExpr)
+moduleTraitCor <- cor(MEs1, datTraits, use = "p")
+moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
+moduleCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
+# Will display correlations and their p-values
+textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
+signif(moduleTraitPvalue, 2), ")", sep = "");
+dim(textMatrix) = dim(moduleTraitCor)
+par(mar = c(6, 8.5, 3, 3))
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = moduleTraitCor,
+xLabels = names(datTraits),
+yLabels = names(MEs1),
+yLabelsPosition = "left",
+ySymbols = names(MEs1),
+yColorWidth = 0.005,
+colorLabels = FALSE,
+colors = blueWhiteRed(50),
+textMatrix = textMatrix,
+setStdMargins = FALSE,
+plotLegend = FALSE,
+cex.text = 0.5,
+zlim = c(-1,1),
+main = paste("Module-treatment correlations", title))
+}
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/ModuleCorrelationsPlot_LPS", height = 24, width = 8) 
+modcorsplot(datExpr_LPS, datTraits_LPS, MEs1_LPS, "LPS")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/ModuleCorrelationsPlot_Anti", height = 24, width = 8) 
+ modcorsplot(datExpr_anti, datTraits_anti, MEs1_anti, "Anti")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/ModuleCorrelationsPlot_Heat", height = 24, width = 8) 
+modcorsplot(datExpr_heat, datTraits_heat, MEs1_heat, "Heat")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/ModuleCorrelationsPlot_AntiHeat", height = 24, width = 8) 
+modcorsplot(datExpr_anti.heat, datTraits_anti.heat, MEs1_anti.heat, "AntiHeat")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.lps/figures/ModuleCorrelationsPlot_AntiHeatLPS", height = 24, width = 8) 
+modcorsplot(datExpr_anti.heat.LPS, datTraits_anti.heat.LPS, MEs1_anti.heat.LPS, "AntiHeatLPS")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-LPS/figures/ModuleCorrelationsPlot_AntixLPS", height = 24, width = 8) 
+modcorsplot(datExpr_antixLPS, datTraits_antixLPS, MEs1_antixLPS, "AntixLPS")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/figures/ModuleCorrelationsPlot_AntixHeat", height = 24, width = 8) 
+modcorsplot(datExpr_antixheat, datTraits_antixheat, MEs1_antixheat, "AntixHeat")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_all/figures/ModuleCorrelationsPlot_All", height = 24, width = 14) 
+modcorsplot(datExpr_all, datTraits_all, MEs1_all, "All")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW1/figures/ModuleCorrelationsPlot_HW1", height = 24, width = 8) 
+modcorsplot(datExpr_HW1, datTraits_HW1, MEs1_HW1, "HW1")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW2/figures/ModuleCorrelationsPlot_HW2", height = 24, width = 8) 
+modcorsplot(datExpr_HW2, datTraits_HW2, MEs1_HW2, "HW2")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT1/figures/ModuleCorrelationsPlot_WT1", height = 24, width = 8) 
+modcorsplot(datExpr_WT1, datTraits_WT1, MEs1_WT1, "WT1")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT2/figures/ModuleCorrelationsPlot_WT2", height = 24, width = 8) 
+modcorsplot(datExpr_WT2, datTraits_WT2, MEs1_WT2, "WT2")
+```
+
+## Output network cluster dendrograms
+```{r}
+netclustdendro <- function(net, moduleColors, title) {
+plotDendroAndColors(dendro = net$dendrograms[[1]], colors = moduleColors[net$blockGenes[[1]]],
+"Module Colors",
+dendroLabels = FALSE, hang = 0.03,
+addGuide = TRUE, guideHang = 0.15,
+abHeight = c(0.95),
+main = title)
+}
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/ClusterDendrogram_LPS", height = 8.5, width = 11)
+netclustdendro(net_LPS, moduleColors_LPS, "LPS Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/ClusterDendrogram_Anti", height = 8.5, width = 11)
+netclustdendro(net_anti, moduleColors_anti, "Antibiotics Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/ClusterDendrogram_Heat", height = 8.5, width = 11)
+netclustdendro(net_heat, moduleColors_heat, "Heat Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/ClusterDendrogram_AntiHeat", height = 8.5, width = 11)
+netclustdendro(net_anti.heat, moduleColors_anti.heat, "Antibiotics + Heat Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.lps/figures/ClusterDendrogram_AntiHeatLPS", height = 8.5, width = 11)
+netclustdendro(net_anti.heat.LPS, moduleColors_anti.heat.LPS, "Antibiotics + Heat + LPS Cluster Dendrogram")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-LPS/figures/ClusterDendrogram_Anti-LPS", height = 8.5, width = 11)
+netclustdendro(net_antixLPS, moduleColors_antixLPS, "Anti-LPS Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/figures/ClusterDendrogram_Anti-Heat-AntiHeat", height = 8.5, width = 11)
+netclustdendro(net_antixheat, moduleColors_antixheat, "Anti-Heat Cluster Dendrogram")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_all/figures/ClusterDendrogram_All", height = 8.5, width = 11)
+netclustdendro(net_all, moduleColors_all, "All Cluster Dendrogram")
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW1/figures/ClusterDendrogram_HW1", height = 8.5, width = 11)
+netclustdendro(net_HW1, moduleColors_HW1, "HW1 Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW2/figures/ClusterDendrogram_HW2", height = 8.5, width = 11)
+netclustdendro(net_HW2, moduleColors_HW2, "HW2 Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT1/figures/ClusterDendrogram_WT1", height = 8.5, width = 11)
+netclustdendro(net_WT1, moduleColors_WT1, "WT1 Cluster Dendrogram")
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT2/figures/ClusterDendrogram_WT2", height = 8.5, width = 11)
+netclustdendro(net_WT2, moduleColors_WT2, "WT2 Cluster Dendrogram")
+```
+
+## Output eigengene dendrograms and heatmaps
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/EigengeneDendrogram_LPS", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_LPS, "LPS eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/EigengeneHeatmap_LPS", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_LPS, "LPS eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/EigengeneDendrogram_Anti", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_anti, "Antibiotics eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/EigengeneHeatmap_Anti", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_anti, "Antibiotics eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/EigengeneDendrogram_Heat", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_heat, "Heat eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/EigengeneHeatmap_Heat", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_heat, "Heat eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/EigengeneDendrogram_AntiHeat", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_anti.heat, "Antibiotics + Heat eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/EigengeneHeatmap_AntiHeat", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_anti.heat, "Antibiotics + Heat eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.lps/figures/EigengeneDendrogram_AntiHeatLPS", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_anti.heat.LPS, "Antibiotics + Heat + LPS eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.lps/figures/EigengeneHeatmap_AntiHeatLPS", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_anti.heat.LPS, "Antibiotics + Heat + LPS eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-lps/figures/EigengeneDendrogram_Anti-LPS", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_antixLPS, "Antibiotics + LPS eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-lps/figures/EigengeneHeatmap_Anti-LPS", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_antixLPS, "Antibiotics + LPS eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/figures/EigengeneDendrogram_AntixHeat", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_antixheat, "Antibiotics + Heat eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/figures/EigengeneHeatmap_AntixHeat", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_antixheat, "Antibiotics + Heat eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_all/figures/EigengeneDendrogram_All", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_all, "All Samples eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_all/figures/EigengeneHeatmap_All", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_all, "All Samples eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW1/figures/EigengeneDendrogram_HW1", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_HW1, "Houwan 1 eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_HW1/figures/EigengeneHeatmap_HW1", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_HW1, "Houwan 1 eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW2/figures/EigengeneDendrogram_HW2", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_HW2, "Houwan 2 eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_HW2/figures/EigengeneHeatmap_HW2", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_HW2, "Houwan 2 eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT1/figures/EigengeneDendrogram_WT1", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_WT1, "Wanglitung 1 eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_WT1/figures/EigengeneHeatmap_WT1", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_WT1, "Wanglitung 1 eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT2/figures/EigengeneDendrogram_WT2", height = 6, width = 16)
+plotEigengeneNetworks(MEs1_WT2, "Wanglitung 2 eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+pdf(file = "./WGCNAmodules_Pdam_WT2/figures/EigengeneHeatmap_WT2", height = 8, width = 9)
+plotEigengeneNetworks(MEs1_WT2, "Wanglitung 2 eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90)
+```
+
+## Output barplots of interesting module eigengene expression
+### Set treatment colors
+```{r}
+treatcolors <- c(rep("#FFCC33",3), rep("#CC0033",2), rep("#FF66FF",3), rep("#FF6600",3), rep ("#00CCCC",3), rep("#0000FF",2), 
+                 rep("#FFCC33",3), rep("#CC0033",2), rep("#FF66FF",3), rep("#FF6600",1), rep ("#00CCCC",3), rep("#0000FF",3))
+
+gendensity <- c(rep(200, 3), rep(30, 2), rep(200, 3), rep(30, 3), rep(200, 3), rep(30, 1), rep(200, 3), rep(30, 3), rep(200, 3), rep(30, 3), rep(200, 2), rep(30, 2))
+
+condcolors <- c(rep("#0000FF",5), rep ("#00CCCC",6), rep("#FF6600",4), rep("#FF66FF",6), rep("#FFCC33",6), rep("#CC0033",4))
+```
+
+```{r}
+eigenbarplot <- function(unimodlist, MEs1, condnames) {
+for (module in unimodlist)
+{
+which.module <- module
+ME <- MEs1[, paste("ME", which.module, sep="")]
+barplot(ME, 
+        col = module, 
+        #border =  gencolors,
+        #density = gendensity,
+        main = which.module, ylim = c(-0.6,0.6), 
+        ylab = "eigengene expression", 
+        axes = TRUE, 
+        names.arg = condnames, 
+        cex.lab = 0.01, las = 3)
+}
+}
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/EigengeneBarplots_LPS")
+eigenbarplot(unimods_LPS, MEs1_LPS, stable_samples_LPS$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/EigengeneBarplots_Anti")
+eigenbarplot(unimods_anti, MEs1_anti, stable_samples_anti$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/EigengeneBarplots_Heat")
+eigenbarplot(unimods_heat, MEs1_heat, stable_samples_heat$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/EigengeneBarplots_Anti.Heat")
+eigenbarplot(unimods_anti.heat, MEs1_anti.heat, stable_samples_anti.heat$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.LPS/figures/EigengeneBarplots_Anti.Heat.LPS")
+eigenbarplot(unimods_anti.heat.LPS, MEs1_anti.heat.LPS, stable_samples_anti.heat.LPS$treatment)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-LPS/figures/EigengeneBarplots_Anti-LPS")
+eigenbarplot(unimods_antixLPS, MEs1_antixLPS, stable_samples_antixLPS$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti-heat-anti.heat/figures/EigengeneBarplots_Anti.Heat")
+eigenbarplot(unimods_antixheat, MEs1_antixheat, stable_samples_antixheat$treatment)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_all/figures/EigengeneBarplots_All")
+eigenbarplot(unimods_all, MEs1_all, stable_samples_all$treatment)
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW1/figures/EigengeneBarplots_HW1")
+eigenbarplot(unimods_HW1, MEs1_HW1, stable_samples_HW1$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_HW2/figures/EigengeneBarplots_HW2")
+eigenbarplot(unimods_HW2, MEs1_HW2, stable_samples_HW2$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT1/figures/EigengeneBarplots_WT1")
+eigenbarplot(unimods_WT1, MEs1_WT1, stable_samples_WT1$treatment)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_WT2/figures/EigengeneBarplots_WT2")
+eigenbarplot(unimods_WT2, MEs1_WT2, stable_samples_WT2$treatment)
+```
+
+## Output gene trait significance and module interconnectivity scatterplots
+```{r}
+scatterGSkME <- function(datExpr, unimodlist, MEs1, moduleColors, traitframe) {
+  datKME <- signedKME(datExpr, MEs1)
+  GS <- as.numeric(cor(datExpr, traitframe, use = "p"))
+  GScolor <- numbers2colors(GS, signed = T)
+  colorOfColumn <- substring(names(datKME), 4)
+  for (module in unimodlist) {     
+  column <- match(module, colorOfColumn)     
+  restModule <- moduleColors == module     
+  verboseScatterplot(datKME[restModule, column], GS[restModule], 
+                     ylim = c(-1,1),
+                     xlim = c(-0.5,1),
+                     abline = TRUE,
+                     col = module,
+                     abline.color = module,
+                     xlab = paste("Module Membership ", module, "module"), 
+                     ylab = paste("GS", names(traitframe)),
+                     main = paste("kME.", module, "vs. GS")) 
+  }
+}
+```
+### Create single-trait data frames
+```{r}
+traitframe_LPS <- as.data.frame(datTraits_LPS$lps) 
+names(traitframe_LPS) <- "LPS" 
+```
+```{r}
+traitframe_anti <- as.data.frame(datTraits_anti$anti)
+names(traitframe_anti) <- "Antibiotics"
+```
+```{r}
+traitframe_heat <- as.data.frame(datTraits_heat$heat)
+names(traitframe_heat) <- "Heat"
+```
+```{r}
+traitframe_anti.heat <- as.data.frame(datTraits_anti.heat$anti.heat)
+names(traitframe_anti.heat) <- "Anti.Heat"
+```
+```{r}
+traitframe_anti.heat.LPS <- as.data.frame(datTraits_anti.heat.LPS$anti.heat.lps)
+names(traitframe_anti.heat.LPS) <- "Anti.Heat.LPS"
+```
+
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-LPS/figures/GSkMEScatterplots_LPS")
+scatterGSkME(datExpr_LPS, unimods_LPS, MEs1_LPS, moduleColors_LPS, traitframe_LPS)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti/figures/GSkMEScatterplots_Anti")
+scatterGSkME(datExpr_anti, unimods_anti, MEs1_anti, moduleColors_anti, traitframe_anti)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-heat/figures/GSkMEScatterplots_Heat")
+scatterGSkME(datExpr_heat, unimods_heat, MEs1_heat, moduleColors_heat, traitframe_heat)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat/figures/GSkMEScatterplots_Anti.Heat")
+scatterGSkME(datExpr_anti.heat, unimods_anti.heat, MEs1_anti.heat, moduleColors_anti.heat, traitframe_anti.heat)
+```
+```{r}
+pdf(file = "./WGCNAmodules_Pdam_ctrl-anti.heat.LPS/figures/GSkMEScatterplots_Anti.Heat.LPS")
+scatterGSkME(datExpr_anti.heat.LPS, unimods_anti.heat.LPS, MEs1_anti.heat.LPS, moduleColors_anti.heat.LPS, traitframe_anti.heat.LPS)
+```
+
+
+
+## Below is experimental code
+
+```{r}
+??WGCNA
+```
+
+```{r}
+datKME_LPS <- signedKME(datExpr_LPS, MEs1_LPS)
+```
+```{r}
+# Next use this trait to define a gene significance variable 
+GS.LPS <- as.numeric(cor(datExpr_LPS, trait, use = "p")) 
+# This translates the numeric values into colors 
+GS.LPSColor <- numbers2colors(GS.LPS, signed = T) 
+```
+
+```{r}
+colorOfColumn <- substring(names(datKME_LPS), 4) 
+selectModules <- c("black") 
+for (module in selectModules) {     
+  column <- match(module, colorOfColumn)     
+  restModule <- moduleColors_LPS == module     
+  verboseScatterplot(datKME_LPS[restModule, column], GS.LPS[restModule], 
+                     abline = TRUE,
+                     col = module,
+                     abline.color = module,
+                     xlab = paste("Module Membership ", module, "module"), 
+                     ylab = "GS.LPS", 
+                     main = paste("kME.", module, "vs. GS")) 
+  }
+```
+
+```{r}
+datKMEblack <- select(datKME_LPS, kMEblack)
+datKMEblack$ID <- rownames(datKMEblack)
+datKMEblack <- filter(datKMEblack, kMEblack > 0.8)
+write.csv(datKMEblack$ID, file = "./KMEtest.csv")
+write.table(as.data.frame(datKMEblack$ID), file = "./KMEtest.txt",
+row.names = FALSE, col.names = FALSE)
+```
+## Remove quotations from list gene IDs and search for gene notes 
+```{bash}
+sed -i -e 's/"//g' ./KMEtest.txt
+```
+
+## Choose top hub gene in each module
+```{r}
+modhubs <- function(datExpr, moduleColors, sft) {
+hubs <- chooseTopHubInEachModule(datExpr = datExpr, colorh = moduleColors, power = sft$powerEstimate, type = "signed")
+hubs <- as.data.frame(hubs)
+hubs
+}
+```
+```{r}
+hubs_LPS <- modhubs(datExpr_LPS, moduleColors_LPS, sft_LPS)
+hubs_anti <- modhubs(datExpr_anti, moduleColors_anti, sft_anti)
+hubs_heat <- modhubs(datExpr_heat, moduleColors_heat, sft_heat)
+hubs_anti.heat
+hubs_anti.heat.LPS <- modhubs(datExpr_anti.heat.LPS, moduleColors_anti.heat.LPS, sft_anti.heat.LPS)
+###
+hubs_antixLPS
+hubs_antixheat
+hubs_all
+```
+
+```{r}
+write.csv(hubs_LPS, file = "./WGCNAmodules_Pdam_ctrl-LPS/hubgenes/hubs.csv")
+write.csv(hubs_anti, file = "./WGCNAmodules_Pdam_ctrl-anti/hubgenes/hubs.csv")
+write.csv(hubs_heat, file = "./WGCNAmodules_Pdam_ctrl-heat/hubgenes/hubs.csv")
+###
+write.csv(hubs_anti.heat.LPS, file = "./WGCNAmodules_Pdam_ctrl-anti.heat.LPS/hubgenes/hubs.csv")
+```
+
+## Search module gene notes from ID lists
+```{bash}
+awk -F "," '{print $2}' ./WGCNAmodules_Pdam*/hubgenes/hubs.csv > ./WGCNAmodules_Pdam*/hubgenes/hubs_IDs.txt
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam*/hubgenes/*.txt
+grep -f ./WGCNAmodules_Pdam*/hubgenes/hubs_IDs.txt ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ./WGCNAmodules_Pdam*/hubgenes/hubs_IDs.notes.txt
+sed -i -e 's/ID=//g' ./WGCNAmodules_Pdam*/hubgenes/*notes.txt
+awk -F " Note=" '{print $1"\t"$2}' ./WGCNAmodules_Pdam*/hubgenes/hubs_IDs.notes.txt > ./WGCNAmodules_Pdam*/hubgenes/hubs_IDsnotes.txt
+rm ./WGCNAmodules_Pdam*/hubgenes/*txt-e
+```
+```{r}
+hubs_IDsnotes_LPS <- read.delim("./WGCNAmodules_Pdam_ctrl-LPS/hubgenes/hubs_IDsnotes.txt", header=FALSE)
+hubs_IDsnotes_anti <- read.delim("./WGCNAmodules_Pdam_ctrl-anti/hubgenes/hubs_IDsnotes.txt", header=FALSE)
+hubs_IDsnotes_heat <- read.delim("./WGCNAmodules_Pdam_ctrl-heat/hubgenes/hubs_IDsnotes.txt", header=FALSE)
+```
+```{r}
+for (hub in hubslist) {
+hubs$notes <- hubs_IDsnotes$V2[match(hubs$hubs, hubs_IDsnotes$V1)]
+}
+write.csv(hubs, file = "./WGCNAmodules_Pdam_ctrl-LPS/hubgenes/modulehubs.csv")
+```
+
+## Output interesting module VisANT edge file
+```{r}
+#need to save TOMs
+
+#setwd("~/computing/scripts/EAPSI-Wanglitung/WGCNAmodules/visANT")
+
+# Select modules (only interested in one for now)
+vismods <- function(datExpr, moduleColors, TOM) {
+visANTModules <- c("lavenderblush3")
+# Select module probes
+Genes <- colnames(datExpr)
+for (visANTmod in visANTModules)
+{
+inModule <- (moduleColors == visANTmod)
+modGeneIDs <- Genes[inModule]
+#modGenes <- genefeatures$IDGeneInfo[match(modProbes, genefeatures$IDGeneInfo)]
+modGeneIDs
+# Select the corresponding Topological Overlap
+modTOM = TOM[inModule, inModule]
+dimnames(modTOM) = list(modGeneIDs, modGeneIDs)
+# Export the network into an edge list file VisANT can read
+vis = exportNetworkToVisANT(modTOM,
+file = paste("VisANTInput-", visANTmod, ".txt", sep=""),
+weighted = TRUE,
+threshold = 0)
+}
+}
+```
+```{r}
+vismods(datExpr_anti, moduleColors_anti, TOM_anti)
+```

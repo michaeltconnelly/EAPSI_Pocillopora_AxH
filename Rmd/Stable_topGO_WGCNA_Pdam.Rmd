@@ -1,0 +1,104 @@
+---
+title: "Stable_topGO_WGCNA_Pdam"
+author: "Mike Connelly"
+date: "11/01/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+## Setup packages and working directories
+```{r packages, error=FALSE, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("genefilter")
+library("topGO")
+library("GO.db")
+library("Rgraphviz")
+```
+## Input required *P. damicornis* GO annotation data and construct Gene-to-GO object for custom annotation mapping
+```{r}
+geneID_GO <- readMappings(file = "pdam_genome_GOterms.txt")
+str(head(geneID_GO))
+```
+## Construct GO-to-Gene object for GO term searches of interesting genes
+```{r}
+GO_geneID2 <- readMappings(file = "pdam_genome_GOgenes3.txt")
+str(head(GO_geneID2))
+```
+
+```{r}
+GO_geneID <- inverseList(geneID_GO)
+str(head(GO_geneID))
+```
+## Generate gene universe and GO universe from Gene-to-GO and GO-to-Gene objects
+```{r}
+geneNames <- names(geneID_GO)
+str(head(geneNames))
+```
+```{r}
+GONames <- names(GO_geneID)
+str(head(GONames))
+```
+```{r}
+fnlist2 <- function(x, fil){ z <- deparse(substitute(x))
+                         cat(z, "\n", file=fil)
+                         nams=names(x) 
+                   for (i in seq_along(x) ){ cat(nams[i], "\t" , x[[i]],"\n", file=fil, append=TRUE) }
+                         }
+```
+```{r}
+fnlist2(GO_geneID, "pdam_genome_GOgenes3.txt")
+```
+
+## Input lists of co-expressed module genes after WGCNA analysis
+```{r, warning = FALSE}
+modulelists <- list.files(path = "./WGCNAmodules_Pdam_WT2/lists", pattern = "_ID.txt", full.names = TRUE)
+```
+## Construct topGOdata object using *P. damicornis* gene models, differentially expressed gene lists and gene ontology annotations
+## Perform Fisher's exact test to identify enriched gene ontology terms
+## Perform Kolmogorov-Smirnov test to identify enriched gene ontology terms
+## Analyse highly-significant GO terms and corresponding p-values, then produce a table of results
+```{r}
+topGOanalyzeWGCNA <- function(filename) {
+### Custom function for full topGO analysis and results table generation
+DEgenes <- read.delim(filename, header = FALSE, stringsAsFactors = FALSE)
+DEgenes <- as.data.frame(DEgenes)
+geneList <- factor(as.integer(geneNames %in% DEgenes$V1))
+names(geneList) <- geneNames
+Pdam_GOdata <- new("topGOdata",
+              description = DElist,
+              ontology = "BP",
+              allGenes = geneList,
+              nodeSize = 10,
+              annot = annFUN.gene2GO,
+              gene2GO = geneID_GO)
+resultFisher01 <- runTest(Pdam_GOdata, algorithm = "weight01", statistic = "fisher")
+resultFisher <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "fisher")
+resultKS <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "ks")
+resultKSelim <- runTest(Pdam_GOdata, algorithm = "elim", statistic = "ks")
+allRes <- GenTable(Pdam_GOdata, 
+                   elimKS = resultKSelim,
+                   classicKS = resultKS,
+                   classicFisher = resultFisher,
+                   weight01Fisher = resultFisher01,
+                   orderBy = "weight01Fisher", 
+                   ranksOf = "weight01Fisher", 
+                   topNodes = 50)
+print(allRes)
+resultfile <- paste(filename, "_topGO.csv", sep = "")
+write.csv(allRes, file = resultfile)
+}
+```
+```{r}
+for (modulelist in modulelists)
+{
+  print(modulelist)
+  topGOanalyzeWGCNA(modulelist)
+}
+```
+```{bash}
+mv ~/computing/scripts/EAPSI.HW-WT-master/WGCNAmodules_Pdam_WT2/lists/*.csv ~/computing/scripts/EAPSI.HW-WT-master/WGCNAmodules_Pdam_WT2/topGO
+```
+

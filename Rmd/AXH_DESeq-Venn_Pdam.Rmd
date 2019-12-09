@@ -1,0 +1,507 @@
+---
+title: "AXH_DESeq-Venn_Pdam"
+author: "Mike Connelly"
+date: "9/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_HW-WT-master/")
+library(DESeq2)
+library(VennDiagram)
+library(extrafont)
+library(extrafontdb)
+```
+```{r}
+resultsNames(dds_anti)
+resultsNames(dds_heat)
+resultsNames(dds_anti.heat)
+resultsNames(dds_antixheat)
+```
+
+## Overall model treatment DEG venn intersects
+```{r}
+AH <- intersect(ressig_anti_ctrl$IDGeneInfo, ressig_heat_ctrl$IDGeneInfo)
+AX <- intersect(ressig_anti_ctrl$IDGeneInfo, ressig_anti.heat_ctrl$IDGeneInfo)
+HX <- intersect(ressig_heat_ctrl$IDGeneInfo, ressig_anti.heat_ctrl$IDGeneInfo)
+AXH <- intersect(intersect(ressig_anti_ctrl$IDGeneInfo, ressig_heat_ctrl$IDGeneInfo), ressig_anti.heat_ctrl$IDGeneInfo)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn <- draw.triple.venn(area1 = length(ressig_anti_ctrl$IDGeneInfo),
+                             area2 = length(ressig_heat_ctrl$IDGeneInfo),
+                             area3 = length(ressig_anti.heat_ctrl$IDGeneInfo),
+                             n12 = length(AH),
+                             n13 = length(AX),
+                             n23 = length(HX),
+                             n123 = length(AXH),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn)
+```
+
+### Up
+```{r}
+AH_up <- intersect(ressig_anti_ctrl_up$IDGeneInfo, ressig_heat_ctrl_up$IDGeneInfo)
+AX_up <- intersect(ressig_anti_ctrl_up$IDGeneInfo, ressig_anti.heat_ctrl_up$IDGeneInfo)
+HX_up <- intersect(ressig_heat_ctrl_up$IDGeneInfo, ressig_anti.heat_ctrl_up$IDGeneInfo)
+AXH_up <- intersect(intersect(ressig_anti_ctrl_up$IDGeneInfo, ressig_heat_ctrl_up$IDGeneInfo), ressig_anti.heat_ctrl_up$IDGeneInfo)
+```
+```{r}
+#pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_up.pdf", height = 2.8, width = 2.8)
+vp = viewport(height = unit(2.8, "in"),  width = unit(2.8, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+UpVenn <- draw.triple.venn(area1 = length(ressig_anti_ctrl_up$IDGeneInfo),
+                           area2 = length(ressig_heat_ctrl_up$IDGeneInfo),
+                           area3 = length(ressig_anti.heat_ctrl_up$IDGeneInfo),
+                           n12 = length(AH_up),
+                           n13 = length(AX_up),
+                           n23 = length(HX_up),
+                           n123 = length(AXH_up),
+                           #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                           fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                           #lwd = rep(1,3),
+                           #cat.cex = rep(1.5, 3),
+                           #cat.fontfamily = rep("Arial", 3),
+                           #cat.fontface = rep("bold", 3),
+                           #alpha = c(rep(0.5, 3)),
+                           #cex = c(rep(1, 4), 2, rep(1, 2)),
+                           #fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                           #fontfamily = c(rep("Arial", 7)),
+                           #label.col = c(rep("black", 4), "black", rep("black", 2)),
+                           print.mode = "raw")
+grid.draw(UpVenn)
+```
+
+### Down
+```{r}
+AH <- intersect(ressig_anti_ctrl_dn$IDGeneInfo, ressig_heat_ctrl_dn$IDGeneInfo)
+AX <- intersect(ressig_anti_ctrl_dn$IDGeneInfo, ressig_anti.heat_ctrl_dn$IDGeneInfo)
+HX <- intersect(ressig_heat_ctrl_dn$IDGeneInfo, ressig_anti.heat_ctrl_dn$IDGeneInfo)
+AXH <- intersect(AH, HX)
+```
+```{r}
+#pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_dn.pdf", height = 2.8, width = 2.8)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+DnVenn <- draw.triple.venn(area1 = length(ressig_anti_ctrl_dn$IDGeneInfo),
+                             area2 = length(ressig_heat_ctrl_dn$IDGeneInfo),
+                             area3 = length(ressig_anti.heat_ctrl_dn$IDGeneInfo),
+                             n12 = length(AH),
+                             n13 = length(AX),
+                             n23 = length(HX),
+                             n123 = length(AXH),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             #lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             #alpha = c(rep(0.5, 3)),
+                             #cex = c(rep(1, 4), 2, rep(1, 2)),
+                             #fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             #fontfamily = c(rep("Arial", 7)),
+                             #label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             #print.mode = "raw",
+                             #sigdigs = 2,
+                             scaled = TRUE)
+grid.draw(DnVenn)
+```
+
+# Colony-specific DEG venn intersects by treatment
+## Antibiotics vs. Control
+```{r}
+sumDEGsHW <- union(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_HW2_anti_ctrl$IDGeneInfo)
+sumDEGsWT <- union(ressig_WT1_anti_ctrl$IDGeneInfo, ressig_WT2_anti_ctrl$IDGeneInfo)
+sumDEGs <- union(sumDEGsHW, sumDEGsWT)
+length(sumDEGs)
+
+##Pairwise
+HW1_HW2 <- intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_HW2_anti_ctrl$IDGeneInfo)
+HW1_WT1 <- intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_WT1_anti_ctrl$IDGeneInfo)
+HW1_WT2 <- intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_WT2_anti_ctrl$IDGeneInfo)
+HW2_WT1 <- intersect(ressig_HW2_anti_ctrl$IDGeneInfo, ressig_WT1_anti_ctrl$IDGeneInfo)
+HW2_WT2 <- intersect(ressig_HW2_anti_ctrl$IDGeneInfo, ressig_WT2_anti_ctrl$IDGeneInfo)
+WT1_WT2 <- intersect(ressig_WT1_anti_ctrl$IDGeneInfo, ressig_WT2_anti_ctrl$IDGeneInfo)
+##Triple
+HW1_HW2_WT1 <- intersect(HW1_HW2, ressig_WT1_anti_ctrl$IDGeneInfo)
+HW1_HW2_WT2 <- intersect(HW1_HW2, ressig_WT2_anti_ctrl$IDGeneInfo)
+HW1_WT1_WT2 <- intersect(WT1_WT2, ressig_HW1_anti_ctrl$IDGeneInfo)
+HW2_WT1_WT2 <- intersect(WT1_WT2, ressig_HW2_anti_ctrl$IDGeneInfo)
+##Quadruple
+HW12_WT12 <- intersect(HW1_HW2, WT1_WT2)
+```
+```{r}
+setdiff(HW1_WT2, HW12_WT12)
+```
+```{r}
+setdiff(WT1_WT2, HW12_WT12)
+```
+
+```{r}
+setdiff(ressig_WT2_LPS$IDGeneInfo, sumDEGsHW)
+```
+```{r}
+pdf("~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/anti_colony_Venn.pdf", height = 2.4, width = 2.4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+#HW1, WT2, HW2, WT1
+anti_ctrl_venn <- draw.quad.venn(area1 = length(ressig_HW1_anti_ctrl$IDGeneInfo),
+               area2 = length(ressig_WT2_anti_ctrl$IDGeneInfo),
+               area3 = length(ressig_HW2_anti_ctrl$IDGeneInfo),
+               area4 = length(ressig_WT1_anti_ctrl$IDGeneInfo),
+               n12 = length(HW1_WT2),
+               n13 = length(HW1_HW2),
+               n14 = length(HW1_WT1),
+               n23 = length(HW2_WT2),
+               n24 = length(WT1_WT2),
+               n34 = length(HW2_WT1),
+               n123 = length(HW1_HW2_WT2),
+               n124 = length(HW1_WT1_WT2),
+               n134 = length(HW1_HW2_WT1),
+               n234 = length(HW2_WT1_WT2),
+               n1234 = length(HW12_WT12),
+               category = c("HW1", "WT2", "HW2", "WT1"),
+               fill = c("#CCFFCC", "#CCCCFF", "#99FFCC", "#CCFFFF"),
+               lwd = rep(1,4),
+               cat.cex = rep(0.8, 4),
+               cat.fontfamily = rep("Arial", 4),
+               cat.fontface = rep("bold", 4),
+               alpha = c(0.3,0.3,0.3,0.3),
+               cex = c(rep(0.8,5), 1.2, rep(0.8, 9)),
+               fontface = c(rep("plain", 5), "bold", rep("plain", 9)),
+               fontfamily = c(rep("Arial", 15)),
+               label.col = c(rep("black", 5), "black", rep("black", 9)),
+               print.mode = "raw",
+               sigdigs = 2,
+               scaled = TRUE
+)
+grid.draw(anti_ctrl_venn)
+```
+
+## Heat vs. Control
+```{r}
+sumDEGsHW <- union(ressig_HW1_heat_ctrl$IDGeneInfo, ressig_HW2_heat_ctrl$IDGeneInfo)
+sumDEGsWT <- union(ressig_WT1_heat_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo)
+sumDEGs <- union(sumDEGsHW, sumDEGsWT)
+length(sumDEGs)
+
+##Pairwise
+HW1_HW2 <- intersect(ressig_HW1_heat_ctrl$IDGeneInfo, ressig_HW2_heat_ctrl$IDGeneInfo)
+HW1_WT1 <- intersect(ressig_HW1_heat_ctrl$IDGeneInfo, ressig_WT1_heat_ctrl$IDGeneInfo)
+HW1_WT2 <- intersect(ressig_HW1_heat_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo)
+HW2_WT1 <- intersect(ressig_HW2_heat_ctrl$IDGeneInfo, ressig_WT1_heat_ctrl$IDGeneInfo)
+HW2_WT2 <- intersect(ressig_HW2_heat_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo)
+WT1_WT2 <- intersect(ressig_WT1_heat_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo)
+##Triple
+HW1_HW2_WT1 <- intersect(HW1_HW2, ressig_WT1_heat_ctrl$IDGeneInfo)
+HW1_HW2_WT2 <- intersect(HW1_HW2, ressig_WT2_heat_ctrl$IDGeneInfo)
+HW1_WT1_WT2 <- intersect(WT1_WT2, ressig_HW1_heat_ctrl$IDGeneInfo)
+HW2_WT1_WT2 <- intersect(WT1_WT2, ressig_HW2_heat_ctrl$IDGeneInfo)
+##Quadruple
+HW12_WT12 <- intersect(HW1_HW2, WT1_WT2)
+```
+```{r}
+setdiff(HW1_WT2, HW12_WT12)
+```
+```{r}
+setdiff(WT1_WT2, HW12_WT12)
+```
+
+```{r}
+pdf("~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/heat_colony_Venn.pdf", height = 2.4, width = 2.4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+#HW1, WT2, HW2, WT1
+heat_ctrl_venn <- draw.quad.venn(area1 = length(ressig_HW1_heat_ctrl$IDGeneInfo),
+               area2 = length(ressig_WT2_heat_ctrl$IDGeneInfo),
+               area3 = length(ressig_HW2_heat_ctrl$IDGeneInfo),
+               area4 = length(ressig_WT1_heat_ctrl$IDGeneInfo),
+               n12 = length(HW1_WT2),
+               n13 = length(HW1_HW2),
+               n14 = length(HW1_WT1),
+               n23 = length(HW2_WT2),
+               n24 = length(WT1_WT2),
+               n34 = length(HW2_WT1),
+               n123 = length(HW1_HW2_WT2),
+               n124 = length(HW1_WT1_WT2),
+               n134 = length(HW1_HW2_WT1),
+               n234 = length(HW2_WT1_WT2),
+               n1234 = length(HW12_WT12),
+               category = c("HW1", "WT2", "HW2", "WT1"),
+               fill = c("#CCFFCC", "#CCCCFF", "#99FFCC", "#CCFFFF"),
+               lwd = rep(1,4),
+               cat.cex = rep(0.8, 4),
+               cat.fontfamily = rep("Arial", 4),
+               cat.fontface = rep("bold", 4),
+               alpha = c(0.3,0.3,0.3,0.3),
+               cex = c(rep(0.8,5), 1.2, rep(0.8, 9)),
+               fontface = c(rep("plain", 5), "bold", rep("plain", 9)),
+               fontfamily = c(rep("Arial", 15)),
+               label.col = c(rep("black", 5), "black", rep("black", 9)),
+               print.mode = "raw",
+               sigdigs = 2,
+               scaled = TRUE
+)
+grid.draw(heat_ctrl_venn)
+```
+
+## Antibiotics.Heat vs. Control
+```{r}
+sumDEGsHW <- union(ressig_HW1_anti.heat_ctrl$IDGeneInfo, ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+sumDEGsWT <- union(ressig_WT1_anti.heat_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+sumDEGs <- union(sumDEGsHW, sumDEGsWT)
+length(sumDEGs)
+
+##Pairwise
+HW1_HW2 <- intersect(ressig_HW1_anti.heat_ctrl$IDGeneInfo, ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+HW1_WT1 <- intersect(ressig_HW1_anti.heat_ctrl$IDGeneInfo, ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+HW1_WT2 <- intersect(ressig_HW1_anti.heat_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+HW2_WT1 <- intersect(ressig_HW2_anti.heat_ctrl$IDGeneInfo, ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+HW2_WT2 <- intersect(ressig_HW2_anti.heat_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+WT1_WT2 <- intersect(ressig_WT1_anti.heat_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+##Triple
+HW1_HW2_WT1 <- intersect(HW1_HW2, ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+HW1_HW2_WT2 <- intersect(HW1_HW2, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+HW1_WT1_WT2 <- intersect(WT1_WT2, ressig_HW1_anti.heat_ctrl$IDGeneInfo)
+HW2_WT1_WT2 <- intersect(WT1_WT2, ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+##Quadruple
+HW12_WT12 <- intersect(HW1_HW2, WT1_WT2)
+```
+```{r}
+HW12_WT12
+```
+
+```{r}
+setdiff(HW1_WT2, HW12_WT12)
+```
+```{r}
+setdiff(WT1_WT2, HW12_WT12)
+```
+
+```{r}
+pdf("~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/AXH_colony_Venn.pdf", height = 2.4, width = 2.4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+#HW1, WT2, HW2, WT1
+anti.heat_ctrl_venn <- draw.quad.venn(area1 = length(ressig_HW1_anti.heat_ctrl$IDGeneInfo),
+               area2 = length(ressig_WT2_anti.heat_ctrl$IDGeneInfo),
+               area3 = length(ressig_HW2_anti.heat_ctrl$IDGeneInfo),
+               area4 = length(ressig_WT1_anti.heat_ctrl$IDGeneInfo),
+               n12 = length(HW1_WT2),
+               n13 = length(HW1_HW2),
+               n14 = length(HW1_WT1),
+               n23 = length(HW2_WT2),
+               n24 = length(WT1_WT2),
+               n34 = length(HW2_WT1),
+               n123 = length(HW1_HW2_WT2),
+               n124 = length(HW1_WT1_WT2),
+               n134 = length(HW1_HW2_WT1),
+               n234 = length(HW2_WT1_WT2),
+               n1234 = length(HW12_WT12),
+               category = c("HW1", "WT2", "HW2", "WT1"),
+               fill = c("#CCFFCC", "#CCCCFF", "#99FFCC", "#CCFFFF"),
+               lwd = rep(1,4),
+               cat.cex = rep(0.8, 4),
+               cat.fontfamily = rep("Arial", 4),
+               cat.fontface = rep("bold", 4),
+               alpha = c(0.3,0.3,0.3,0.3),
+               cex = c(rep(0.8,5), 1.2, rep(0.8, 9)),
+               fontface = c(rep("plain", 5), "bold", rep("plain", 9)),
+               fontfamily = c(rep("Arial", 15)),
+               label.col = c(rep("black", 5), "black", rep("black", 9)),
+               print.mode = "raw",
+               sigdigs = 2,
+               scaled = TRUE
+)
+grid.draw(anti.heat_ctrl_venn)
+```
+
+# Colony-specific up/down DEG Venn intersects by treatment
+
+# Treatment-specific DEG venn intersects by colony
+## HW1
+```{r}
+AH_HW1 <- intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_HW1_heat_ctrl$IDGeneInfo)
+AX_HW1 <- intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_HW1_anti.heat_ctrl$IDGeneInfo)
+HX_HW1 <- intersect(ressig_HW1_heat_ctrl$IDGeneInfo, ressig_HW1_anti.heat_ctrl$IDGeneInfo)
+AXH_HW1 <- intersect(intersect(ressig_HW1_anti_ctrl$IDGeneInfo, ressig_HW1_heat_ctrl$IDGeneInfo), ressig_HW1_anti.heat_ctrl$IDGeneInfo)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_HW1.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn <- draw.triple.venn(area1 = length(ressig_HW1_anti_ctrl$IDGeneInfo),
+                             area2 = length(ressig_HW1_heat_ctrl$IDGeneInfo),
+                             area3 = length(ressig_HW1_anti.heat_ctrl$IDGeneInfo),
+                             n12 = length(AH_HW1),
+                             n13 = length(AX_HW1),
+                             n23 = length(HX_HW1),
+                             n123 = length(AXH_HW1),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn)
+```
+
+## HW2
+```{r}
+AH_HW2 <- intersect(ressig_HW2_anti_ctrl$IDGeneInfo, ressig_HW2_heat_ctrl$IDGeneInfo)
+AX_HW2 <- intersect(ressig_HW2_anti_ctrl$IDGeneInfo, ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+HX_HW2 <- intersect(ressig_HW2_heat_ctrl$IDGeneInfo, ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+AXH_HW2 <- intersect(intersect(ressig_HW2_anti_ctrl$IDGeneInfo, ressig_HW2_heat_ctrl$IDGeneInfo), ressig_HW2_anti.heat_ctrl$IDGeneInfo)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_HW2.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn <- draw.triple.venn(area1 = length(ressig_HW2_anti_ctrl$IDGeneInfo),
+                             area2 = length(ressig_HW2_heat_ctrl$IDGeneInfo),
+                             area3 = length(ressig_HW2_anti.heat_ctrl$IDGeneInfo),
+                             n12 = length(AH_HW2),
+                             n13 = length(AX_HW2),
+                             n23 = length(HX_HW2),
+                             n123 = length(AXH_HW2),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn)
+```
+## WT1
+```{r}
+AH_WT1 <- intersect(ressig_WT1_anti_ctrl$IDGeneInfo, ressig_WT1_heat_ctrl$IDGeneInfo)
+AX_WT1 <- intersect(ressig_WT1_anti_ctrl$IDGeneInfo, ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+HX_WT1 <- intersect(ressig_WT1_heat_ctrl$IDGeneInfo, ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+AXH_WT1 <- intersect(intersect(ressig_WT1_anti_ctrl$IDGeneInfo, ressig_WT1_heat_ctrl$IDGeneInfo), ressig_WT1_anti.heat_ctrl$IDGeneInfo)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_WT1.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn <- draw.triple.venn(area1 = length(ressig_WT1_anti_ctrl$IDGeneInfo),
+                             area2 = length(ressig_WT1_heat_ctrl$IDGeneInfo),
+                             area3 = length(ressig_WT1_anti.heat_ctrl$IDGeneInfo),
+                             n12 = length(AH_WT1),
+                             n13 = length(AX_WT1),
+                             n23 = length(HX_WT1),
+                             n123 = length(AXH_WT1),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn)
+```
+
+## WT2
+```{r}
+AH_WT2 <- intersect(ressig_WT2_anti_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo)
+AX_WT2 <- intersect(ressig_WT2_anti_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+HX_WT2 <- intersect(ressig_WT2_heat_ctrl$IDGeneInfo, ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+AXH_WT2 <- intersect(intersect(ressig_WT2_anti_ctrl$IDGeneInfo, ressig_WT2_heat_ctrl$IDGeneInfo), ressig_WT2_anti.heat_ctrl$IDGeneInfo)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Venn_AXH_WT2.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn <- draw.triple.venn(area1 = length(ressig_WT2_anti_ctrl$IDGeneInfo),
+                             area2 = length(ressig_WT2_heat_ctrl$IDGeneInfo),
+                             area3 = length(ressig_WT2_anti.heat_ctrl$IDGeneInfo),
+                             n12 = length(AH_WT2),
+                             n13 = length(AX_WT2),
+                             n23 = length(HX_WT2),
+                             n123 = length(AXH_WT2),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn)
+```
+
+# Overall and Colony-specific DEG Venn
