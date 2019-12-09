@@ -1,0 +1,8 @@
+Pipeline setup process started
+Reference genome sequences copied to scratch
+Program files copied to scratch
+Filesystem and project directories created
+EAPSI sequences copied
+Job <23131285> is submitted to queue <general>.
+Job <23131286> is submitted to queue <bigmem>.
+RNAseq pipeline scripts successfully activated

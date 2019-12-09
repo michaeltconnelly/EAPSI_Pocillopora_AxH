@@ -1,0 +1,231 @@
+Sender: LSF System <lsfadmin@n178>
+Subject: Job 23131344: <starwrap_pdam> in cluster <mk2> Done
+
+Job <starwrap_pdam> was submitted from host <n178> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n178>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH> was used as the working directory.
+Started at Mon Dec  9 11:09:06 2019
+Results reported on Mon Dec  9 11:09:07 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/STARalignwrapper_Pdam_v2.sh
+#purpose: align trimmed RNAseq reads against the Pocillopora damicornis genome using STAR on the Pegasus bigmem queue
+#version 2: two-pass alignment for improved splice junction detection accuracy, downstream SNP calling and phylotranscriptomics, output non-aligning reads for Symbiodinaceae analysis
+#To start this job from the EAPSI_Pocillopora_AxH directory, use:
+#bsub -P transcriptomics < /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/bash/STARalignwrapper_Pdam_v2.sh
+
+#BSUB -J starwrap_pdam
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o STARwrap_pdam%J.out
+#BSUB -e STARwrap_pdam%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH"
+exp="AxH"
+EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c"
+
+#lets me know which files are being processed
+echo "These are the reads to be aligned to the Pocillopora reference genome: $EAPSIsamples"
+
+#loop to automate generation of scripts to direct sequence file trimming
+for EAPSIsample in $EAPSIsamples
+do \
+echo "Aligning ${EAPSIsample}"
+
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -J '"${EAPSIsample}"_staralign_pdam'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$EAPSIsample"staralign_pdam%J.out'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$EAPSIsample"staralign_pdam%J.err'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_staralign_pdam.job
+
+#   input command to run STAR aligner
+echo ${mcs}/programs/STAR-2.5.3a/bin/Linux_x86_64/STAR \
+--runMode alignReads \
+--quantMode TranscriptomeSAM \
+--runThreadN 16 \
+--readFilesIn ${prodir}/outputs/trimmomaticreads/${EAPSIsample}_trimmed.fastq.gz \
+--readFilesCommand gunzip -c \
+--genomeDir ${mcs}/sequences/genomes/coral/pocillopora/STARindex \
+--sjdbGTFfeatureExon exon \
+--sjdbGTFtagExonParentTranscript Parent \
+--sjdbGTFfile  ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.gff \
+--twopassMode Basic \
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.97 sec.
+    Max Memory :                                 2 MB
+    Average Memory :                             2.00 MB
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               11998.00 MB
+    Max Swap :                                   228 MB
+    Max Processes :                              3
+    Max Threads :                                4
+
+The output (if any) follows:
+
+These are the reads to be aligned to the Pocillopora reference genome: Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c
+Aligning Wt1-1a
+STAR alignment script of Wt1-1a submitted
+Job <23131345> is submitted to queue <bigmem>.
+Aligning Wt1-1b
+STAR alignment script of Wt1-1b submitted
+Job <23131346> is submitted to queue <bigmem>.
+Aligning Wt1-1c
+STAR alignment script of Wt1-1c submitted
+Job <23131347> is submitted to queue <bigmem>.
+Aligning Wt1-4a
+STAR alignment script of Wt1-4a submitted
+Job <23131348> is submitted to queue <bigmem>.
+Aligning Wt1-4b
+STAR alignment script of Wt1-4b submitted
+Job <23131349> is submitted to queue <bigmem>.
+Aligning Wt1-4c
+STAR alignment script of Wt1-4c submitted
+Job <23131350> is submitted to queue <bigmem>.
+Aligning Wt1-5a
+STAR alignment script of Wt1-5a submitted
+Job <23131351> is submitted to queue <bigmem>.
+Aligning Wt1-5b
+STAR alignment script of Wt1-5b submitted
+Job <23131352> is submitted to queue <bigmem>.
+Aligning Wt1-5c
+STAR alignment script of Wt1-5c submitted
+Job <23131353> is submitted to queue <bigmem>.
+Aligning Wt1-6a
+STAR alignment script of Wt1-6a submitted
+Job <23131354> is submitted to queue <bigmem>.
+Aligning Wt1-6b
+STAR alignment script of Wt1-6b submitted
+Job <23131355> is submitted to queue <bigmem>.
+Aligning Wt1-6c
+STAR alignment script of Wt1-6c submitted
+Job <23131356> is submitted to queue <bigmem>.
+Aligning Wt2-1a
+STAR alignment script of Wt2-1a submitted
+Job <23131357> is submitted to queue <bigmem>.
+Aligning Wt2-1b
+STAR alignment script of Wt2-1b submitted
+Job <23131358> is submitted to queue <bigmem>.
+Aligning Wt2-1c
+STAR alignment script of Wt2-1c submitted
+Job <23131359> is submitted to queue <bigmem>.
+Aligning Wt2-4a
+STAR alignment script of Wt2-4a submitted
+Job <23131360> is submitted to queue <bigmem>.
+Aligning Wt2-4b
+STAR alignment script of Wt2-4b submitted
+Job <23131361> is submitted to queue <bigmem>.
+Aligning Wt2-4c
+STAR alignment script of Wt2-4c submitted
+Job <23131362> is submitted to queue <bigmem>.
+Aligning Wt2-5a
+STAR alignment script of Wt2-5a submitted
+Job <23131363> is submitted to queue <bigmem>.
+Aligning Wt2-5b
+STAR alignment script of Wt2-5b submitted
+Job <23131364> is submitted to queue <bigmem>.
+Aligning Wt2-5c
+STAR alignment script of Wt2-5c submitted
+Job <23131365> is submitted to queue <bigmem>.
+Aligning Wt2-6a
+STAR alignment script of Wt2-6a submitted
+Job <23131366> is submitted to queue <bigmem>.
+Aligning Wt2-6b
+STAR alignment script of Wt2-6b submitted
+Job <23131367> is submitted to queue <bigmem>.
+Aligning Wt2-6c
+STAR alignment script of Wt2-6c submitted
+Job <23131368> is submitted to queue <bigmem>.
+Aligning Hw1-1a
+STAR alignment script of Hw1-1a submitted
+Job <23131369> is submitted to queue <bigmem>.
+Aligning Hw1-1b
+STAR alignment script of Hw1-1b submitted
+Job <23131370> is submitted to queue <bigmem>.
+Aligning Hw1-1c
+STAR alignment script of Hw1-1c submitted
+Job <23131371> is submitted to queue <bigmem>.
+Aligning Hw1-4a
+STAR alignment script of Hw1-4a submitted
+Job <23131372> is submitted to queue <bigmem>.
+Aligning Hw1-4b
+STAR alignment script of Hw1-4b submitted
+Job <23131373> is submitted to queue <bigmem>.
+Aligning Hw1-4c
+STAR alignment script of Hw1-4c submitted
+Job <23131374> is submitted to queue <bigmem>.
+Aligning Hw1-5a
+STAR alignment script of Hw1-5a submitted
+Job <23131375> is submitted to queue <bigmem>.
+Aligning Hw1-5b
+STAR alignment script of Hw1-5b submitted
+Job <23131376> is submitted to queue <bigmem>.
+Aligning Hw1-5c
+STAR alignment script of Hw1-5c submitted
+Job <23131377> is submitted to queue <bigmem>.
+Aligning Hw1-6a
+STAR alignment script of Hw1-6a submitted
+Job <23131378> is submitted to queue <bigmem>.
+Aligning Hw1-6b
+STAR alignment script of Hw1-6b submitted
+Job <23131379> is submitted to queue <bigmem>.
+Aligning Hw1-6c
+STAR alignment script of Hw1-6c submitted
+Job <23131380> is submitted to queue <bigmem>.
+Aligning Hw2-1a
+STAR alignment script of Hw2-1a submitted
+Job <23131381> is submitted to queue <bigmem>.
+Aligning Hw2-1b
+STAR alignment script of Hw2-1b submitted
+Job <23131382> is submitted to queue <bigmem>.
+Aligning Hw2-1c
+STAR alignment script of Hw2-1c submitted
+Job <23131383> is submitted to queue <bigmem>.
+Aligning Hw2-4a
+STAR alignment script of Hw2-4a submitted
+Job <23131384> is submitted to queue <bigmem>.
+Aligning Hw2-4b
+STAR alignment script of Hw2-4b submitted
+Job <23131385> is submitted to queue <bigmem>.
+Aligning Hw2-4c
+STAR alignment script of Hw2-4c submitted
+Job <23131386> is submitted to queue <bigmem>.
+Aligning Hw2-5a
+STAR alignment script of Hw2-5a submitted
+Job <23131387> is submitted to queue <bigmem>.
+Aligning Hw2-5b
+STAR alignment script of Hw2-5b submitted
+Job <23131388> is submitted to queue <bigmem>.
+Aligning Hw2-5c
+STAR alignment script of Hw2-5c submitted
+Job <23131389> is submitted to queue <bigmem>.
+Aligning Hw2-6b
+STAR alignment script of Hw2-6b submitted
+Job <23131390> is submitted to queue <bigmem>.
+Aligning Hw2-6c
+STAR alignment script of Hw2-6c submitted
+Job <23131391> is submitted to queue <bigmem>.
+
+
+PS:
+
+Read file <STARwrap_pdam23131344.err> for stderr output of this job.
+

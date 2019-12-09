@@ -9,7 +9,7 @@
 #BSUB -P transcriptomics
 #BSUB -o starfC_pdam%J.out
 #BSUB -e starfC_pdam%J.err
-#BSUB -n 16
+#BSUB -n 8
 #BSUB -W 6:00
 #BSUB -u mconnelly@rsmas.miami.edu
 #BSUB -N

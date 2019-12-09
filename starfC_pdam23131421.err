@@ -1,0 +1,419 @@
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+	  v1.6.0
+
+//========================== featureCounts setting ===========================\\
+||                                                                            ||
+||             Input files : 47 BAM files                                     ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                           S /scratch/projects/transcriptomics/mikeconn ... ||
+||                                                                            ||
+||             Output file : /scratch/projects/transcriptomics/mikeconnel ... ||
+||                 Summary : /scratch/projects/transcriptomics/mikeconnel ... ||
+||              Annotation : /scratch/projects/transcriptomics/mikeconnel ... ||
+||      Dir for temp files : /scratch/projects/transcriptomics/mikeconnel ... ||
+||                                                                            ||
+||                 Threads : 1                                                ||
+||                   Level : meta-feature level                               ||
+||              Paired-end : no                                               ||
+||         Strand specific : no                                               ||
+||      Multimapping reads : not counted                                      ||
+|| Multi-overlapping reads : not counted                                      ||
+||   Min overlapping bases : 1                                                ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
+//================================= Running ==================================\\
+||                                                                            ||
+|| Load annotation file /scratch/projects/transcriptomics/mikeconnelly/se ... ||
+||    Features : 26077                                                        ||
+||    Meta-features : 26077                                                   ||
+||    Chromosomes/contigs : 1968                                              ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7066657                                                   ||
+||    Successfully assigned reads : 4907111 (69.4%)                           ||
+||    Running time : 0.30 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7437595                                                   ||
+||    Successfully assigned reads : 5309766 (71.4%)                           ||
+||    Running time : 0.31 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6246575                                                   ||
+||    Successfully assigned reads : 4199512 (67.2%)                           ||
+||    Running time : 0.32 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 5514542                                                   ||
+||    Successfully assigned reads : 3460228 (62.7%)                           ||
+||    Running time : 0.23 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 5511004                                                   ||
+||    Successfully assigned reads : 3983516 (72.3%)                           ||
+||    Running time : 0.23 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6869566                                                   ||
+||    Successfully assigned reads : 4734756 (68.9%)                           ||
+||    Running time : 0.29 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14255005                                                  ||
+||    Successfully assigned reads : 9285764 (65.1%)                           ||
+||    Running time : 0.59 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12851434                                                  ||
+||    Successfully assigned reads : 8762394 (68.2%)                           ||
+||    Running time : 0.54 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11849156                                                  ||
+||    Successfully assigned reads : 8108113 (68.4%)                           ||
+||    Running time : 0.49 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13349944                                                  ||
+||    Successfully assigned reads : 8976150 (67.2%)                           ||
+||    Running time : 0.56 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12249763                                                  ||
+||    Successfully assigned reads : 8323104 (67.9%)                           ||
+||    Running time : 0.51 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 10231843                                                  ||
+||    Successfully assigned reads : 6759635 (66.1%)                           ||
+||    Running time : 0.42 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7078177                                                   ||
+||    Successfully assigned reads : 4692925 (66.3%)                           ||
+||    Running time : 0.30 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9737783                                                   ||
+||    Successfully assigned reads : 6783984 (69.7%)                           ||
+||    Running time : 0.41 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9706858                                                   ||
+||    Successfully assigned reads : 6338289 (65.3%)                           ||
+||    Running time : 0.40 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 5170790                                                   ||
+||    Successfully assigned reads : 3513488 (67.9%)                           ||
+||    Running time : 0.22 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7426532                                                   ||
+||    Successfully assigned reads : 4881184 (65.7%)                           ||
+||    Running time : 0.31 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6927085                                                   ||
+||    Successfully assigned reads : 4602778 (66.4%)                           ||
+||    Running time : 0.29 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11211122                                                  ||
+||    Successfully assigned reads : 7621833 (68.0%)                           ||
+||    Running time : 0.47 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14501891                                                  ||
+||    Successfully assigned reads : 9602954 (66.2%)                           ||
+||    Running time : 0.60 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9906533                                                   ||
+||    Successfully assigned reads : 6676437 (67.4%)                           ||
+||    Running time : 0.41 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13439825                                                  ||
+||    Successfully assigned reads : 8628697 (64.2%)                           ||
+||    Running time : 0.55 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9992247                                                   ||
+||    Successfully assigned reads : 6719010 (67.2%)                           ||
+||    Running time : 0.42 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9030790                                                   ||
+||    Successfully assigned reads : 6191125 (68.6%)                           ||
+||    Running time : 0.38 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7713895                                                   ||
+||    Successfully assigned reads : 5218974 (67.7%)                           ||
+||    Running time : 0.32 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 9563584                                                   ||
+||    Successfully assigned reads : 6477923 (67.7%)                           ||
+||    Running time : 0.41 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6667805                                                   ||
+||    Successfully assigned reads : 4548852 (68.2%)                           ||
+||    Running time : 0.28 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6363841                                                   ||
+||    Successfully assigned reads : 4239550 (66.6%)                           ||
+||    Running time : 0.27 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7527852                                                   ||
+||    Successfully assigned reads : 4980833 (66.2%)                           ||
+||    Running time : 0.32 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 6933371                                                   ||
+||    Successfully assigned reads : 4741392 (68.4%)                           ||
+||    Running time : 0.29 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13441588                                                  ||
+||    Successfully assigned reads : 9058877 (67.4%)                           ||
+||    Running time : 0.56 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12570122                                                  ||
+||    Successfully assigned reads : 8608768 (68.5%)                           ||
+||    Running time : 0.53 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 15113428                                                  ||
+||    Successfully assigned reads : 10283164 (68.0%)                          ||
+||    Running time : 0.63 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13642642                                                  ||
+||    Successfully assigned reads : 9246110 (67.8%)                           ||
+||    Running time : 0.57 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14397222                                                  ||
+||    Successfully assigned reads : 9937426 (69.0%)                           ||
+||    Running time : 0.60 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 16478325                                                  ||
+||    Successfully assigned reads : 11162588 (67.7%)                          ||
+||    Running time : 0.69 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8042243                                                   ||
+||    Successfully assigned reads : 5562226 (69.2%)                           ||
+||    Running time : 0.34 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7333884                                                   ||
+||    Successfully assigned reads : 5164171 (70.4%)                           ||
+||    Running time : 0.31 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 8218872                                                   ||
+||    Successfully assigned reads : 5233448 (63.7%)                           ||
+||    Running time : 0.34 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 13371772                                                  ||
+||    Successfully assigned reads : 9226647 (69.0%)                           ||
+||    Running time : 0.55 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14863705                                                  ||
+||    Successfully assigned reads : 10207910 (68.7%)                          ||
+||    Running time : 0.62 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12134333                                                  ||
+||    Successfully assigned reads : 8194559 (67.5%)                           ||
+||    Running time : 0.51 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12480494                                                  ||
+||    Successfully assigned reads : 8654239 (69.3%)                           ||
+||    Running time : 0.52 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 7250351                                                   ||
+||    Successfully assigned reads : 5118736 (70.6%)                           ||
+||    Running time : 0.30 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 14487896                                                  ||
+||    Successfully assigned reads : 9971455 (68.8%)                           ||
+||    Running time : 0.61 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 11346949                                                  ||
+||    Successfully assigned reads : 8046746 (70.9%)                           ||
+||    Running time : 0.48 minutes                                             ||
+||                                                                            ||
+|| Process BAM file /scratch/projects/transcriptomics/mikeconnelly/projec ... ||
+||    Single-end reads are included.                                          ||
+||    Assign reads to features...                                             ||
+||    Total reads : 12142900                                                  ||
+||    Successfully assigned reads : 8229834 (67.8%)                           ||
+||    Running time : 0.51 minutes                                             ||
+||                                                                            ||
+||                         Read assignment finished.                          ||
+||                                                                            ||
+|| Summary of counting results can be found in file "/scratch/projects/trans  ||
+|| criptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/STARcounts  ||
+|| _Pdam/AxH_Pdam.counts.summary"                                             ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
