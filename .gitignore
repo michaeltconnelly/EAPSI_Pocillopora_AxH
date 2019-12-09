@@ -2,6 +2,12 @@
 .Rproj.user
 *.Rproj
 data/zippedreads/
-outputs/
+outputs/logfiles/
+outputs/errorfiles/
+outputs/fastcs/
+outputs/trimqcs/
+outputs/trimmomaticreads/
+outputs/STARalign_Pdam/
+outputs/phylotrans_Pdam/
 bash/jobs/
 .Rhistory
