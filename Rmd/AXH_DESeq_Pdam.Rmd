@@ -1,30 +1,32 @@
 ---
 title: "AXH_DESeq_Pdam"
 author: "Mike Connelly"
-date: "9/18/2019"
+date: "12/9/2019"
 output: html_document
 ---
 
-RMarkdown document containing scripts for DESeq2 modelling of differential gene expression between fragments of four *Pocillopora damicornis* genotypes collected at Wanglitung and Houwan reefs and placed in five experimental treatment groups and once control group during EAPSI Taiwan, summer 2017.
+RMarkdown document containing scripts for DESeq2 modelling of differential gene expression between fragments of four *Pocillopora damicornis* genotypes collected at Wanglitung and Houwan reefs and placed in three experimental treatment groups and once control group during EAPSI Taiwan, summer 2017.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_AntiXHeat-master/")
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 ## Setup packages and working directories
 ```{r packages, error=FALSE, warning=FALSE, message=FALSE}
 library("tidyverse")
 library("DESeq2")
+library("ggpubr")
+library("apeglm")
 ```
 ## Import sample data
 ```{r, echo=FALSE}
-stable_samples <- read.table("EAPSIsamples_stable.txt", header = TRUE)
+stable_samples <- read.table("./data/EAPSIsamples_stable.txt", header = TRUE)
 #stable_samples$treatment <- as.factor(stable_samples$treatment)
 #stable_samples$genotype <- as.factor(stable_samples$genotype)
 ```
 ## Import counts data 
 ```{r}
-countdata <- read.delim("alltreatments_Pdam.counts", comment.char="#")
+countdata <- read.delim("./outputs/STARcounts_Pdam/AxH_Pdam.counts", comment.char="#")
 ```
 ## Tidy counts data
   Set Gene ID's as row names
@@ -34,14 +36,14 @@ countdata <- read.delim("alltreatments_Pdam.counts", comment.char="#")
 ```{r, echo=FALSE}
 row.names(countdata) <- countdata$Geneid
 countdata <- countdata[ ,7:ncol(countdata)]
+#countdata <- countdata[ ,6:ncol(countdata)]
   colnames(countdata) <- gsub("X.", "", colnames(countdata))
-  colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.sequences.EAPSI.", "", colnames(countdata))
-  colnames(countdata) <- gsub("houwanwanglitung.alltreatments.STARalign_Pdam.", "", colnames(countdata))
+  colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.projects.EAPSI_Pocillopora_AxH.outputs.STARalign_Pdam.", "", colnames(countdata))
   colnames(countdata) <- gsub("_PdamAligned.out.bam$", "", colnames(countdata))
 ```
 ## Import gene feature annotation information
 ```{r}
-genefeatures <- read.delim(file = "/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome_IDInfo.gff", header = F)
+genefeatures <- read.delim(file = "./data/pdam_genome_IDInfo.gff", header = F)
 colnames(genefeatures) <- c("IDGeneInfo")
 rownames(genefeatures) <- rownames(countdata)
 ```

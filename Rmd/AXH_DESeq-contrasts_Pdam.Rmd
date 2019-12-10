@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_HW-WT-master/")
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 library(DESeq2)
 library(VennDiagram)
 ```
@@ -26,31 +26,31 @@ res_anti_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Antibiotics",
 res_anti_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_anti_ctrl$IDGeneInfo <- as.character(res_anti_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_anti_ctrl[order(res_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_anti_ctrl.csv")
+write.csv(as.data.frame(res_anti_ctrl[order(res_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti_ctrl.csv")
 ressig_anti_ctrl <- subset(res_anti_ctrl, padj<0.01)
 ressig_anti_ctrl_up <- subset(res_anti_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_anti_ctrl_dn <- subset(res_anti_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_anti_ctrl[order(ressig_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti_ctrl.csv")
-write.csv(as.data.frame(ressig_anti_ctrl_up[order(ressig_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti_ctrl_up.csv")
-write.csv(as.data.frame(ressig_anti_ctrl_dn[order(ressig_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_anti_ctrl[order(ressig_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_anti_ctrl.csv")
+write.csv(as.data.frame(ressig_anti_ctrl_up[order(ressig_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_anti_ctrl_up.csv")
+write.csv(as.data.frame(ressig_anti_ctrl_dn[order(ressig_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_anti_ctrl_dn.csv")
 colnames(res_anti_ctrl)
 summary(res_anti_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_anti_ctrl.csv > ./outputs/DESeq-results/lists/res_anti_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_anti_ctrl_up.csv > ./outputs/DESeq-results/lists/res_anti_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_anti_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_anti_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti_ctrl_dn_ID.txt-e
 ```
 
 ### Heat vs. Control
@@ -59,31 +59,31 @@ res_heat_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Heat", "contr
 res_heat_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_heat_ctrl$IDGeneInfo <- as.character(res_heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_heat_ctrl[order(res_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_heat_ctrl.csv")
+write.csv(as.data.frame(res_heat_ctrl[order(res_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_heat_ctrl.csv")
 ressig_heat_ctrl <- subset(res_heat_ctrl, padj<0.01)
 ressig_heat_ctrl_up <- subset(res_heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_heat_ctrl_dn <- subset(res_heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_heat_ctrl[order(ressig_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_heat_ctrl.csv")
-write.csv(as.data.frame(ressig_heat_ctrl_up[order(ressig_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_heat_ctrl_dn[order(ressig_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_heat_ctrl[order(ressig_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_heat_ctrl.csv")
+write.csv(as.data.frame(ressig_heat_ctrl_up[order(ressig_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_heat_ctrl_dn[order(ressig_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_heat_ctrl_dn.csv")
 colnames(res_heat_ctrl)
 summary(res_heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_heat_ctrl.csv > ./outputs/DESeq-results/lists/res_heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_heat_ctrl_dn_ID.txt-e
 ```
 
 ### Antibiotics.Heat vs. Control
@@ -92,31 +92,31 @@ res_anti.heat_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Antibiot
 res_anti.heat_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_anti.heat_ctrl$IDGeneInfo <- as.character(res_anti.heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_anti.heat_ctrl[order(res_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_anti.heat_ctrl.csv")
+write.csv(as.data.frame(res_anti.heat_ctrl[order(res_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti.heat_ctrl.csv")
 ressig_anti.heat_ctrl <- subset(res_anti.heat_ctrl, padj<0.01)
 ressig_anti.heat_ctrl_up <- subset(res_anti.heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_anti.heat_ctrl_dn <- subset(res_anti.heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_ctrl.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_anti.heat_ctrl.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_anti.heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_anti.heat_ctrl_dn.csv")
 colnames(res_anti.heat_ctrl)
 summary(res_anti.heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_anti.heat_ctrl.csv > ./outputs/DESeq-results/lists/res_anti.heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_anti.heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_anti.heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_anti.heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_anti.heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_ctrl_dn_ID.txt-e
 ```
 
 ### Antibiotics.Heat vs. Antibiotics
@@ -125,31 +125,31 @@ res_anti.heat_anti <- results(dds_antixheat, contrast = c("Treatment", "Antibiot
 res_anti.heat_anti$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_anti.heat_anti$IDGeneInfo <- as.character(res_anti.heat_anti$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_anti.heat_anti[order(res_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_anti.heat_anti.csv")
+write.csv(as.data.frame(res_anti.heat_anti[order(res_anti.heat_anti$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti.heat_anti.csv")
 ressig_anti.heat_ctrl <- subset(res_anti.heat_anti, padj<0.01)
 ressig_anti.heat_ctrl_up <- subset(res_anti.heat_anti, padj<0.01 & log2FoldChange>0)
 ressig_anti.heat_ctrl_dn <- subset(res_anti.heat_anti, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_anti.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_anti_up.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_anti_dn.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_anti.heat_anti.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_anti.heat_anti_up.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_anti.heat_anti_dn.csv")
 colnames(res_anti.heat_anti)
 summary(res_anti.heat_anti)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_anti.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_anti.heat_anti.csv > ./outputs/DESeq-results/lists/res_anti.heat_anti_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_anti_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_anti_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_anti_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_anti_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_anti.heat_anti_up.csv > ./outputs/DESeq-results/lists/res_anti.heat_anti_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_anti_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_anti_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_anti_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_anti_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_anti_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_anti.heat_anti_dn.csv > ./outputs/DESeq-results/lists/res_anti.heat_anti_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_anti_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_anti_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_anti_dn_ID.txt-e
 ```
 
 ### Antibiotics.Heat vs. Heat
@@ -158,31 +158,31 @@ res_anti.heat_heat <- results(dds_antixheat, contrast = c("Treatment", "Antibiot
 res_anti.heat_heat$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_anti.heat_heat$IDGeneInfo <- as.character(res_anti.heat_heat$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_anti.heat_heat[order(res_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_anti.heat_heat.csv")
+write.csv(as.data.frame(res_anti.heat_heat[order(res_anti.heat_heat$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti.heat_heat.csv")
 ressig_anti.heat_ctrl <- subset(res_anti.heat_heat, padj<0.01)
 ressig_anti.heat_ctrl_up <- subset(res_anti.heat_heat, padj<0.01 & log2FoldChange>0)
 ressig_anti.heat_ctrl_dn <- subset(res_anti.heat_heat, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_heat.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_heat_up.csv")
-write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_heat_dn.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl[order(ressig_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_anti.heat_heat.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_up[order(ressig_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_anti.heat_heat_up.csv")
+write.csv(as.data.frame(ressig_anti.heat_ctrl_dn[order(ressig_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_anti.heat_heat_dn.csv")
 colnames(res_anti.heat_heat)
 summary(res_anti.heat_heat)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_anti.heat_heat.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_anti.heat_heat.csv > ./outputs/DESeq-results/lists/res_anti.heat_heat_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_heat_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_heat_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_heat_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_anti.heat_heat_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_anti.heat_heat_up.csv > ./outputs/DESeq-results/lists/res_anti.heat_heat_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_heat_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_heat_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_heat_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_anti.heat_heat_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.heat_heat_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_anti.heat_heat_dn.csv > ./outputs/DESeq-results/lists/res_anti.heat_heat_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_anti.heat_heat_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_anti.heat_heat_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_anti.heat_heat_dn_ID.txt-e
 ```
 
 ## Results contrasts between different coral genotypes
@@ -192,13 +192,13 @@ rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_anti.h
 res_HW1_HW2 <- results(dds_antixheat, contrast = c("Colony", "HW1", "HW2"))
 res_HW1_HW2$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_HW1_HW2$IDGeneInfo <- as.character(res_HW1_HW2$IDGeneInfo)
-write.csv(as.data.frame(res_HW1_HW2[order(res_HW1_HW2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_HW2.csv")
+write.csv(as.data.frame(res_HW1_HW2[order(res_HW1_HW2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_HW2.csv")
 ressig_HW1_HW2 <- subset(res_HW1_HW2, padj<0.01)
 ressig_HW1_HW2_up <- subset(res_HW1_HW2, padj<0.01 & log2FoldChange>0)
 ressig_HW1_HW2_dn <- subset(res_HW1_HW2, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_HW2[order(ressig_HW1_HW2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_HW2.csv")
-write.csv(as.data.frame(ressig_HW1_HW2_up[order(ressig_HW1_HW2_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_HW2_up.csv")
-write.csv(as.data.frame(ressig_HW1_HW2_dn[order(ressig_HW1_HW2_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_HW2_dn.csv")
+write.csv(as.data.frame(ressig_HW1_HW2[order(ressig_HW1_HW2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_HW2.csv")
+write.csv(as.data.frame(ressig_HW1_HW2_up[order(ressig_HW1_HW2_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_HW2_up.csv")
+write.csv(as.data.frame(ressig_HW1_HW2_dn[order(ressig_HW1_HW2_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_HW2_dn.csv")
 colnames(res_HW1_HW2)
 summary(res_HW1_HW2)
 ```
@@ -208,13 +208,13 @@ summary(res_HW1_HW2)
 res_HW1_WT1 <- results(dds_antixheat, contrast = c("Colony", "HW1", "WT1"))
 res_HW1_WT1$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_HW1_WT1$IDGeneInfo <- as.character(res_HW1_WT1$IDGeneInfo)
-write.csv(as.data.frame(res_HW1_WT1[order(res_HW1_WT1$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_WT1.csv")
+write.csv(as.data.frame(res_HW1_WT1[order(res_HW1_WT1$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_WT1.csv")
 ressig_HW1_WT1 <- subset(res_HW1_WT1, padj<0.01)
 ressig_HW1_WT1_up <- subset(res_HW1_WT1, padj<0.01 & log2FoldChange>0)
 ressig_HW1_WT1_dn <- subset(res_HW1_WT1, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_WT1[order(ressig_HW1_WT1$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_WT1.csv")
-write.csv(as.data.frame(ressig_HW1_WT1_up[order(ressig_HW1_WT1_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_WT1_up.csv")
-write.csv(as.data.frame(ressig_HW1_WT1_dn[order(ressig_HW1_WT1_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_WT1_dn.csv")
+write.csv(as.data.frame(ressig_HW1_WT1[order(ressig_HW1_WT1$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_WT1.csv")
+write.csv(as.data.frame(ressig_HW1_WT1_up[order(ressig_HW1_WT1_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_WT1_up.csv")
+write.csv(as.data.frame(ressig_HW1_WT1_dn[order(ressig_HW1_WT1_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_WT1_dn.csv")
 colnames(res_HW1_WT1)
 summary(res_HW1_WT1)
 ```
@@ -224,13 +224,13 @@ summary(res_HW1_WT1)
 res_HW1_WT2 <- results(dds_antixheat, contrast = c("Colony", "HW1", "WT2"))
 res_HW1_WT2$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_HW1_WT2$IDGeneInfo <- as.character(res_HW1_WT2$IDGeneInfo)
-write.csv(as.data.frame(res_HW1_WT2[order(res_HW1_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_WT2.csv")
+write.csv(as.data.frame(res_HW1_WT2[order(res_HW1_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_WT2.csv")
 ressig_HW1_WT2 <- subset(res_HW1_WT2, padj<0.01)
 ressig_HW1_WT2_up <- subset(res_HW1_WT2, padj<0.01 & log2FoldChange>0)
 ressig_HW1_WT2_dn <- subset(res_HW1_WT2, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_WT2[order(ressig_HW1_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_WT2.csv")
-write.csv(as.data.frame(ressig_HW1_WT2_up[order(ressig_HW1_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_WT2_up.csv")
-write.csv(as.data.frame(ressig_HW1_WT2_dn[order(ressig_HW1_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_WT2_dn.csv")
+write.csv(as.data.frame(ressig_HW1_WT2[order(ressig_HW1_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_WT2.csv")
+write.csv(as.data.frame(ressig_HW1_WT2_up[order(ressig_HW1_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_WT2_up.csv")
+write.csv(as.data.frame(ressig_HW1_WT2_dn[order(ressig_HW1_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_WT2_dn.csv")
 colnames(res_HW1_WT2)
 summary(res_HW1_WT2)
 ```
@@ -240,13 +240,13 @@ summary(res_HW1_WT2)
 res_HW2_WT1 <- results(dds_antixheat, contrast = c("Colony", "HW2", "WT1"))
 res_HW2_WT1$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_HW2_WT1$IDGeneInfo <- as.character(res_HW2_WT1$IDGeneInfo)
-write.csv(as.data.frame(res_HW2_WT1[order(res_HW2_WT1$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_WT1.csv")
+write.csv(as.data.frame(res_HW2_WT1[order(res_HW2_WT1$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_WT1.csv")
 ressig_HW2_WT1 <- subset(res_HW2_WT1, padj<0.01)
 ressig_HW2_WT1_up <- subset(res_HW2_WT1, padj<0.01 & log2FoldChange>0)
 ressig_HW2_WT1_dn <- subset(res_HW2_WT1, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_WT1[order(ressig_HW2_WT1$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_WT1.csv")
-write.csv(as.data.frame(ressig_HW2_WT1_up[order(ressig_HW2_WT1_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_WT1_up.csv")
-write.csv(as.data.frame(ressig_HW2_WT1_dn[order(ressig_HW2_WT1_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_WT1_dn.csv")
+write.csv(as.data.frame(ressig_HW2_WT1[order(ressig_HW2_WT1$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_WT1.csv")
+write.csv(as.data.frame(ressig_HW2_WT1_up[order(ressig_HW2_WT1_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_WT1_up.csv")
+write.csv(as.data.frame(ressig_HW2_WT1_dn[order(ressig_HW2_WT1_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_WT1_dn.csv")
 colnames(res_HW2_WT1)
 summary(res_HW2_WT1)
 ```
@@ -256,13 +256,13 @@ summary(res_HW2_WT1)
 res_HW2_WT2 <- results(dds_antixheat, contrast = c("Colony", "HW2", "WT2"))
 res_HW2_WT2$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_HW2_WT2$IDGeneInfo <- as.character(res_HW2_WT2$IDGeneInfo)
-write.csv(as.data.frame(res_HW2_WT2[order(res_HW2_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_WT2.csv")
+write.csv(as.data.frame(res_HW2_WT2[order(res_HW2_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_WT2.csv")
 ressig_HW2_WT2 <- subset(res_HW2_WT2, padj<0.01)
 ressig_HW2_WT2_up <- subset(res_HW2_WT2, padj<0.01 & log2FoldChange>0)
 ressig_HW2_WT2_dn <- subset(res_HW2_WT2, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_WT2[order(ressig_HW2_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_WT2.csv")
-write.csv(as.data.frame(ressig_HW2_WT2_up[order(ressig_HW2_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_WT2_up.csv")
-write.csv(as.data.frame(ressig_HW2_WT2_dn[order(ressig_HW2_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_WT2_dn.csv")
+write.csv(as.data.frame(ressig_HW2_WT2[order(ressig_HW2_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_WT2.csv")
+write.csv(as.data.frame(ressig_HW2_WT2_up[order(ressig_HW2_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_WT2_up.csv")
+write.csv(as.data.frame(ressig_HW2_WT2_dn[order(ressig_HW2_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_WT2_dn.csv")
 colnames(res_HW2_WT2)
 summary(res_HW2_WT2)
 ```
@@ -272,13 +272,13 @@ summary(res_HW2_WT2)
 res_WT1_WT2 <- results(dds_antixheat, contrast = c("Colony", "WT1", "WT2"))
 res_WT1_WT2$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_WT1_WT2$IDGeneInfo <- as.character(res_WT1_WT2$IDGeneInfo)
-write.csv(as.data.frame(res_WT1_WT2[order(res_WT1_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_WT2.csv")
+write.csv(as.data.frame(res_WT1_WT2[order(res_WT1_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_WT2.csv")
 ressig_WT1_WT2 <- subset(res_WT1_WT2, padj<0.01)
 ressig_WT1_WT2_up <- subset(res_WT1_WT2, padj<0.01 & log2FoldChange>0)
 ressig_WT1_WT2_dn <- subset(res_WT1_WT2, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_WT2[order(ressig_WT1_WT2$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_WT2.csv")
-write.csv(as.data.frame(ressig_WT1_WT2_up[order(ressig_WT1_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_WT2_up.csv")
-write.csv(as.data.frame(ressig_WT1_WT2_dn[order(ressig_WT1_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_WT2_dn.csv")
+write.csv(as.data.frame(ressig_WT1_WT2[order(ressig_WT1_WT2$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_WT2.csv")
+write.csv(as.data.frame(ressig_WT1_WT2_up[order(ressig_WT1_WT2_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_WT2_up.csv")
+write.csv(as.data.frame(ressig_WT1_WT2_dn[order(ressig_WT1_WT2_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_WT2_dn.csv")
 colnames(res_WT1_WT2)
 summary(res_WT1_WT2)
 ```
@@ -291,31 +291,31 @@ res_HW1_anti_ctrl <- results(dds_HW1, contrast = c("Treatment", "Antibiotics", "
 res_HW1_anti_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW1_anti_ctrl$IDGeneInfo <- as.character(res_HW1_anti_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW1_anti_ctrl[order(res_HW1_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_anti_ctrl.csv")
+write.csv(as.data.frame(res_HW1_anti_ctrl[order(res_HW1_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_anti_ctrl.csv")
 ressig_HW1_anti_ctrl <- subset(res_HW1_anti_ctrl, padj<0.01)
 ressig_HW1_anti_ctrl_up <- subset(res_HW1_anti_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW1_anti_ctrl_dn <- subset(res_HW1_anti_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_anti_ctrl[order(ressig_HW1_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti_ctrl.csv")
-write.csv(as.data.frame(ressig_HW1_anti_ctrl_up[order(ressig_HW1_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW1_anti_ctrl_dn[order(ressig_HW1_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW1_anti_ctrl[order(ressig_HW1_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_anti_ctrl.csv")
+write.csv(as.data.frame(ressig_HW1_anti_ctrl_up[order(ressig_HW1_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_anti_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW1_anti_ctrl_dn[order(ressig_HW1_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_anti_ctrl_dn.csv")
 colnames(res_HW1_anti_ctrl)
 summary(res_HW1_anti_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW1_anti_ctrl.csv > ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW1_anti_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW1_anti_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti_ctrl_dn_ID.txt-e
 ```
 #### Heat vs. Control
 ```{r}
@@ -323,31 +323,31 @@ res_HW1_heat_ctrl <- results(dds_HW1, contrast = c("Treatment", "Heat", "control
 res_HW1_heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW1_heat_ctrl$IDGeneInfo <- as.character(res_HW1_heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW1_heat_ctrl[order(res_HW1_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_heat_ctrl.csv")
+write.csv(as.data.frame(res_HW1_heat_ctrl[order(res_HW1_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_heat_ctrl.csv")
 ressig_HW1_heat_ctrl <- subset(res_HW1_heat_ctrl, padj<0.01)
 ressig_HW1_heat_ctrl_up <- subset(res_HW1_heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW1_heat_ctrl_dn <- subset(res_HW1_heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_heat_ctrl[order(ressig_HW1_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_heat_ctrl.csv")
-write.csv(as.data.frame(ressig_HW1_heat_ctrl_up[order(ressig_HW1_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW1_heat_ctrl_dn[order(ressig_HW1_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW1_heat_ctrl[order(ressig_HW1_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_heat_ctrl.csv")
+write.csv(as.data.frame(ressig_HW1_heat_ctrl_up[order(ressig_HW1_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW1_heat_ctrl_dn[order(ressig_HW1_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_heat_ctrl_dn.csv")
 colnames(res_HW1_heat_ctrl)
 summary(res_HW1_heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW1_heat_ctrl.csv > ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW1_heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW1_heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Control
 ```{r}
@@ -355,31 +355,31 @@ res_HW1_anti.heat_ctrl <- results(dds_HW1, contrast = c("Treatment", "Antibiotic
 res_HW1_anti.heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW1_anti.heat_ctrl$IDGeneInfo <- as.character(res_HW1_anti.heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW1_anti.heat_ctrl[order(res_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_anti.heat_ctrl.csv")
+write.csv(as.data.frame(res_HW1_anti.heat_ctrl[order(res_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_anti.heat_ctrl.csv")
 ressig_HW1_anti.heat_ctrl <- subset(res_HW1_anti.heat_ctrl, padj<0.01)
 ressig_HW1_anti.heat_ctrl_up <- subset(res_HW1_anti.heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW1_anti.heat_ctrl_dn <- subset(res_HW1_anti.heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_ctrl.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_ctrl.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_anti.heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_anti.heat_ctrl_dn.csv")
 colnames(res_HW1_anti.heat_ctrl)
 summary(res_HW1_anti.heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_ctrl.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW1_anti.heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW1_anti.heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Antibiotics
 ```{r}
@@ -387,31 +387,31 @@ res_HW1_anti.heat_anti <- results(dds_HW1, contrast = c("Treatment", "Antibiotic
 res_HW1_anti.heat_anti$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW1_anti.heat_anti$IDGeneInfo <- as.character(res_HW1_anti.heat_anti$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW1_anti.heat_anti[order(res_HW1_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_anti.heat_anti.csv")
+write.csv(as.data.frame(res_HW1_anti.heat_anti[order(res_HW1_anti.heat_anti$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_anti.heat_anti.csv")
 ressig_HW1_anti.heat_ctrl <- subset(res_HW1_anti.heat_anti, padj<0.01)
 ressig_HW1_anti.heat_ctrl_up <- subset(res_HW1_anti.heat_anti, padj<0.01 & log2FoldChange>0)
 ressig_HW1_anti.heat_ctrl_dn <- subset(res_HW1_anti.heat_anti, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_anti.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_anti_up.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_anti_dn.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_anti.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_anti.heat_anti_up.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_anti.heat_anti_dn.csv")
 colnames(res_HW1_anti.heat_anti)
 summary(res_HW1_anti.heat_anti)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_anti.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_anti.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_anti_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW1_anti.heat_anti_up.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_anti_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_anti_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW1_anti.heat_anti_dn.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_anti_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Heat
 ```{r}
@@ -419,31 +419,31 @@ res_HW1_anti.heat_heat <- results(dds_HW1, contrast = c("Treatment", "Antibiotic
 res_HW1_anti.heat_heat$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW1_anti.heat_heat$IDGeneInfo <- as.character(res_HW1_anti.heat_heat$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW1_anti.heat_heat[order(res_HW1_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW1_anti.heat_heat.csv")
+write.csv(as.data.frame(res_HW1_anti.heat_heat[order(res_HW1_anti.heat_heat$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW1_anti.heat_heat.csv")
 ressig_HW1_anti.heat_ctrl <- subset(res_HW1_anti.heat_heat, padj<0.01)
 ressig_HW1_anti.heat_ctrl_up <- subset(res_HW1_anti.heat_heat, padj<0.01 & log2FoldChange>0)
 ressig_HW1_anti.heat_ctrl_dn <- subset(res_HW1_anti.heat_heat, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_heat.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_heat_up.csv")
-write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_heat_dn.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl[order(ressig_HW1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_heat.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_up[order(ressig_HW1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW1_anti.heat_heat_up.csv")
+write.csv(as.data.frame(ressig_HW1_anti.heat_ctrl_dn[order(ressig_HW1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW1_anti.heat_heat_dn.csv")
 colnames(res_HW1_anti.heat_heat)
 summary(res_HW1_anti.heat_heat)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW1_anti.heat_heat.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW1_anti.heat_heat.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW1_anti.heat_heat_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW1_anti.heat_heat_up.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW1_anti.heat_heat_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW1_anti.heat_heat_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW1_anti.heat_heat_dn.csv > ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW1_anti.heat_heat_dn_ID.txt-e
 ```
 
 ### Houwan2
@@ -453,31 +453,31 @@ res_HW2_anti_ctrl <- results(dds_HW2, contrast = c("Treatment", "Antibiotics", "
 res_HW2_anti_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW2_anti_ctrl$IDGeneInfo <- as.character(res_HW2_anti_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW2_anti_ctrl[order(res_HW2_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_anti_ctrl.csv")
+write.csv(as.data.frame(res_HW2_anti_ctrl[order(res_HW2_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_anti_ctrl.csv")
 ressig_HW2_anti_ctrl <- subset(res_HW2_anti_ctrl, padj<0.01)
 ressig_HW2_anti_ctrl_up <- subset(res_HW2_anti_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW2_anti_ctrl_dn <- subset(res_HW2_anti_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_anti_ctrl[order(ressig_HW2_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti_ctrl.csv")
-write.csv(as.data.frame(ressig_HW2_anti_ctrl_up[order(ressig_HW2_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW2_anti_ctrl_dn[order(ressig_HW2_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW2_anti_ctrl[order(ressig_HW2_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_anti_ctrl.csv")
+write.csv(as.data.frame(ressig_HW2_anti_ctrl_up[order(ressig_HW2_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_anti_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW2_anti_ctrl_dn[order(ressig_HW2_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_anti_ctrl_dn.csv")
 colnames(res_HW2_anti_ctrl)
 summary(res_HW2_anti_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW2_anti_ctrl.csv > ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW2_anti_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW2_anti_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti_ctrl_dn_ID.txt-e
 ```
 #### Heat vs. Control
 ```{r}
@@ -485,31 +485,31 @@ res_HW2_heat_ctrl <- results(dds_HW2, contrast = c("Treatment", "Heat", "control
 res_HW2_heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW2_heat_ctrl$IDGeneInfo <- as.character(res_HW2_heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW2_heat_ctrl[order(res_HW2_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_heat_ctrl.csv")
+write.csv(as.data.frame(res_HW2_heat_ctrl[order(res_HW2_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_heat_ctrl.csv")
 ressig_HW2_heat_ctrl <- subset(res_HW2_heat_ctrl, padj<0.01)
 ressig_HW2_heat_ctrl_up <- subset(res_HW2_heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW2_heat_ctrl_dn <- subset(res_HW2_heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_heat_ctrl[order(ressig_HW2_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_heat_ctrl.csv")
-write.csv(as.data.frame(ressig_HW2_heat_ctrl_up[order(ressig_HW2_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW2_heat_ctrl_dn[order(ressig_HW2_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW2_heat_ctrl[order(ressig_HW2_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_heat_ctrl.csv")
+write.csv(as.data.frame(ressig_HW2_heat_ctrl_up[order(ressig_HW2_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW2_heat_ctrl_dn[order(ressig_HW2_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_heat_ctrl_dn.csv")
 colnames(res_HW2_heat_ctrl)
 summary(res_HW2_heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW2_heat_ctrl.csv > ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW2_heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW2_heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Control
 ```{r}
@@ -517,31 +517,31 @@ res_HW2_anti.heat_ctrl <- results(dds_HW2, contrast = c("Treatment", "Antibiotic
 res_HW2_anti.heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_HW2_anti.heat_ctrl$IDGeneInfo <- as.character(res_HW2_anti.heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW2_anti.heat_ctrl[order(res_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_anti.heat_ctrl.csv")
+write.csv(as.data.frame(res_HW2_anti.heat_ctrl[order(res_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_anti.heat_ctrl.csv")
 ressig_HW2_anti.heat_ctrl <- subset(res_HW2_anti.heat_ctrl, padj<0.01)
 ressig_HW2_anti.heat_ctrl_up <- subset(res_HW2_anti.heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_HW2_anti.heat_ctrl_dn <- subset(res_HW2_anti.heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_ctrl.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_ctrl.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_anti.heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_anti.heat_ctrl_dn.csv")
 colnames(res_HW2_anti.heat_ctrl)
 summary(res_HW2_anti.heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_ctrl.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW2_anti.heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW2_anti.heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Antibiotics
 ```{r}
@@ -549,31 +549,31 @@ res_HW2_anti.heat_anti <- results(dds_HW2, contrast = c("Treatment", "Antibiotic
 res_HW2_anti.heat_anti$IDGeneInfo <- mcols(dds_HW2)$IDGeneInfo
 res_HW2_anti.heat_anti$IDGeneInfo <- as.character(res_HW2_anti.heat_anti$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW2_anti.heat_anti[order(res_HW2_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_anti.heat_anti.csv")
+write.csv(as.data.frame(res_HW2_anti.heat_anti[order(res_HW2_anti.heat_anti$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_anti.heat_anti.csv")
 ressig_HW2_anti.heat_ctrl <- subset(res_HW2_anti.heat_anti, padj<0.01)
 ressig_HW2_anti.heat_ctrl_up <- subset(res_HW2_anti.heat_anti, padj<0.01 & log2FoldChange>0)
 ressig_HW2_anti.heat_ctrl_dn <- subset(res_HW2_anti.heat_anti, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_anti.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_anti_up.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_anti_dn.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_anti.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_anti.heat_anti_up.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_anti.heat_anti_dn.csv")
 colnames(res_HW2_anti.heat_anti)
 summary(res_HW2_anti.heat_anti)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_anti.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_anti.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_anti_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW2_anti.heat_anti_up.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_anti_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_anti_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW2_anti.heat_anti_dn.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_anti_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Heat
 ```{r}
@@ -581,31 +581,31 @@ res_HW2_anti.heat_heat <- results(dds_HW2, contrast = c("Treatment", "Antibiotic
 res_HW2_anti.heat_heat$IDGeneInfo <- mcols(dds_HW2)$IDGeneInfo
 res_HW2_anti.heat_heat$IDGeneInfo <- as.character(res_HW2_anti.heat_heat$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_HW2_anti.heat_heat[order(res_HW2_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_HW2_anti.heat_heat.csv")
+write.csv(as.data.frame(res_HW2_anti.heat_heat[order(res_HW2_anti.heat_heat$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_HW2_anti.heat_heat.csv")
 ressig_HW2_anti.heat_ctrl <- subset(res_HW2_anti.heat_heat, padj<0.01)
 ressig_HW2_anti.heat_ctrl_up <- subset(res_HW2_anti.heat_heat, padj<0.01 & log2FoldChange>0)
 ressig_HW2_anti.heat_ctrl_dn <- subset(res_HW2_anti.heat_heat, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_heat.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_heat_up.csv")
-write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_heat_dn.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl[order(ressig_HW2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_heat.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_up[order(ressig_HW2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_HW2_anti.heat_heat_up.csv")
+write.csv(as.data.frame(ressig_HW2_anti.heat_ctrl_dn[order(ressig_HW2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_HW2_anti.heat_heat_dn.csv")
 colnames(res_HW2_anti.heat_heat)
 summary(res_HW2_anti.heat_heat)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_HW2_anti.heat_heat.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_HW2_anti.heat_heat.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_HW2_anti.heat_heat_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_HW2_anti.heat_heat_up.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_HW2_anti.heat_heat_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_HW2_anti.heat_heat_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_HW2_anti.heat_heat_dn.csv > ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_HW2_anti.heat_heat_dn_ID.txt-e
 ```
 
 ### Wanglitung1
@@ -615,31 +615,31 @@ res_WT1_anti_ctrl <- results(dds_WT1, contrast = c("Treatment", "Antibiotics", "
 res_WT1_anti_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT1_anti_ctrl$IDGeneInfo <- as.character(res_WT1_anti_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT1_anti_ctrl[order(res_WT1_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_anti_ctrl.csv")
+write.csv(as.data.frame(res_WT1_anti_ctrl[order(res_WT1_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_anti_ctrl.csv")
 ressig_WT1_anti_ctrl <- subset(res_WT1_anti_ctrl, padj<0.01)
 ressig_WT1_anti_ctrl_up <- subset(res_WT1_anti_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT1_anti_ctrl_dn <- subset(res_WT1_anti_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_anti_ctrl[order(ressig_WT1_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti_ctrl.csv")
-write.csv(as.data.frame(ressig_WT1_anti_ctrl_up[order(ressig_WT1_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT1_anti_ctrl_dn[order(ressig_WT1_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT1_anti_ctrl[order(ressig_WT1_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_anti_ctrl.csv")
+write.csv(as.data.frame(ressig_WT1_anti_ctrl_up[order(ressig_WT1_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_anti_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT1_anti_ctrl_dn[order(ressig_WT1_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_anti_ctrl_dn.csv")
 colnames(res_WT1_anti_ctrl)
 summary(res_WT1_anti_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT1_anti_ctrl.csv > ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT1_anti_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT1_anti_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti_ctrl_dn_ID.txt-e
 ```
 #### Heat vs. Control
 ```{r}
@@ -647,31 +647,31 @@ res_WT1_heat_ctrl <- results(dds_WT1, contrast = c("Treatment", "Heat", "control
 res_WT1_heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT1_heat_ctrl$IDGeneInfo <- as.character(res_WT1_heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT1_heat_ctrl[order(res_WT1_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_heat_ctrl.csv")
+write.csv(as.data.frame(res_WT1_heat_ctrl[order(res_WT1_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_heat_ctrl.csv")
 ressig_WT1_heat_ctrl <- subset(res_WT1_heat_ctrl, padj<0.01)
 ressig_WT1_heat_ctrl_up <- subset(res_WT1_heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT1_heat_ctrl_dn <- subset(res_WT1_heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_heat_ctrl[order(ressig_WT1_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_heat_ctrl.csv")
-write.csv(as.data.frame(ressig_WT1_heat_ctrl_up[order(ressig_WT1_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT1_heat_ctrl_dn[order(ressig_WT1_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT1_heat_ctrl[order(ressig_WT1_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_heat_ctrl.csv")
+write.csv(as.data.frame(ressig_WT1_heat_ctrl_up[order(ressig_WT1_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT1_heat_ctrl_dn[order(ressig_WT1_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_heat_ctrl_dn.csv")
 colnames(res_WT1_heat_ctrl)
 summary(res_WT1_heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT1_heat_ctrl.csv > ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT1_heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT1_heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Control
 ```{r}
@@ -679,31 +679,31 @@ res_WT1_anti.heat_ctrl <- results(dds_WT1, contrast = c("Treatment", "Antibiotic
 res_WT1_anti.heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT1_anti.heat_ctrl$IDGeneInfo <- as.character(res_WT1_anti.heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT1_anti.heat_ctrl[order(res_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_anti.heat_ctrl.csv")
+write.csv(as.data.frame(res_WT1_anti.heat_ctrl[order(res_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_anti.heat_ctrl.csv")
 ressig_WT1_anti.heat_ctrl <- subset(res_WT1_anti.heat_ctrl, padj<0.01)
 ressig_WT1_anti.heat_ctrl_up <- subset(res_WT1_anti.heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT1_anti.heat_ctrl_dn <- subset(res_WT1_anti.heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_ctrl.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_ctrl.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_anti.heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_anti.heat_ctrl_dn.csv")
 colnames(res_WT1_anti.heat_ctrl)
 summary(res_WT1_anti.heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_ctrl.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT1_anti.heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT1_anti.heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Antibiotics
 ```{r}
@@ -711,31 +711,31 @@ res_WT1_anti.heat_anti <- results(dds_WT1, contrast = c("Treatment", "Antibiotic
 res_WT1_anti.heat_anti$IDGeneInfo <- mcols(dds_WT1)$IDGeneInfo
 res_WT1_anti.heat_anti$IDGeneInfo <- as.character(res_WT1_anti.heat_anti$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT1_anti.heat_anti[order(res_WT1_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_anti.heat_anti.csv")
+write.csv(as.data.frame(res_WT1_anti.heat_anti[order(res_WT1_anti.heat_anti$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_anti.heat_anti.csv")
 ressig_WT1_anti.heat_ctrl <- subset(res_WT1_anti.heat_anti, padj<0.01)
 ressig_WT1_anti.heat_ctrl_up <- subset(res_WT1_anti.heat_anti, padj<0.01 & log2FoldChange>0)
 ressig_WT1_anti.heat_ctrl_dn <- subset(res_WT1_anti.heat_anti, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_anti.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_anti_up.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_anti_dn.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_anti.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_anti.heat_anti_up.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_anti.heat_anti_dn.csv")
 colnames(res_WT1_anti.heat_anti)
 summary(res_WT1_anti.heat_anti)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_anti.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_anti.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_anti_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT1_anti.heat_anti_up.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_anti_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_anti_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT1_anti.heat_anti_dn.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_anti_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Heat
 ```{r}
@@ -743,31 +743,31 @@ res_WT1_anti.heat_heat <- results(dds_WT1, contrast = c("Treatment", "Antibiotic
 res_WT1_anti.heat_heat$IDGeneInfo <- mcols(dds_WT1)$IDGeneInfo
 res_WT1_anti.heat_heat$IDGeneInfo <- as.character(res_WT1_anti.heat_heat$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT1_anti.heat_heat[order(res_WT1_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT1_anti.heat_heat.csv")
+write.csv(as.data.frame(res_WT1_anti.heat_heat[order(res_WT1_anti.heat_heat$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT1_anti.heat_heat.csv")
 ressig_WT1_anti.heat_ctrl <- subset(res_WT1_anti.heat_heat, padj<0.01)
 ressig_WT1_anti.heat_ctrl_up <- subset(res_WT1_anti.heat_heat, padj<0.01 & log2FoldChange>0)
 ressig_WT1_anti.heat_ctrl_dn <- subset(res_WT1_anti.heat_heat, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_heat.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_heat_up.csv")
-write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_heat_dn.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl[order(ressig_WT1_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_heat.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_up[order(ressig_WT1_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT1_anti.heat_heat_up.csv")
+write.csv(as.data.frame(ressig_WT1_anti.heat_ctrl_dn[order(ressig_WT1_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT1_anti.heat_heat_dn.csv")
 colnames(res_WT1_anti.heat_heat)
 summary(res_WT1_anti.heat_heat)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT1_anti.heat_heat.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT1_anti.heat_heat.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT1_anti.heat_heat_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT1_anti.heat_heat_up.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT1_anti.heat_heat_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT1_anti.heat_heat_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT1_anti.heat_heat_dn.csv > ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT1_anti.heat_heat_dn_ID.txt-e
 ```
 
 ### Wanglitung2
@@ -777,31 +777,31 @@ res_WT2_anti_ctrl <- results(dds_WT2, contrast = c("Treatment", "Antibiotics", "
 res_WT2_anti_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT2_anti_ctrl$IDGeneInfo <- as.character(res_WT2_anti_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT2_anti_ctrl[order(res_WT2_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT2_anti_ctrl.csv")
+write.csv(as.data.frame(res_WT2_anti_ctrl[order(res_WT2_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT2_anti_ctrl.csv")
 ressig_WT2_anti_ctrl <- subset(res_WT2_anti_ctrl, padj<0.01)
 ressig_WT2_anti_ctrl_up <- subset(res_WT2_anti_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT2_anti_ctrl_dn <- subset(res_WT2_anti_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT2_anti_ctrl[order(ressig_WT2_anti_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti_ctrl.csv")
-write.csv(as.data.frame(ressig_WT2_anti_ctrl_up[order(ressig_WT2_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT2_anti_ctrl_dn[order(ressig_WT2_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT2_anti_ctrl[order(ressig_WT2_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT2_anti_ctrl.csv")
+write.csv(as.data.frame(ressig_WT2_anti_ctrl_up[order(ressig_WT2_anti_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT2_anti_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT2_anti_ctrl_dn[order(ressig_WT2_anti_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT2_anti_ctrl_dn.csv")
 colnames(res_WT2_anti_ctrl)
 summary(res_WT2_anti_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT2_anti_ctrl.csv > ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT2_anti_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT2_anti_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti_ctrl_dn_ID.txt-e
 ```
 #### Heat vs. Control
 ```{r}
@@ -809,31 +809,31 @@ res_WT2_heat_ctrl <- results(dds_WT2, contrast = c("Treatment", "Heat", "control
 res_WT2_heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT2_heat_ctrl$IDGeneInfo <- as.character(res_WT2_heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT2_heat_ctrl[order(res_WT2_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT2_heat_ctrl.csv")
+write.csv(as.data.frame(res_WT2_heat_ctrl[order(res_WT2_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT2_heat_ctrl.csv")
 ressig_WT2_heat_ctrl <- subset(res_WT2_heat_ctrl, padj<0.01)
 ressig_WT2_heat_ctrl_up <- subset(res_WT2_heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT2_heat_ctrl_dn <- subset(res_WT2_heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT2_heat_ctrl[order(ressig_WT2_heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_heat_ctrl.csv")
-write.csv(as.data.frame(ressig_WT2_heat_ctrl_up[order(ressig_WT2_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT2_heat_ctrl_dn[order(ressig_WT2_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT2_heat_ctrl[order(ressig_WT2_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT2_heat_ctrl.csv")
+write.csv(as.data.frame(ressig_WT2_heat_ctrl_up[order(ressig_WT2_heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT2_heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT2_heat_ctrl_dn[order(ressig_WT2_heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT2_heat_ctrl_dn.csv")
 colnames(res_WT2_heat_ctrl)
 summary(res_WT2_heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT2_heat_ctrl.csv > ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT2_heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT2_heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Control
 ```{r}
@@ -841,31 +841,31 @@ res_WT2_anti.heat_ctrl <- results(dds_WT2, contrast = c("Treatment", "Antibiotic
 res_WT2_anti.heat_ctrl$IDGeneInfo <- mcols(dds_HW1)$IDGeneInfo
 res_WT2_anti.heat_ctrl$IDGeneInfo <- as.character(res_WT2_anti.heat_ctrl$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT2_anti.heat_ctrl[order(res_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT2_anti.heat_ctrl.csv")
+write.csv(as.data.frame(res_WT2_anti.heat_ctrl[order(res_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT2_anti.heat_ctrl.csv")
 ressig_WT2_anti.heat_ctrl <- subset(res_WT2_anti.heat_ctrl, padj<0.01)
 ressig_WT2_anti.heat_ctrl_up <- subset(res_WT2_anti.heat_ctrl, padj<0.01 & log2FoldChange>0)
 ressig_WT2_anti.heat_ctrl_dn <- subset(res_WT2_anti.heat_ctrl, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_ctrl.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_ctrl_up.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_ctrl_dn.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_ctrl.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT2_anti.heat_ctrl_up.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT2_anti.heat_ctrl_dn.csv")
 colnames(res_WT2_anti.heat_ctrl)
 summary(res_WT2_anti.heat_ctrl)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_ctrl.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_ctrl.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_ctrl_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT2_anti.heat_ctrl_up.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_ctrl_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_ctrl_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT2_anti.heat_ctrl_dn.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_ctrl_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Antibiotics
 ```{r}
@@ -873,31 +873,31 @@ res_WT2_anti.heat_anti <- results(dds_WT2, contrast = c("Treatment", "Antibiotic
 res_WT2_anti.heat_anti$IDGeneInfo <- mcols(dds_WT2)$IDGeneInfo
 res_WT2_anti.heat_anti$IDGeneInfo <- as.character(res_WT2_anti.heat_anti$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT2_anti.heat_anti[order(res_WT2_anti.heat_anti$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT2_anti.heat_anti.csv")
+write.csv(as.data.frame(res_WT2_anti.heat_anti[order(res_WT2_anti.heat_anti$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT2_anti.heat_anti.csv")
 ressig_WT2_anti.heat_ctrl <- subset(res_WT2_anti.heat_anti, padj<0.01)
 ressig_WT2_anti.heat_ctrl_up <- subset(res_WT2_anti.heat_anti, padj<0.01 & log2FoldChange>0)
 ressig_WT2_anti.heat_ctrl_dn <- subset(res_WT2_anti.heat_anti, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_anti.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_anti_up.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_anti_dn.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_anti.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT2_anti.heat_anti_up.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT2_anti.heat_anti_dn.csv")
 colnames(res_WT2_anti.heat_anti)
 summary(res_WT2_anti.heat_anti)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_anti.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_anti.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_anti_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT2_anti.heat_anti_up.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_anti_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_anti_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT2_anti.heat_anti_dn.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_anti_dn_ID.txt-e
 ```
 #### Antibiotics.Heat vs. Heat
 ```{r}
@@ -905,31 +905,31 @@ res_WT2_anti.heat_heat <- results(dds_WT2, contrast = c("Treatment", "Antibiotic
 res_WT2_anti.heat_heat$IDGeneInfo <- mcols(dds_WT2)$IDGeneInfo
 res_WT2_anti.heat_heat$IDGeneInfo <- as.character(res_WT2_anti.heat_heat$IDGeneInfo)
 ###
-write.csv(as.data.frame(res_WT2_anti.heat_heat[order(res_WT2_anti.heat_heat$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/all/res_WT2_anti.heat_heat.csv")
+write.csv(as.data.frame(res_WT2_anti.heat_heat[order(res_WT2_anti.heat_heat$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_WT2_anti.heat_heat.csv")
 ressig_WT2_anti.heat_ctrl <- subset(res_WT2_anti.heat_heat, padj<0.01)
 ressig_WT2_anti.heat_ctrl_up <- subset(res_WT2_anti.heat_heat, padj<0.01 & log2FoldChange>0)
 ressig_WT2_anti.heat_ctrl_dn <- subset(res_WT2_anti.heat_heat, padj<0.01 & log2FoldChange<0)
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_heat.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_heat_up.csv")
-write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_heat_dn.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl[order(ressig_WT2_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_heat.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_up[order(ressig_WT2_anti.heat_ctrl_up$log2FoldChange, decreasing = TRUE),]), file = "./outputs/DESeq-results/tables/up/res_WT2_anti.heat_heat_up.csv")
+write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_ctrl_dn$log2FoldChange, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/down/res_WT2_anti.heat_heat_dn.csv")
 colnames(res_WT2_anti.heat_heat)
 summary(res_WT2_anti.heat_heat)
 ```
 ```{bash}
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/overall/res_WT2_anti.heat_heat.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/overall/res_WT2_anti.heat_heat.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/up/res_WT2_anti.heat_heat_up.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_up_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_up_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_up_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_up_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/up/res_WT2_anti.heat_heat_up.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_up_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_up_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_up_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_up_ID.txt-e
 
-awk -F "," '{print $1}' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/tables/down/res_WT2_anti.heat_heat_dn.csv > ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_dn_ID.txt
-sed -i '' 1d ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_dn_ID.txt
-sed -i -e 's/"//g' ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_dn_ID.txt
-rm ~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/lists/res_WT2_anti.heat_heat_dn_ID.txt-e
+awk -F "," '{print $1}' ./outputs/DESeq-results/tables/down/res_WT2_anti.heat_heat_dn.csv > ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_dn_ID.txt
+sed -i '' 1d ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_dn_ID.txt
+sed -i -e 's/"//g' ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_dn_ID.txt
+rm ./outputs/DESeq-results/lists/res_WT2_anti.heat_heat_dn_ID.txt-e
 ```
 
 

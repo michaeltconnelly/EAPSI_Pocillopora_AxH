@@ -11,3 +11,5 @@ outputs/STARalign_Pdam/
 outputs/phylotrans_Pdam/
 bash/jobs/
 .Rhistory
+.RData
+Rmd/*.html
