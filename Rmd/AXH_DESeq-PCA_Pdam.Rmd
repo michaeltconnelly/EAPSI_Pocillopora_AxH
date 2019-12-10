@@ -162,7 +162,7 @@ ggPCA(rld_anti.heat, stable_samples_anti.heat, condcolors_anti.heat, pclab = c(2
 ggPCA(rld_anti.heat, stable_samples_anti.heat, condcolors_anti.heat, pclab = c(3,4))
 ```
 ```{r}
-pdf(file = "./outputs/DESeq-results/figuresPCAs_AXH.pdf", height = 4, width = 8)
+pdf(file = "./outputs/DESeq-results/figures/PCAs_AXH.pdf", height = 4, width = 8)
 ggPCA(rld_antixheat, stable_samples_antixheat, condcolors_antixheat, pclab = c(1,2))
 ggPCA(rld_antixheat, stable_samples_antixheat, condcolors_antixheat, pclab = c(1,3))
 ggPCA(rld_antixheat, stable_samples_antixheat, condcolors_antixheat, pclab = c(1,4))
