@@ -54,5 +54,5 @@ echo "GATK HaplotypeCaller script of $EAPSIsample submitted"
 bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkHC_pdam.job
 done
 
-bsub -P transcriptomics < ./bash/gatk_VF_Pdam.sh
-echo "Started next job in phylotranscriptomics pipeline: GATK VariantFiltration"
+#bsub -P transcriptomics < ./bash/gatk_VF_Pdam.sh
+#echo "Started next job in phylotranscriptomics pipeline: GATK VariantFiltration"
