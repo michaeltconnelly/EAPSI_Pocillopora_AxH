@@ -9,7 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 library(DESeq2)
-library(VennDiagram)
 ```
 ```{r}
 resultsNames(dds_anti)

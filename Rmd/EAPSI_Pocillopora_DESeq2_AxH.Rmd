@@ -11,7 +11,8 @@ RMarkdown document containing scripts for DESeq2 modelling of differential gene 
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
-## Setup packages and working directories
+
+## Load packages, set ggplot2 themes, colors, and shapes
 Include all packages needed for the entire DESeq2 analysis and downstream visualizations
 ```{r packages, error=FALSE, warning=FALSE, message=FALSE}
 library("tidyverse")
@@ -22,9 +23,10 @@ library("VennDiagram")
 library("ggrepel")
 library("RColorBrewer")
 library("calibrate")
+library("pheatmap")
+library("RColorBrewer")
+library("genefilter")
 ```
-
-## Set overall theme, colors, and shapes for DESeq2 visualizations
 ```{r}
 theme_set(theme_bw())
 condcolors_anti <- c("#00CCCC", "#0000FF")
@@ -32,11 +34,12 @@ condcolors_heat <- c("#0000FF", "#FF6600")
 condcolors_anti.heat <- c("#0000FF", "#FFCC33")
 condcolors_antixheat <- c("#0000FF", "#FF6600", "#00CCCC", "#FFCC33")
 ###
-condfillcolors <- c("#99FFFF", "#FFFF66", "#FF6666", "#99CCFF", "#FFCC99", "#FFCCFF")
 condfillcolors_antixheat <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
-colshapes <- c(18, 9, 16, 10)
+colshapes <- c(16, 17, 15, 18)
 colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#99CCFF")
 ```
+
+# DESeq2 Analysis
 
 ## Import sample metadata and counts data
 ```{r, echo=TRUE}
@@ -63,9 +66,7 @@ countdata <- countdata[ ,7:ncol(countdata)]
 genefeatures <- read.delim(file = "./data/pdam_genome_IDInfo.gff", header = F)
 colnames(genefeatures) <- c("IDGeneInfo")
 rownames(genefeatures) <- rownames(countdata)
-```
-## Check gene feature annotation and countdata rowname order coherence
-```{r}
+#Check gene feature annotation and countdata rowname order coherence
 all(rownames(countdata) == rownames(genefeatures))
 ```
 ## Select which treatments to use in DESeq object construction
@@ -73,29 +74,25 @@ anti: Control-Antibiotics
 heat: Control-Heat
 anti.heat: Control-Antibiotics.Heat
 antixheat: Control-Antibiotics-Heat-Antibiotics.Heat
-```{r}
+```{r, echo=FALSE}
 countdata_anti <- dplyr::select(countdata, matches("[HW][wt][12].[56]."))
 countdata_heat <- dplyr::select(countdata, matches("[HW][wt][12].[46]."))
 countdata_anti.heat <- dplyr::select(countdata, matches("[HW][wt][12].[16]."))
-###
 countdata_antixheat <- dplyr::select(countdata, matches("[HW][wt][12].[1456]."))
 ```
-```{r}
+```{r, echo=FALSE}
 countdata_HW1 <- dplyr::select(countdata_antixheat, matches("Hw1.*"))
 countdata_HW2 <- dplyr::select(countdata_antixheat, matches("Hw2.*"))
 countdata_WT1 <- dplyr::select(countdata_antixheat, matches("Wt1.*"))
 countdata_WT2 <- dplyr::select(countdata_antixheat, matches("Wt2.*"))
 ```
-
-```{r}
+```{r, echo=FALSE}
 stable_samples_anti <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics")
 stable_samples_heat <- filter(stable_samples, Treatment == "control" | Treatment == "Heat")
-###
 stable_samples_anti.heat <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics.Heat")
-###
 stable_samples_antixheat <- filter(stable_samples, Treatment == "control" | Treatment == "Antibiotics" | Treatment == "Heat" | Treatment == "Antibiotics.Heat")
 ```
-```{r}
+```{r, echo=FALSE}
 stable_samples_HW1 <- filter(stable_samples_antixheat, Colony == "HW1")# %>% select(-contains("W"), -contains("2"))
 stable_samples_HW2 <- filter(stable_samples_antixheat, Colony == "HW2")# %>% select(-contains("W"), -contains("1"))
 stable_samples_WT1 <- filter(stable_samples_antixheat, Colony == "WT1")# %>% select(-contains("H"), -contains("2"))
@@ -136,7 +133,6 @@ relevel(dds_anti.heat$Treatment, ref = "control")
       dds_antixheat$Treatment <- factor(dds_antixheat$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
 relevel(dds_antixheat$Treatment, ref = "control")
 ```
-
 ```{r, message=FALSE}
       dds_HW1 <- DESeqDataSetFromMatrix(countData=countdata_HW1, colData=stable_samples_HW1, design= ~Treatment)
 ### Batch effect encompasses Treatment
@@ -158,28 +154,25 @@ relevel(dds_WT1$Treatment, ref = "control")
       dds_WT2$Treatment <- factor(dds_WT2$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
 relevel(dds_WT2$Treatment, ref = "control")
 ```
-## Check annotation and dds object rowname order coherence
-```{r}
+```{r, echo=FALSE}
+#Check annotation and dds object rowname order coherence
 all(rownames(dds_anti) == rownames(genefeatures))
 all(rownames(dds_heat) == rownames(genefeatures))
 all(rownames(dds_anti.heat) == rownames(genefeatures))
 all(rownames(dds_antixheat) == rownames(genefeatures))
-```
-```{r}
+###
 all(rownames(dds_HW1) == rownames(genefeatures))
 all(rownames(dds_HW2) == rownames(genefeatures))
 all(rownames(dds_WT1) == rownames(genefeatures))
 all(rownames(dds_WT2) == rownames(genefeatures))
 ```
-
-## Add gene feature annotation to DESeqDataSets
-```{r}
+```{r, echo=FALSE}
+#Add gene feature annotation to DESeqDataSets
 mcols(dds_anti) <- cbind(mcols(dds_anti), genefeatures)
 mcols(dds_heat) <- cbind(mcols(dds_heat), genefeatures)
 mcols(dds_anti.heat) <- cbind(mcols(dds_anti.heat), genefeatures)
 mcols(dds_antixheat) <- cbind(mcols(dds_antixheat), genefeatures)
-```
-```{r}
+###
 mcols(dds_HW1) <- cbind(mcols(dds_HW1), genefeatures)
 mcols(dds_HW2) <- cbind(mcols(dds_HW2), genefeatures)
 mcols(dds_WT1) <- cbind(mcols(dds_WT1), genefeatures)
@@ -244,11 +237,9 @@ plotMA(res_anti, ylim = c(-20, 20))
 ```
 
 ## Check output of Heat DESeq2 analysis to ensure quality
-```{r}
+```{r, echo=FALSE}
 resultsNames(dds_heat)
 summary(res_heat)
-```
-```{r}
 res_heat$IDGeneInfo <- mcols(dds_heat)$IDGeneInfo
 res_heat$IDGeneInfo <- as.character(res_heat$IDGeneInfo)
 ```
@@ -258,11 +249,9 @@ plotMA(res_heat, ylim = c(-20, 20))
 ```
 
 ## Check output of Antibiotics.Heat DESeq2 analysis to ensure quality
-```{r}
+```{r, echo=FALSE}
 resultsNames(dds_anti.heat)
 summary(res_anti.heat)
-```
-```{r}
 res_anti.heat$IDGeneInfo <- mcols(dds_anti.heat)$IDGeneInfo
 res_anti.heat$IDGeneInfo <- as.character(res_anti.heat$IDGeneInfo)
 ```
@@ -272,11 +261,9 @@ plotMA(res_anti.heat, ylim = c(-20, 20))
 ```
 
 ## Check output of AntibioticsXHeat DESeq2 analysis to ensure quality
-```{r}
+```{r, echo=FALSE}
 resultsNames(dds_antixheat)
 summary(res_antixheat)
-```
-```{r}
 res_antixheat$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_antixheat$IDGeneInfo <- as.character(res_antixheat$IDGeneInfo)
 ```
@@ -284,3 +271,13 @@ res_antixheat$IDGeneInfo <- as.character(res_antixheat$IDGeneInfo)
 plotDispEsts(dds_antixheat)
 plotMA(res_antixheat, ylim = c(-20, 20))
 ```
+
+# DESeq2 Results Contrasts
+
+# Volcano Plots
+
+# Principal Components Analysis
+
+# Gene Expression Heatmaps
+
+# DEG Venn Diagrams and UpSet Plots

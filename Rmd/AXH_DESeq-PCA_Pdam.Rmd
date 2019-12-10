@@ -10,20 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 
-Set theme, colors and shapes for ggplot2 plotting
-```{r}
-theme_set(theme_bw())
-condcolors_anti <- c("#00CCCC", "#0000FF")
-condcolors_heat <- c("#0000FF", "#FF6600")
-condcolors_anti.heat <- c("#0000FF", "#FFCC33")
-condcolors_antixheat <- c("#0000FF", "#FF6600", "#00CCCC", "#FFCC33")
-###
-condfillcolors <- c("#99FFFF", "#FFFF66", "#FF6666", "#99CCFF", "#FFCC99", "#FFCCFF")
-condfillcolors_antixheat <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
-colshapes <- c(18, 9, 16, 10)
-colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#99CCFF")
-```
-
 ## Regularized-log transformations
 ```{r, include=FALSE}
       rld_anti <- rlogTransformation(dds_anti, blind = TRUE)
