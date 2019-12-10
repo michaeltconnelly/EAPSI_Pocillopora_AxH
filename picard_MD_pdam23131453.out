@@ -1,0 +1,88 @@
+Sender: LSF System <lsfadmin@n295>
+Subject: Job 23131453: <picard_MD_pdam> in cluster <mk2> Done
+
+Job <picard_MD_pdam> was submitted from host <n212> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n295>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH> was used as the working directory.
+Started at Mon Dec  9 14:33:55 2019
+Results reported on Mon Dec  9 17:06:40 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/picardtools_MD_Pdam.sh
+#purpose: sort bam files by coordinate for downstream SNP processing
+#To start this job from the EAPSI_Pocillopora_AxH directory, use:
+#bsub -P transcriptomics < ./bash/picardtools_MD_Pdam.sh
+
+#BSUB -J picard_MD_pdam
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o picard_MD_pdam%J.out
+#BSUB -e picard_MD_pdam%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH"
+exp="AxH"
+EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c"
+
+#lets me know which files are being processed
+echo "These are the bam files to be processed : $EAPSIsamples"
+
+module load java/1.8.0_60
+module load picard-tools/1.103
+
+for EAPSIsample in $EAPSIsamples
+do \
+java -jar /share/apps/picard-tools/1.103/AddOrReplaceReadGroups.jar \
+INPUT=${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}_PdamAligned.sorted.out.bam \
+OUTPUT=${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}_PdamAligned.sorted.out.rg.bam \
+RGID=id \
+RGLB=library \
+RGPL=illumina \
+RGPU=unit1 \
+RGSM=${EAPSIsample}
+
+java -jar /share/apps/picard-tools/1.103/MarkDuplicates.jar \
+INPUT= ${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}_PdamAligned.sorted.out.rg.bam \
+OUTPUT=${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}_PdamAligned.sorted.out.md.rg.bam \
+CREATE_INDEX=true \
+VALIDATION_STRINGENCY=SILENT \
+METRICS_FILE=${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}_marked_dup_metrics.txt
+done
+
+bsub -P transcriptomics < ./bash/gatk_splitN_Pdam.sh
+echo "Started next job in phylotranscriptomics pipeline: GATK SplitNCigarReads"
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   18238.89 sec.
+    Max Memory :                                 628 MB
+    Average Memory :                             399.18 MB
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               11372.00 MB
+    Max Swap :                                   4381 MB
+    Max Processes :                              4
+    Max Threads :                                38
+
+The output (if any) follows:
+
+These are the bam files to be processed : Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c
+Job <23131572> is submitted to queue <bigmem>.
+Started next job in phylotranscriptomics pipeline: GATK SplitNCigarReads
+
+
+PS:
+
+Read file <picard_MD_pdam23131453.err> for stderr output of this job.
+

@@ -1,0 +1,1617 @@
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:06:43,652 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:06:43,656 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:06:43,656 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:06:43,656 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:06:43,660 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:06:43,673 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:06:43,673 HelpFormatter - Date/Time: 2019/12/09 22:06:43 
+INFO  22:06:43,674 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:06:43,674 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:06:44,264 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:06:44,444 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:06:44,451 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:06:44,611 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  22:06:44,768 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:06:44,773 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:06:44,773 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:06:44,773 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:06:44,774 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:06:44,861 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:06:44,863 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:07:17,013 ProgressMeter - SczhEnG_1028:16280   1993914.0    32.0 s      16.0 s       24.0%     2.2 m     101.0 s 
+INFO  22:07:47,040 ProgressMeter - SczhEnG_1810:8118   3730786.0    62.0 s      16.0 s       41.1%     2.5 m      88.0 s 
+INFO  22:08:18,813 ProgressMeter - SczhEnG_2925:7316   5807570.0    94.0 s      16.0 s       65.7%     2.4 m      49.0 s 
+INFO  22:08:48,815 ProgressMeter - SczhEnG_3918:481659   8002963.0     2.1 m      15.0 s       88.8%     2.3 m      15.0 s 
+INFO  22:09:18,817 ProgressMeter - SczhEnG_4410:3181   9030787.0     2.6 m      17.0 s      100.0%     2.6 m       0.0 s 
+INFO  22:09:48,819 ProgressMeter - SczhEnG_4410:3181   9030787.0     3.1 m      20.0 s      100.0%     3.1 m       0.0 s 
+INFO  22:09:58,282 ProgressMeter -            done   9030790.0     3.2 m      21.0 s      100.0%     3.2 m       0.0 s 
+INFO  22:09:58,282 ProgressMeter - Total runtime 193.51 secs, 3.23 min, 0.05 hours 
+INFO  22:09:58,286 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9030790 total reads (0.00%) 
+INFO  22:09:58,287 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:09:58,287 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:09:58,287 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:09:59,026 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:10:00,996 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:10:00,998 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:10:00,999 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:10:00,999 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:10:01,002 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:10:01,008 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:10:01,009 HelpFormatter - Date/Time: 2019/12/09 22:10:00 
+INFO  22:10:01,009 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:10:01,009 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:10:01,568 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:10:01,743 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:10:01,750 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:10:01,916 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  22:10:02,040 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:10:02,044 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:10:02,045 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:10:02,045 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:10:02,045 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:10:02,135 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:10:02,136 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:10:33,547 ProgressMeter - SczhEnG_1412:50750   2231642.0    31.0 s      14.0 s       31.1%    99.0 s      68.0 s 
+INFO  22:11:03,926 ProgressMeter - SczhEnG_2659:68   4447509.0    61.0 s      13.0 s       59.3%   102.0 s      41.0 s 
+INFO  22:11:34,544 ProgressMeter - SczhEnG_3582:58   6314427.0    92.0 s      14.0 s       81.5%   112.0 s      20.0 s 
+INFO  22:12:04,546 ProgressMeter - SczhEnG_4409:65   7713893.0     2.0 m      15.0 s      100.0%     2.0 m       0.0 s 
+INFO  22:12:34,548 ProgressMeter - SczhEnG_4409:65   7713893.0     2.5 m      19.0 s      100.0%     2.5 m       0.0 s 
+INFO  22:12:40,271 ProgressMeter -            done   7713895.0     2.6 m      20.0 s      100.0%     2.6 m       0.0 s 
+INFO  22:12:40,271 ProgressMeter - Total runtime 158.23 secs, 2.64 min, 0.04 hours 
+INFO  22:12:40,275 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7713895 total reads (0.00%) 
+INFO  22:12:40,275 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:12:40,276 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:12:40,276 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:12:40,842 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:12:42,737 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:12:42,739 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:12:42,740 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:12:42,740 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:12:42,744 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-1c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:12:42,750 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:12:42,750 HelpFormatter - Date/Time: 2019/12/09 22:12:42 
+INFO  22:12:42,751 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:12:42,751 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:12:43,337 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:12:43,507 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:12:43,514 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:12:43,684 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  22:12:43,814 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:12:43,818 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:12:43,819 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:12:43,819 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:12:43,820 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:12:43,917 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:12:43,918 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:13:13,822 ProgressMeter - SczhEnG_862:555882   1870912.0    30.0 s      16.0 s       21.1%     2.4 m     112.0 s 
+INFO  22:13:45,231 ProgressMeter - SczhEnG_1758:27274   3803319.0    61.0 s      16.0 s       39.8%     2.6 m      92.0 s 
+INFO  22:14:15,280 ProgressMeter - SczhEnG_2838:227841   5962098.0    91.0 s      15.0 s       64.2%     2.4 m      50.0 s 
+INFO  22:14:45,307 ProgressMeter - SczhEnG_3670:179   7953288.0     2.0 m      15.0 s       83.4%     2.4 m      24.0 s 
+INFO  22:15:15,309 ProgressMeter - SczhEnG_4411:1075   9563583.0     2.5 m      15.0 s      100.0%     2.5 m       0.0 s 
+INFO  22:15:45,310 ProgressMeter - SczhEnG_4411:1075   9563583.0     3.0 m      18.0 s      100.0%     3.0 m       0.0 s 
+INFO  22:16:04,393 ProgressMeter -            done   9563584.0     3.3 m      20.0 s      100.0%     3.3 m       0.0 s 
+INFO  22:16:04,394 ProgressMeter - Total runtime 200.57 secs, 3.34 min, 0.06 hours 
+INFO  22:16:04,397 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9563584 total reads (0.00%) 
+INFO  22:16:04,397 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:16:04,397 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:16:04,397 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:16:04,970 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:16:06,931 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:16:06,934 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:16:06,934 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:16:06,934 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:16:06,938 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:16:06,944 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:16:06,945 HelpFormatter - Date/Time: 2019/12/09 22:16:06 
+INFO  22:16:06,945 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:16:06,945 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:16:07,524 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:16:07,685 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:16:07,693 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:16:07,856 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  22:16:07,982 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:16:07,987 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:16:07,988 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:16:07,988 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:16:07,988 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:16:08,079 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:16:08,081 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:16:38,143 ProgressMeter - SczhEnG_1529:263034   2100770.0    30.0 s      14.0 s       34.2%    87.0 s      57.0 s 
+INFO  22:17:08,610 ProgressMeter - SczhEnG_2846:909   4217333.0    60.0 s      14.0 s       64.8%    92.0 s      32.0 s 
+INFO  22:17:39,102 ProgressMeter - SczhEnG_4255:40   6537797.0    91.0 s      13.0 s       97.8%    93.0 s       2.0 s 
+INFO  22:18:09,104 ProgressMeter - SczhEnG_4410:3221   6667803.0     2.0 m      18.0 s      100.0%     2.0 m       0.0 s 
+INFO  22:18:22,160 ProgressMeter -            done   6667805.0     2.2 m      20.0 s      100.0%     2.2 m       0.0 s 
+INFO  22:18:22,160 ProgressMeter - Total runtime 134.17 secs, 2.24 min, 0.04 hours 
+INFO  22:18:22,163 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6667805 total reads (0.00%) 
+INFO  22:18:22,164 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:18:22,164 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:18:22,164 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:18:22,781 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:18:24,599 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:18:24,601 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:18:24,601 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:18:24,601 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:18:24,605 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:18:24,610 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:18:24,610 HelpFormatter - Date/Time: 2019/12/09 22:18:24 
+INFO  22:18:24,611 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:18:24,611 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:18:25,143 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:18:25,294 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:18:25,301 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:18:25,456 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  22:18:25,567 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:18:25,572 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:18:25,572 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:18:25,572 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:18:25,573 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:18:25,657 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:18:25,658 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:18:56,004 ProgressMeter - SczhEnG_1558:381578   2070880.0    30.0 s      14.0 s       34.7%    86.0 s      56.0 s 
+INFO  22:19:26,006 ProgressMeter - SczhEnG_3106:369390   4325013.0    60.0 s      13.0 s       70.2%    85.0 s      25.0 s 
+INFO  22:19:56,307 ProgressMeter - SczhEnG_4411:1067   6363840.0    90.0 s      14.0 s      100.0%    90.0 s       0.0 s 
+INFO  22:20:26,309 ProgressMeter - SczhEnG_4411:1067   6363840.0   120.0 s      18.0 s      100.0%   120.0 s       0.0 s 
+INFO  22:20:34,755 ProgressMeter -            done   6363841.0     2.2 m      20.0 s      100.0%     2.2 m       0.0 s 
+INFO  22:20:34,756 ProgressMeter - Total runtime 129.18 secs, 2.15 min, 0.04 hours 
+INFO  22:20:34,759 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6363841 total reads (0.00%) 
+INFO  22:20:34,759 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:20:34,760 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:20:34,760 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:20:35,322 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:20:37,221 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:20:37,224 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:20:37,224 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:20:37,224 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:20:37,228 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-4c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:20:37,233 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:20:37,234 HelpFormatter - Date/Time: 2019/12/09 22:20:37 
+INFO  22:20:37,234 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:20:37,235 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:20:37,807 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:20:37,971 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:20:37,978 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:20:38,138 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  22:20:38,266 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:20:38,271 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:20:38,272 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:20:38,272 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:20:38,272 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:20:38,366 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:20:38,368 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:21:08,539 ProgressMeter - SczhEnG_1415:1057812   2135484.0    30.0 s      14.0 s       31.6%    94.0 s      64.0 s 
+INFO  22:21:38,541 ProgressMeter - SczhEnG_2712:1592549   4327532.0    60.0 s      13.0 s       60.5%    99.0 s      39.0 s 
+INFO  22:22:08,542 ProgressMeter - SczhEnG_3873:280   6646425.0    90.0 s      13.0 s       88.0%   102.0 s      12.0 s 
+INFO  22:22:38,732 ProgressMeter - SczhEnG_4409:773   7527851.0   120.0 s      16.0 s      100.0%   120.0 s       0.0 s 
+INFO  22:23:07,956 ProgressMeter -            done   7527852.0     2.5 m      19.0 s      100.0%     2.5 m       0.0 s 
+INFO  22:23:07,956 ProgressMeter - Total runtime 149.68 secs, 2.49 min, 0.04 hours 
+INFO  22:23:07,960 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7527852 total reads (0.00%) 
+INFO  22:23:07,960 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:23:07,961 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:23:07,961 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:23:08,549 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:23:10,497 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:23:10,500 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:23:10,500 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:23:10,500 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:23:10,504 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:23:10,510 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:23:10,510 HelpFormatter - Date/Time: 2019/12/09 22:23:10 
+INFO  22:23:10,510 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:23:10,511 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:23:11,089 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:23:11,254 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:23:11,262 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:23:11,434 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  22:23:11,559 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:23:11,563 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:23:11,564 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:23:11,564 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:23:11,564 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:23:11,658 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:23:11,659 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:23:43,119 ProgressMeter - SczhEnG_1415:1842545   1983804.0    31.0 s      15.0 s       31.9%    97.0 s      66.0 s 
+INFO  22:24:13,333 ProgressMeter - SczhEnG_2824:4978   4244585.0    61.0 s      14.0 s       63.4%    96.0 s      35.0 s 
+INFO  22:24:43,365 ProgressMeter - SczhEnG_4065:317   6404156.0    91.0 s      14.0 s       92.2%    98.0 s       7.0 s 
+INFO  22:25:13,367 ProgressMeter - SczhEnG_4411:840   6933367.0     2.0 m      17.0 s      100.0%     2.0 m       0.0 s 
+INFO  22:25:34,387 ProgressMeter -            done   6933371.0     2.4 m      20.0 s      100.0%     2.4 m       0.0 s 
+INFO  22:25:34,388 ProgressMeter - Total runtime 142.82 secs, 2.38 min, 0.04 hours 
+INFO  22:25:34,391 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6933371 total reads (0.00%) 
+INFO  22:25:34,392 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:25:34,392 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:25:34,392 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:25:34,967 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:25:36,864 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:25:36,866 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:25:36,867 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:25:36,867 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:25:36,870 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:25:36,876 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:25:36,877 HelpFormatter - Date/Time: 2019/12/09 22:25:36 
+INFO  22:25:36,877 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:25:36,877 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:25:37,446 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:25:37,625 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:25:37,633 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:25:37,807 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  22:25:37,939 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:25:37,944 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:25:37,945 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:25:37,945 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:25:37,945 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:25:38,039 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:25:38,041 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:26:08,036 ProgressMeter - SczhEnG_575:1266   1826978.0    30.0 s      16.0 s       14.9%     3.3 m       2.8 m 
+INFO  22:26:38,038 ProgressMeter - SczhEnG_1415:924330   3828668.0    60.0 s      15.0 s       31.5%     3.2 m       2.2 m 
+INFO  22:27:09,995 ProgressMeter - SczhEnG_2019:291919   6078903.0    92.0 s      15.0 s       46.1%     3.3 m     107.0 s 
+INFO  22:27:39,997 ProgressMeter - SczhEnG_2728:65   7971279.0     2.0 m      15.0 s       61.0%     3.3 m      77.0 s 
+INFO  22:28:10,163 ProgressMeter - SczhEnG_3266:665   9674095.0     2.5 m      15.0 s       74.2%     3.4 m      52.0 s 
+INFO  22:28:40,165 ProgressMeter - SczhEnG_3831:87   1.1686816E7     3.0 m      15.0 s       87.0%     3.5 m      27.0 s 
+INFO  22:29:10,209 ProgressMeter - SczhEnG_4411:324   1.3441585E7     3.5 m      15.0 s      100.0%     3.5 m       0.0 s 
+INFO  22:29:40,211 ProgressMeter - SczhEnG_4411:324   1.3441585E7     4.0 m      18.0 s      100.0%     4.0 m       0.0 s 
+INFO  22:30:10,214 ProgressMeter - SczhEnG_4411:324   1.3441585E7     4.5 m      20.0 s      100.0%     4.5 m       0.0 s 
+INFO  22:30:23,801 ProgressMeter -            done   1.3441588E7     4.8 m      21.0 s      100.0%     4.8 m       0.0 s 
+INFO  22:30:23,802 ProgressMeter - Total runtime 285.86 secs, 4.76 min, 0.08 hours 
+INFO  22:30:23,805 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 13441588 total reads (0.00%) 
+INFO  22:30:23,806 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:30:23,806 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:30:23,806 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:30:24,349 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:30:26,218 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:30:26,221 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:30:26,221 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:30:26,221 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:30:26,225 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-5c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:30:26,230 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:30:26,231 HelpFormatter - Date/Time: 2019/12/09 22:30:26 
+INFO  22:30:26,231 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:30:26,231 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:30:26,784 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:30:26,934 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:30:26,941 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:30:27,090 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  22:30:27,207 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:30:27,213 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:30:27,213 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:30:27,213 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:30:27,214 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:30:27,299 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:30:27,301 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:30:57,434 ProgressMeter - SczhEnG_787:140   2155087.0    30.0 s      14.0 s       18.8%     2.7 m       2.2 m 
+INFO  22:31:28,575 ProgressMeter - SczhEnG_1558:381659   4114645.0    61.0 s      14.0 s       34.7%     2.9 m     114.0 s 
+INFO  22:32:01,056 ProgressMeter - SczhEnG_2275:499046   6336446.0    93.0 s      14.0 s       52.1%     3.0 m      85.0 s 
+INFO  22:32:31,059 ProgressMeter - SczhEnG_2986:238124   8230323.0     2.1 m      15.0 s       67.6%     3.0 m      58.0 s 
+INFO  22:33:01,659 ProgressMeter - SczhEnG_3678:428   1.0397723E7     2.6 m      14.0 s       83.4%     3.1 m      30.0 s 
+INFO  22:33:31,661 ProgressMeter - SczhEnG_4411:1075   1.2570121E7     3.1 m      14.0 s      100.0%     3.1 m       0.0 s 
+INFO  22:34:01,663 ProgressMeter - SczhEnG_4411:1075   1.2570121E7     3.6 m      17.0 s      100.0%     3.6 m       0.0 s 
+INFO  22:34:31,677 ProgressMeter - SczhEnG_4411:1075   1.2570121E7     4.1 m      19.0 s      100.0%     4.1 m       0.0 s 
+INFO  22:34:42,375 ProgressMeter -            done   1.2570122E7     4.3 m      20.0 s      100.0%     4.3 m       0.0 s 
+INFO  22:34:42,375 ProgressMeter - Total runtime 255.16 secs, 4.25 min, 0.07 hours 
+INFO  22:34:42,378 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12570122 total reads (0.00%) 
+INFO  22:34:42,379 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:34:42,379 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:34:42,379 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:34:42,938 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:34:44,814 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:34:44,816 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:34:44,817 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:34:44,817 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:34:44,821 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:34:44,826 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:34:44,827 HelpFormatter - Date/Time: 2019/12/09 22:34:44 
+INFO  22:34:44,827 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:34:44,827 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:34:45,367 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:34:45,520 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:34:45,527 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:34:45,690 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  22:34:45,817 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:34:45,822 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:34:45,822 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:34:45,823 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:34:45,823 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:34:45,915 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:34:45,916 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:35:16,165 ProgressMeter - SczhEnG_536:19750   1875547.0    30.0 s      16.0 s       13.1%     3.8 m       3.3 m 
+INFO  22:35:46,272 ProgressMeter - SczhEnG_1309:40   4131821.0    60.0 s      14.0 s       29.8%     3.4 m       2.4 m 
+INFO  22:36:18,087 ProgressMeter - SczhEnG_1809:457852   6067556.0    92.0 s      15.0 s       41.0%     3.7 m       2.2 m 
+INFO  22:36:48,089 ProgressMeter - SczhEnG_2392:298841   8075589.0     2.0 m      15.0 s       55.1%     3.7 m      99.0 s 
+INFO  22:37:19,762 ProgressMeter - SczhEnG_2956:121   9768854.0     2.6 m      15.0 s       66.5%     3.8 m      77.0 s 
+INFO  22:37:51,470 ProgressMeter - SczhEnG_3465:168   1.1593642E7     3.1 m      16.0 s       78.3%     3.9 m      51.0 s 
+INFO  22:38:21,860 ProgressMeter - SczhEnG_4065:3437   1.396176E7     3.6 m      15.0 s       92.2%     3.9 m      18.0 s 
+INFO  22:38:51,862 ProgressMeter - SczhEnG_4411:1075   1.5113426E7     4.1 m      16.0 s      100.0%     4.1 m       0.0 s 
+INFO  22:39:21,864 ProgressMeter - SczhEnG_4411:1075   1.5113426E7     4.6 m      18.0 s      100.0%     4.6 m       0.0 s 
+INFO  22:39:51,866 ProgressMeter - SczhEnG_4411:1075   1.5113426E7     5.1 m      20.0 s      100.0%     5.1 m       0.0 s 
+INFO  22:40:08,635 ProgressMeter -            done   1.5113428E7     5.4 m      21.0 s      100.0%     5.4 m       0.0 s 
+INFO  22:40:08,636 ProgressMeter - Total runtime 322.81 secs, 5.38 min, 0.09 hours 
+INFO  22:40:08,639 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 15113428 total reads (0.00%) 
+INFO  22:40:08,639 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:40:08,639 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:40:08,640 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:40:09,195 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:40:11,065 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:40:11,067 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:40:11,067 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:40:11,067 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:40:11,071 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:40:11,077 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:40:11,077 HelpFormatter - Date/Time: 2019/12/09 22:40:11 
+INFO  22:40:11,078 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:40:11,078 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:40:11,634 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:40:11,783 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:40:11,790 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:40:11,940 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  22:40:12,059 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:40:12,064 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:40:12,065 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:40:12,065 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:40:12,065 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:40:12,152 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:40:12,154 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:40:42,186 ProgressMeter -  SczhEnG_565:87   1829277.0    30.0 s      16.0 s       14.6%     3.4 m       2.9 m 
+INFO  22:41:12,344 ProgressMeter - SczhEnG_1365:50   3745945.0    60.0 s      16.0 s       30.8%     3.2 m       2.2 m 
+INFO  22:41:42,505 ProgressMeter - SczhEnG_1748:95730   5321830.0    90.0 s      16.0 s       39.7%     3.8 m       2.3 m 
+INFO  22:42:12,683 ProgressMeter - SczhEnG_2406:91485   7287174.0   120.0 s      16.0 s       55.2%     3.6 m      97.0 s 
+INFO  22:42:42,904 ProgressMeter - SczhEnG_2975:1296   8778602.0     2.5 m      17.0 s       67.0%     3.7 m      73.0 s 
+INFO  22:43:13,312 ProgressMeter - SczhEnG_3473:226   1.0528214E7     3.0 m      17.0 s       78.5%     3.8 m      49.0 s 
+INFO  22:43:44,184 ProgressMeter - SczhEnG_4055:514839   1.2531291E7     3.5 m      16.0 s       91.9%     3.8 m      18.0 s 
+INFO  22:44:14,198 ProgressMeter - SczhEnG_4411:842   1.3642641E7     4.0 m      17.0 s      100.0%     4.0 m       0.0 s 
+INFO  22:44:44,200 ProgressMeter - SczhEnG_4411:842   1.3642641E7     4.5 m      19.0 s      100.0%     4.5 m       0.0 s 
+INFO  22:45:14,202 ProgressMeter - SczhEnG_4411:842   1.3642641E7     5.0 m      22.0 s      100.0%     5.0 m       0.0 s 
+INFO  22:45:21,046 ProgressMeter -            done   1.3642642E7     5.1 m      22.0 s      100.0%     5.1 m       0.0 s 
+INFO  22:45:21,047 ProgressMeter - Total runtime 308.98 secs, 5.15 min, 0.09 hours 
+INFO  22:45:21,050 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 13642642 total reads (0.00%) 
+INFO  22:45:21,051 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:45:21,051 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:45:21,051 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:45:21,593 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:45:23,544 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:45:23,546 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:45:23,547 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:45:23,547 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:45:23,550 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt1-6c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:45:23,556 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:45:23,556 HelpFormatter - Date/Time: 2019/12/09 22:45:23 
+INFO  22:45:23,557 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:45:23,557 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:45:24,069 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:45:24,220 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:45:24,227 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:45:24,380 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  22:45:24,499 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:45:24,503 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:45:24,504 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:45:24,504 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:45:24,504 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:45:24,593 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:45:24,594 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:45:54,507 ProgressMeter - SczhEnG_538:1744143   1750039.0    30.0 s      17.0 s       13.8%     3.6 m       3.1 m 
+INFO  22:46:24,509 ProgressMeter - SczhEnG_1313:257611   3852824.0    60.0 s      15.0 s       29.9%     3.3 m       2.3 m 
+INFO  22:46:56,079 ProgressMeter - SczhEnG_1726:158220   5620976.0    91.0 s      16.0 s       39.3%     3.9 m       2.3 m 
+INFO  22:47:26,081 ProgressMeter - SczhEnG_2422:1072770   7802299.0     2.0 m      15.0 s       56.0%     3.6 m      94.0 s 
+INFO  22:47:57,515 ProgressMeter - SczhEnG_2953:789   9245451.0     2.6 m      16.0 s       66.3%     3.8 m      77.0 s 
+INFO  22:48:27,519 ProgressMeter - SczhEnG_3447:240004   1.0951828E7     3.1 m      16.0 s       77.9%     3.9 m      51.0 s 
+INFO  22:48:57,521 ProgressMeter - SczhEnG_4012:230197   1.3068208E7     3.6 m      16.0 s       90.7%     3.9 m      21.0 s 
+INFO  22:49:27,523 ProgressMeter - SczhEnG_4411:1075   1.4397221E7     4.1 m      16.0 s      100.0%     4.1 m       0.0 s 
+INFO  22:49:57,530 ProgressMeter - SczhEnG_4411:1075   1.4397221E7     4.6 m      18.0 s      100.0%     4.6 m       0.0 s 
+INFO  22:50:27,532 ProgressMeter - SczhEnG_4411:1075   1.4397221E7     5.1 m      21.0 s      100.0%     5.1 m       0.0 s 
+INFO  22:50:43,894 ProgressMeter -            done   1.4397222E7     5.3 m      22.0 s      100.0%     5.3 m       0.0 s 
+INFO  22:50:43,895 ProgressMeter - Total runtime 319.39 secs, 5.32 min, 0.09 hours 
+INFO  22:50:43,898 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 14397222 total reads (0.00%) 
+INFO  22:50:43,898 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:50:43,898 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:50:43,899 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:50:44,603 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:50:46,428 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:50:46,431 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:50:46,431 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:50:46,431 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:50:46,435 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:50:46,440 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:50:46,440 HelpFormatter - Date/Time: 2019/12/09 22:50:46 
+INFO  22:50:46,441 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:50:46,441 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:50:46,987 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:50:47,130 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:50:47,137 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:50:47,281 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.14 
+INFO  22:50:47,395 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:50:47,399 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:50:47,400 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:50:47,400 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:50:47,401 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:50:47,487 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:50:47,489 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:51:17,403 ProgressMeter - SczhEnG_476:266   1858204.0    30.0 s      16.0 s       11.9%     4.2 m       3.7 m 
+INFO  22:51:47,405 ProgressMeter - SczhEnG_1092:166744   3809273.0    60.0 s      15.0 s       25.4%     3.9 m       2.9 m 
+INFO  22:52:17,406 ProgressMeter - SczhEnG_1598:637523   5874774.0    90.0 s      15.0 s       35.8%     4.2 m       2.7 m 
+INFO  22:52:47,408 ProgressMeter - SczhEnG_2176:48   8011615.0   120.0 s      14.0 s       49.7%     4.0 m       2.0 m 
+INFO  22:53:17,409 ProgressMeter - SczhEnG_2712:1008648   9597249.0     2.5 m      15.0 s       60.2%     4.1 m      98.0 s 
+INFO  22:53:47,411 ProgressMeter - SczhEnG_3058:489564   1.095225E7     3.0 m      16.0 s       69.2%     4.3 m      80.0 s 
+INFO  22:54:17,413 ProgressMeter - SczhEnG_3448:48   1.2587883E7     3.5 m      16.0 s       77.9%     4.5 m      59.0 s 
+INFO  22:54:47,426 ProgressMeter - SczhEnG_4004:5071   1.4828795E7     4.0 m      16.0 s       90.4%     4.4 m      25.0 s 
+INFO  22:55:17,428 ProgressMeter - SczhEnG_4411:829   1.6478314E7     4.5 m      16.0 s      100.0%     4.5 m       0.0 s 
+INFO  22:55:47,429 ProgressMeter - SczhEnG_4411:829   1.6478314E7     5.0 m      18.0 s      100.0%     5.0 m       0.0 s 
+INFO  22:56:17,431 ProgressMeter - SczhEnG_4411:829   1.6478314E7     5.5 m      20.0 s      100.0%     5.5 m       0.0 s 
+INFO  22:56:47,433 ProgressMeter - SczhEnG_4411:829   1.6478314E7     6.0 m      21.0 s      100.0%     6.0 m       0.0 s 
+INFO  22:56:54,227 ProgressMeter -            done   1.6478325E7     6.1 m      22.0 s      100.0%     6.1 m       0.0 s 
+INFO  22:56:54,228 ProgressMeter - Total runtime 366.83 secs, 6.11 min, 0.10 hours 
+INFO  22:56:54,231 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 16478325 total reads (0.00%) 
+INFO  22:56:54,232 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:56:54,232 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:56:54,232 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:56:54,800 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:56:56,671 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:56:56,673 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:56:56,674 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:56:56,674 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:56:56,677 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:56:56,683 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:56:56,684 HelpFormatter - Date/Time: 2019/12/09 22:56:56 
+INFO  22:56:56,684 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:56:56,684 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:56:57,226 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:56:57,379 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:56:57,386 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:56:57,538 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  22:56:57,659 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:56:57,664 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:56:57,665 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:56:57,665 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:56:57,665 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:56:57,751 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:56:57,753 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  22:57:28,935 ProgressMeter - SczhEnG_1312:957   2188221.0    31.0 s      14.0 s       29.8%   104.0 s      73.0 s 
+INFO  22:57:59,798 ProgressMeter - SczhEnG_2468:2818   4438468.0    62.0 s      13.0 s       56.8%   109.0 s      47.0 s 
+INFO  22:58:29,800 ProgressMeter - SczhEnG_3644:447731   6632395.0    92.0 s      13.0 s       83.2%   110.0 s      18.0 s 
+INFO  22:58:59,802 ProgressMeter - SczhEnG_4411:830   8042228.0     2.0 m      15.0 s      100.0%     2.0 m       0.0 s 
+INFO  22:59:29,804 ProgressMeter - SczhEnG_4411:830   8042228.0     2.5 m      18.0 s      100.0%     2.5 m       0.0 s 
+INFO  22:59:37,380 ProgressMeter -            done   8042243.0     2.7 m      19.0 s      100.0%     2.7 m       0.0 s 
+INFO  22:59:37,380 ProgressMeter - Total runtime 159.72 secs, 2.66 min, 0.04 hours 
+INFO  22:59:37,384 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 8042243 total reads (0.00%) 
+INFO  22:59:37,385 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  22:59:37,385 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  22:59:37,385 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  22:59:38,009 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  22:59:39,961 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:59:39,964 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  22:59:39,964 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  22:59:39,964 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  22:59:39,968 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-1c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  22:59:39,973 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  22:59:39,974 HelpFormatter - Date/Time: 2019/12/09 22:59:39 
+INFO  22:59:39,974 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:59:39,974 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  22:59:40,523 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  22:59:40,670 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  22:59:40,677 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  22:59:40,895 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.22 
+INFO  22:59:41,013 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  22:59:41,018 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  22:59:41,018 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  22:59:41,019 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  22:59:41,019 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  22:59:41,105 ReadShardBalancer$1 - Loading BAM index data 
+INFO  22:59:41,107 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:00:11,022 ProgressMeter - SczhEnG_1415:1442682   2180019.0    30.0 s      13.0 s       31.8%    94.0 s      64.0 s 
+INFO  23:00:41,024 ProgressMeter - SczhEnG_2837:2316   4499331.0    60.0 s      13.0 s       64.0%    93.0 s      33.0 s 
+INFO  23:01:11,965 ProgressMeter - SczhEnG_4052:713   6728735.0    90.0 s      13.0 s       91.6%    98.0 s       8.0 s 
+INFO  23:01:41,967 ProgressMeter - SczhEnG_4411:820   7333878.0   120.0 s      16.0 s      100.0%   120.0 s       0.0 s 
+INFO  23:02:04,752 ProgressMeter -            done   7333884.0     2.4 m      19.0 s      100.0%     2.4 m       0.0 s 
+INFO  23:02:04,752 ProgressMeter - Total runtime 143.73 secs, 2.40 min, 0.04 hours 
+INFO  23:02:04,755 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7333884 total reads (0.00%) 
+INFO  23:02:04,756 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:02:04,756 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:02:04,756 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:02:05,449 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:02:07,299 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:02:07,301 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:02:07,301 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:02:07,301 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:02:07,305 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:02:07,311 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:02:07,312 HelpFormatter - Date/Time: 2019/12/09 23:02:07 
+INFO  23:02:07,312 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:02:07,312 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:02:07,883 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:02:08,040 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:02:08,047 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:02:08,210 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  23:02:08,337 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:02:08,342 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:02:08,342 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:02:08,343 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:02:08,343 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:02:08,434 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:02:08,436 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:02:38,447 ProgressMeter - SczhEnG_1246:1044   2299333.0    30.0 s      13.0 s       28.1%   106.0 s      76.0 s 
+INFO  23:03:08,548 ProgressMeter - SczhEnG_2563:2336   4729656.0    60.0 s      12.0 s       58.3%   102.0 s      42.0 s 
+INFO  23:03:38,550 ProgressMeter - SczhEnG_3808:499114   7057662.0    90.0 s      12.0 s       86.1%   104.0 s      14.0 s 
+INFO  23:04:08,599 ProgressMeter - SczhEnG_4411:475   8218860.0   120.0 s      14.0 s      100.0%   120.0 s       0.0 s 
+INFO  23:04:38,600 ProgressMeter - SczhEnG_4411:475   8218860.0     2.5 m      18.0 s      100.0%     2.5 m       0.0 s 
+INFO  23:04:42,927 ProgressMeter -            done   8218872.0     2.6 m      18.0 s      100.0%     2.6 m       0.0 s 
+INFO  23:04:42,928 ProgressMeter - Total runtime 154.59 secs, 2.58 min, 0.04 hours 
+INFO  23:04:42,931 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 8218872 total reads (0.00%) 
+INFO  23:04:42,932 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:04:42,932 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:04:42,932 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:04:43,549 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:04:45,429 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:04:45,432 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:04:45,432 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:04:45,432 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:04:45,436 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:04:45,442 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:04:45,443 HelpFormatter - Date/Time: 2019/12/09 23:04:45 
+INFO  23:04:45,443 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:04:45,443 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:04:45,992 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:04:46,140 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:04:46,147 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:04:46,302 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:04:46,419 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:04:46,424 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:04:46,424 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:04:46,425 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:04:46,425 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:04:46,514 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:04:46,516 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:05:16,428 ProgressMeter - SczhEnG_549:231029   1774033.0    30.0 s      16.0 s       14.2%     3.5 m       3.0 m 
+INFO  23:05:46,586 ProgressMeter - SczhEnG_1415:576515   3806312.0    60.0 s      15.0 s       31.4%     3.2 m       2.2 m 
+INFO  23:06:16,591 ProgressMeter - SczhEnG_2036:2959   6043838.0    90.0 s      14.0 s       46.5%     3.2 m     103.0 s 
+INFO  23:06:47,471 ProgressMeter - SczhEnG_2789:730   8042073.0     2.0 m      15.0 s       62.5%     3.2 m      72.0 s 
+INFO  23:07:17,473 ProgressMeter - SczhEnG_3433:878787   1.0054376E7     2.5 m      15.0 s       77.2%     3.3 m      44.0 s 
+INFO  23:07:47,475 ProgressMeter - SczhEnG_4068:71349   1.233923E7     3.0 m      14.0 s       92.2%     3.3 m      15.0 s 
+INFO  23:08:17,488 ProgressMeter - SczhEnG_4411:521   1.337176E7     3.5 m      15.0 s      100.0%     3.5 m       0.0 s 
+INFO  23:08:47,490 ProgressMeter - SczhEnG_4411:521   1.337176E7     4.0 m      18.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:09:17,492 ProgressMeter - SczhEnG_4411:521   1.337176E7     4.5 m      20.0 s      100.0%     4.5 m       0.0 s 
+INFO  23:09:22,410 ProgressMeter -            done   1.3371772E7     4.6 m      20.0 s      100.0%     4.6 m       0.0 s 
+INFO  23:09:22,410 ProgressMeter - Total runtime 275.99 secs, 4.60 min, 0.08 hours 
+INFO  23:09:22,413 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 13371772 total reads (0.00%) 
+INFO  23:09:22,414 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:09:22,414 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:09:22,414 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:09:23,111 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:09:24,990 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:09:24,992 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:09:24,993 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:09:24,993 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:09:24,996 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-4c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:09:25,002 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:09:25,002 HelpFormatter - Date/Time: 2019/12/09 23:09:24 
+INFO  23:09:25,002 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:09:25,003 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:09:25,561 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:09:25,714 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:09:25,721 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:09:25,875 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:09:25,998 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:09:26,002 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:09:26,003 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:09:26,003 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:09:26,003 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:09:26,093 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:09:26,094 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:09:56,952 ProgressMeter - SczhEnG_535:1184   1846516.0    30.0 s      16.0 s       13.1%     3.8 m       3.3 m 
+INFO  23:10:28,248 ProgressMeter - SczhEnG_1215:111   3751288.0    62.0 s      16.0 s       27.6%     3.7 m       2.7 m 
+INFO  23:10:58,250 ProgressMeter - SczhEnG_1721:300520   5681050.0    92.0 s      16.0 s       39.0%     3.9 m       2.4 m 
+INFO  23:11:28,423 ProgressMeter - SczhEnG_2324:634281   7791378.0     2.0 m      15.0 s       54.1%     3.8 m     103.0 s 
+INFO  23:11:58,425 ProgressMeter - SczhEnG_2960:294   9558351.0     2.5 m      15.0 s       66.5%     3.8 m      76.0 s 
+INFO  23:12:30,086 ProgressMeter - SczhEnG_3491:314199   1.1529599E7     3.1 m      15.0 s       79.1%     3.9 m      48.0 s 
+INFO  23:13:00,099 ProgressMeter - SczhEnG_4046:367937   1.3573688E7     3.6 m      15.0 s       91.6%     3.9 m      19.0 s 
+INFO  23:13:30,430 ProgressMeter - SczhEnG_4411:840   1.4863695E7     4.1 m      16.0 s      100.0%     4.1 m       0.0 s 
+INFO  23:14:00,432 ProgressMeter - SczhEnG_4411:840   1.4863695E7     4.6 m      18.0 s      100.0%     4.6 m       0.0 s 
+INFO  23:14:30,434 ProgressMeter - SczhEnG_4411:840   1.4863695E7     5.1 m      20.0 s      100.0%     5.1 m       0.0 s 
+INFO  23:14:47,109 ProgressMeter -            done   1.4863705E7     5.4 m      21.0 s      100.0%     5.4 m       0.0 s 
+INFO  23:14:47,110 ProgressMeter - Total runtime 321.11 secs, 5.35 min, 0.09 hours 
+INFO  23:14:47,113 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 14863705 total reads (0.00%) 
+INFO  23:14:47,114 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:14:47,114 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:14:47,114 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:14:47,688 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:14:49,556 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:14:49,559 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:14:49,559 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:14:49,559 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:14:49,563 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:14:49,568 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:14:49,569 HelpFormatter - Date/Time: 2019/12/09 23:14:49 
+INFO  23:14:49,569 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:14:49,570 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:14:50,120 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:14:50,295 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:14:50,302 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:14:50,465 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  23:14:50,587 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:14:50,592 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:14:50,593 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:14:50,593 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:14:50,593 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:14:50,688 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:14:50,689 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:15:20,672 ProgressMeter - SczhEnG_795:132421   2081767.0    30.0 s      14.0 s       19.2%     2.6 m       2.1 m 
+INFO  23:15:50,673 ProgressMeter - SczhEnG_1560:74524   4179668.0    60.0 s      14.0 s       34.8%     2.9 m     112.0 s 
+INFO  23:16:20,675 ProgressMeter - SczhEnG_2315:884418   6315100.0    90.0 s      14.0 s       53.7%     2.8 m      77.0 s 
+INFO  23:16:50,677 ProgressMeter - SczhEnG_3206:292273   8378694.0   120.0 s      14.0 s       71.6%     2.8 m      47.0 s 
+INFO  23:17:20,683 ProgressMeter - SczhEnG_3916:140129   1.07177E7     2.5 m      14.0 s       88.6%     2.8 m      19.0 s 
+INFO  23:17:50,933 ProgressMeter - SczhEnG_4411:324   1.2134323E7     3.0 m      14.0 s      100.0%     3.0 m       0.0 s 
+INFO  23:18:20,934 ProgressMeter - SczhEnG_4411:324   1.2134323E7     3.5 m      17.0 s      100.0%     3.5 m       0.0 s 
+INFO  23:18:50,950 ProgressMeter - SczhEnG_4411:324   1.2134323E7     4.0 m      19.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:18:51,320 ProgressMeter -            done   1.2134333E7     4.0 m      19.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:18:51,321 ProgressMeter - Total runtime 240.73 secs, 4.01 min, 0.07 hours 
+INFO  23:18:51,324 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12134333 total reads (0.00%) 
+INFO  23:18:51,325 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:18:51,325 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:18:51,325 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:18:51,913 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:18:53,784 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:18:53,786 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:18:53,786 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:18:53,786 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:18:53,790 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:18:53,796 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:18:53,797 HelpFormatter - Date/Time: 2019/12/09 23:18:53 
+INFO  23:18:53,797 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:18:53,797 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:18:54,347 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:18:54,496 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:18:54,502 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:18:54,647 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.14 
+INFO  23:18:54,767 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:18:54,772 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:18:54,772 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:18:54,773 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:18:54,773 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:18:54,859 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:18:54,860 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:19:26,521 ProgressMeter - SczhEnG_745:519422   1950801.0    31.0 s      16.0 s       18.0%     2.9 m       2.3 m 
+INFO  23:19:58,704 ProgressMeter - SczhEnG_1559:68487   4068752.0    63.0 s      15.0 s       34.8%     3.0 m     118.0 s 
+INFO  23:20:30,220 ProgressMeter - SczhEnG_2267:755   6288913.0    95.0 s      15.0 s       51.9%     3.1 m      88.0 s 
+INFO  23:21:02,178 ProgressMeter - SczhEnG_3054:142166   8270435.0     2.1 m      15.0 s       68.7%     3.1 m      57.0 s 
+INFO  23:21:33,927 ProgressMeter - SczhEnG_3612:39   1.0180191E7     2.7 m      15.0 s       82.2%     3.2 m      34.0 s 
+INFO  23:22:03,929 ProgressMeter - SczhEnG_4375:360867   1.239877E7     3.2 m      15.0 s       99.4%     3.2 m       1.0 s 
+INFO  23:22:33,931 ProgressMeter - SczhEnG_4411:840   1.2480487E7     3.7 m      17.0 s      100.0%     3.7 m       0.0 s 
+INFO  23:23:03,943 ProgressMeter - SczhEnG_4411:840   1.2480487E7     4.2 m      19.0 s      100.0%     4.2 m       0.0 s 
+INFO  23:23:18,634 ProgressMeter -            done   1.2480494E7     4.4 m      21.0 s      100.0%     4.4 m       0.0 s 
+INFO  23:23:18,634 ProgressMeter - Total runtime 263.86 secs, 4.40 min, 0.07 hours 
+INFO  23:23:18,637 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12480494 total reads (0.00%) 
+INFO  23:23:18,638 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:23:18,638 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:23:18,639 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:23:19,218 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:23:21,103 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:23:21,106 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:23:21,106 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:23:21,106 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:23:21,110 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-5c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:23:21,116 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:23:21,117 HelpFormatter - Date/Time: 2019/12/09 23:23:21 
+INFO  23:23:21,117 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:23:21,118 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:23:21,688 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:23:21,861 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:23:21,868 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:23:22,040 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  23:23:22,172 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:23:22,177 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:23:22,177 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:23:22,178 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:23:22,178 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:23:22,281 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:23:22,282 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:23:53,525 ProgressMeter - SczhEnG_1415:642629   2041836.0    31.0 s      15.0 s       31.4%    98.0 s      67.0 s 
+INFO  23:24:23,527 ProgressMeter - SczhEnG_2563:2334   4142033.0    61.0 s      14.0 s       58.3%   104.0 s      43.0 s 
+INFO  23:24:53,528 ProgressMeter - SczhEnG_3681:63553   5984705.0    91.0 s      15.0 s       83.5%   109.0 s      18.0 s 
+INFO  23:25:23,536 ProgressMeter - SczhEnG_4411:854   7250345.0     2.0 m      16.0 s      100.0%     2.0 m       0.0 s 
+INFO  23:25:51,272 ProgressMeter -            done   7250351.0     2.5 m      20.0 s      100.0%     2.5 m       0.0 s 
+INFO  23:25:51,272 ProgressMeter - Total runtime 149.09 secs, 2.48 min, 0.04 hours 
+INFO  23:25:51,276 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7250351 total reads (0.00%) 
+INFO  23:25:51,276 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:25:51,277 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:25:51,277 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:25:51,846 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:25:53,714 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:25:53,717 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:25:53,717 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:25:53,717 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:25:53,721 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:25:53,726 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:25:53,727 HelpFormatter - Date/Time: 2019/12/09 23:25:53 
+INFO  23:25:53,727 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:25:53,727 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:25:54,285 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:25:54,446 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:25:54,453 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:25:54,625 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  23:25:54,753 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:25:54,757 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:25:54,758 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:25:54,758 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:25:54,759 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:25:54,852 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:25:54,854 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:26:24,838 ProgressMeter -  SczhEnG_481:46   1671383.0    30.0 s      17.0 s       12.0%     4.2 m       3.7 m 
+INFO  23:26:54,839 ProgressMeter - SczhEnG_1112:12703   3339892.0    60.0 s      17.0 s       25.6%     3.9 m       2.9 m 
+INFO  23:27:24,840 ProgressMeter - SczhEnG_1660:199   5392219.0    90.0 s      16.0 s       36.9%     4.1 m       2.6 m 
+INFO  23:27:54,842 ProgressMeter - SczhEnG_2298:1300   7419559.0   120.0 s      16.0 s       52.7%     3.8 m     107.0 s 
+INFO  23:28:24,844 ProgressMeter - SczhEnG_2844:972878   9177031.0     2.5 m      16.0 s       64.6%     3.9 m      82.0 s 
+INFO  23:28:54,845 ProgressMeter - SczhEnG_3439:652   1.1025216E7     3.0 m      16.0 s       77.4%     3.9 m      52.0 s 
+INFO  23:29:24,847 ProgressMeter - SczhEnG_4047:150   1.3329857E7     3.5 m      15.0 s       91.6%     3.8 m      19.0 s 
+INFO  23:29:55,292 ProgressMeter - SczhEnG_4411:788   1.4487892E7     4.0 m      16.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:30:25,293 ProgressMeter - SczhEnG_4411:788   1.4487892E7     4.5 m      18.0 s      100.0%     4.5 m       0.0 s 
+INFO  23:30:55,295 ProgressMeter - SczhEnG_4411:788   1.4487892E7     5.0 m      20.0 s      100.0%     5.0 m       0.0 s 
+INFO  23:31:06,872 ProgressMeter -            done   1.4487896E7     5.2 m      21.0 s      100.0%     5.2 m       0.0 s 
+INFO  23:31:06,872 ProgressMeter - Total runtime 312.11 secs, 5.20 min, 0.09 hours 
+INFO  23:31:06,875 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 14487896 total reads (0.00%) 
+INFO  23:31:06,876 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:31:06,876 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:31:06,876 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:31:07,564 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:31:09,442 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:31:09,444 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:31:09,445 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:31:09,445 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:31:09,449 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:31:09,455 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:31:09,455 HelpFormatter - Date/Time: 2019/12/09 23:31:09 
+INFO  23:31:09,455 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:31:09,456 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:31:10,001 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:31:10,151 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:31:10,158 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:31:10,309 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:31:10,432 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:31:10,436 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:31:10,437 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:31:10,437 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:31:10,438 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:31:10,527 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:31:10,528 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:31:40,441 ProgressMeter - SczhEnG_647:381235   1678763.0    30.0 s      17.0 s       16.4%     3.0 m       2.5 m 
+INFO  23:32:10,481 ProgressMeter - SczhEnG_1415:2056455   3328244.0    60.0 s      18.0 s       32.0%     3.1 m       2.1 m 
+INFO  23:32:40,483 ProgressMeter - SczhEnG_2176:35   5545054.0    90.0 s      16.0 s       49.7%     3.0 m      91.0 s 
+INFO  23:33:10,485 ProgressMeter - SczhEnG_2844:1074223   7099752.0   120.0 s      16.0 s       64.6%     3.1 m      65.0 s 
+INFO  23:33:40,486 ProgressMeter - SczhEnG_3582:150   9210879.0     2.5 m      16.0 s       81.5%     3.1 m      34.0 s 
+INFO  23:34:10,488 ProgressMeter - SczhEnG_4411:840   1.1346942E7     3.0 m      15.0 s      100.0%     3.0 m       0.0 s 
+INFO  23:34:40,490 ProgressMeter - SczhEnG_4411:840   1.1346942E7     3.5 m      18.0 s      100.0%     3.5 m       0.0 s 
+INFO  23:35:10,503 ProgressMeter - SczhEnG_4411:840   1.1346942E7     4.0 m      21.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:35:18,314 ProgressMeter -            done   1.1346949E7     4.1 m      21.0 s      100.0%     4.1 m       0.0 s 
+INFO  23:35:18,315 ProgressMeter - Total runtime 247.88 secs, 4.13 min, 0.07 hours 
+INFO  23:35:18,318 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 11346949 total reads (0.00%) 
+INFO  23:35:18,319 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:35:18,319 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:35:18,319 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:35:18,866 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:35:20,712 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:35:20,715 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:35:20,715 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:35:20,715 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:35:20,719 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Wt2-6c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:35:20,724 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:35:20,725 HelpFormatter - Date/Time: 2019/12/09 23:35:20 
+INFO  23:35:20,725 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:35:20,725 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:35:21,279 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:35:21,427 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:35:21,434 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:35:21,590 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  23:35:21,704 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:35:21,709 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:35:21,709 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:35:21,710 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:35:21,710 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:35:21,794 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:35:21,795 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:35:53,008 ProgressMeter - SczhEnG_624:63777   1924223.0    31.0 s      16.0 s       15.6%     3.3 m       2.8 m 
+INFO  23:36:23,070 ProgressMeter - SczhEnG_1465:47   3804364.0    61.0 s      16.0 s       33.0%     3.1 m       2.1 m 
+INFO  23:36:53,929 ProgressMeter - SczhEnG_2243:1060777   6026974.0    92.0 s      15.0 s       51.1%     3.0 m      88.0 s 
+INFO  23:37:23,958 ProgressMeter - SczhEnG_2846:45   7751851.0     2.0 m      15.0 s       64.8%     3.1 m      66.0 s 
+INFO  23:37:53,960 ProgressMeter - SczhEnG_3540:284   9794423.0     2.5 m      15.0 s       80.9%     3.1 m      35.0 s 
+INFO  23:38:24,027 ProgressMeter - SczhEnG_4231:1076729   1.1722758E7     3.0 m      15.0 s       97.3%     3.1 m       4.0 s 
+INFO  23:38:54,029 ProgressMeter - SczhEnG_4411:130   1.2142888E7     3.5 m      17.0 s      100.0%     3.5 m       0.0 s 
+INFO  23:39:24,041 ProgressMeter - SczhEnG_4411:130   1.2142888E7     4.0 m      19.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:39:41,286 ProgressMeter -            done   1.21429E7     4.3 m      21.0 s      100.0%     4.3 m       0.0 s 
+INFO  23:39:41,287 ProgressMeter - Total runtime 259.58 secs, 4.33 min, 0.07 hours 
+INFO  23:39:41,290 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12142900 total reads (0.00%) 
+INFO  23:39:41,290 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:39:41,291 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:39:41,291 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:39:41,922 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:39:43,772 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:39:43,775 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:39:43,775 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:39:43,775 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:39:43,779 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:39:43,784 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:39:43,785 HelpFormatter - Date/Time: 2019/12/09 23:39:43 
+INFO  23:39:43,785 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:39:43,785 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:39:44,356 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:39:44,504 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:39:44,511 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:39:44,664 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:39:44,781 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:39:44,785 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:39:44,786 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:39:44,786 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:39:44,786 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:39:44,873 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:39:44,874 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:40:15,930 ProgressMeter - SczhEnG_1485:132410   2333937.0    31.0 s      13.0 s       33.4%    92.0 s      61.0 s 
+INFO  23:40:46,604 ProgressMeter - SczhEnG_2951:75   4632667.0    61.0 s      13.0 s       66.3%    92.0 s      31.0 s 
+INFO  23:41:16,708 ProgressMeter - SczhEnG_4198:119130   6735984.0    91.0 s      13.0 s       95.9%    94.0 s       3.0 s 
+INFO  23:41:46,710 ProgressMeter - SczhEnG_4411:822   7066656.0     2.0 m      17.0 s      100.0%     2.0 m       0.0 s 
+INFO  23:42:06,236 ProgressMeter -            done   7066657.0     2.4 m      20.0 s      100.0%     2.4 m       0.0 s 
+INFO  23:42:06,236 ProgressMeter - Total runtime 141.45 secs, 2.36 min, 0.04 hours 
+INFO  23:42:06,240 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7066657 total reads (0.00%) 
+INFO  23:42:06,240 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:42:06,241 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:42:06,241 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:42:06,793 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:42:08,599 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:42:08,601 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:42:08,601 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:42:08,601 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:42:08,605 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:42:08,610 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:42:08,611 HelpFormatter - Date/Time: 2019/12/09 23:42:08 
+INFO  23:42:08,611 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:42:08,611 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:42:09,148 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:42:09,292 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:42:09,299 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:42:09,440 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.14 
+INFO  23:42:09,555 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:42:09,559 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:42:09,559 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:42:09,560 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:42:09,560 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:42:09,646 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:42:09,647 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:42:41,175 ProgressMeter - SczhEnG_1531:169821   2322661.0    31.0 s      13.0 s       34.4%    90.0 s      59.0 s 
+INFO  23:43:11,404 ProgressMeter - SczhEnG_2974:853   4844468.0    61.0 s      12.0 s       67.0%    91.0 s      30.0 s 
+INFO  23:43:41,406 ProgressMeter - SczhEnG_4357:217   7372530.0    91.0 s      12.0 s       99.2%    91.0 s       0.0 s 
+INFO  23:44:11,408 ProgressMeter - SczhEnG_4410:3170   7437591.0     2.0 m      16.0 s      100.0%     2.0 m       0.0 s 
+INFO  23:44:28,318 ProgressMeter -            done   7437595.0     2.3 m      18.0 s      100.0%     2.3 m       0.0 s 
+INFO  23:44:28,318 ProgressMeter - Total runtime 138.76 secs, 2.31 min, 0.04 hours 
+INFO  23:44:28,322 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7437595 total reads (0.00%) 
+INFO  23:44:28,322 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:44:28,323 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:44:28,323 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:44:28,871 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:44:30,727 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:44:30,730 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:44:30,730 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:44:30,730 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:44:30,734 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-1c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:44:30,739 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:44:30,740 HelpFormatter - Date/Time: 2019/12/09 23:44:30 
+INFO  23:44:30,740 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:44:30,740 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:44:31,326 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:44:31,474 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:44:31,480 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:44:31,625 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.14 
+INFO  23:44:31,742 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:44:31,746 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:44:31,747 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:44:31,747 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:44:31,748 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:44:31,833 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:44:31,835 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:45:02,965 ProgressMeter - SczhEnG_1568:98   2341239.0    31.0 s      13.0 s       35.1%    88.0 s      57.0 s 
+INFO  23:45:33,833 ProgressMeter - SczhEnG_3251:420108   4498200.0    62.0 s      13.0 s       72.9%    85.0 s      23.0 s 
+INFO  23:46:04,518 ProgressMeter - SczhEnG_4410:110   6246564.0    92.0 s      14.0 s      100.0%    92.0 s       0.0 s 
+INFO  23:46:34,349 ProgressMeter -            done   6246575.0     2.0 m      19.0 s      100.0%     2.0 m       0.0 s 
+INFO  23:46:34,350 ProgressMeter - Total runtime 122.60 secs, 2.04 min, 0.03 hours 
+INFO  23:46:34,353 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6246575 total reads (0.00%) 
+INFO  23:46:34,354 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:46:34,354 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:46:34,354 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:46:34,947 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:46:36,807 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:46:36,809 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:46:36,810 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:46:36,810 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:46:36,814 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:46:36,820 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:46:36,820 HelpFormatter - Date/Time: 2019/12/09 23:46:36 
+INFO  23:46:36,820 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:46:36,821 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:46:37,363 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:46:37,509 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:46:37,516 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:46:37,669 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:46:37,788 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:46:37,792 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:46:37,793 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:46:37,793 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:46:37,793 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:46:37,877 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:46:37,879 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:47:09,474 ProgressMeter - SczhEnG_1949:71229   2531122.0    31.0 s      12.0 s       44.3%    70.0 s      39.0 s 
+INFO  23:47:39,847 ProgressMeter - SczhEnG_3929:32945   4953068.0    62.0 s      12.0 s       89.0%    69.0 s       7.0 s 
+INFO  23:48:09,849 ProgressMeter - SczhEnG_4410:3255   5514539.0    92.0 s      16.0 s      100.0%    92.0 s       0.0 s 
+INFO  23:48:21,375 ProgressMeter -            done   5514542.0   103.0 s      18.0 s      100.0%   103.0 s       0.0 s 
+INFO  23:48:21,375 ProgressMeter - Total runtime 103.58 secs, 1.73 min, 0.03 hours 
+INFO  23:48:21,379 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 5514542 total reads (0.00%) 
+INFO  23:48:21,379 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:48:21,379 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:48:21,380 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:48:21,951 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:48:23,801 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:48:23,804 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:48:23,804 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:48:23,804 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:48:23,808 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:48:23,813 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:48:23,814 HelpFormatter - Date/Time: 2019/12/09 23:48:23 
+INFO  23:48:23,814 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:48:23,814 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:48:24,372 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:48:24,521 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:48:24,528 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:48:24,675 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:48:24,798 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:48:24,802 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:48:24,803 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:48:24,803 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:48:24,803 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:48:24,889 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:48:24,890 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:48:56,474 ProgressMeter - SczhEnG_1907:27871   2368382.0    31.0 s      13.0 s       43.2%    71.0 s      40.0 s 
+INFO  23:49:27,709 ProgressMeter - SczhEnG_3826:230646   4774704.0    62.0 s      13.0 s       86.8%    71.0 s       9.0 s 
+INFO  23:49:57,711 ProgressMeter - SczhEnG_4410:3224   5510999.0    92.0 s      16.0 s      100.0%    92.0 s       0.0 s 
+INFO  23:50:12,492 ProgressMeter -            done   5511004.0   107.0 s      19.0 s      100.0%   107.0 s       0.0 s 
+INFO  23:50:12,492 ProgressMeter - Total runtime 107.69 secs, 1.79 min, 0.03 hours 
+INFO  23:50:12,496 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 5511004 total reads (0.00%) 
+INFO  23:50:12,496 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:50:12,496 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:50:12,497 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:50:13,066 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:50:15,025 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:50:15,028 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:50:15,028 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:50:15,028 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:50:15,031 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-4c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:50:15,037 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:50:15,037 HelpFormatter - Date/Time: 2019/12/09 23:50:15 
+INFO  23:50:15,038 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:50:15,038 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:50:15,557 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:50:15,710 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:50:15,718 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:50:15,874 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  23:50:15,996 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:50:16,001 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:50:16,001 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:50:16,002 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:50:16,002 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:50:16,090 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:50:16,091 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:50:46,086 ProgressMeter - SczhEnG_1529:263371   2073507.0    30.0 s      14.0 s       34.2%    87.0 s      57.0 s 
+INFO  23:51:17,604 ProgressMeter - SczhEnG_2792:168   4201090.0    61.0 s      14.0 s       62.9%    97.0 s      36.0 s 
+INFO  23:51:47,606 ProgressMeter - SczhEnG_4125:81   6510601.0    91.0 s      14.0 s       94.7%    96.0 s       5.0 s 
+INFO  23:52:17,608 ProgressMeter - SczhEnG_4411:824   6869564.0     2.0 m      17.0 s      100.0%     2.0 m       0.0 s 
+INFO  23:52:35,333 ProgressMeter -            done   6869566.0     2.3 m      20.0 s      100.0%     2.3 m       0.0 s 
+INFO  23:52:35,333 ProgressMeter - Total runtime 139.33 secs, 2.32 min, 0.04 hours 
+INFO  23:52:35,337 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6869566 total reads (0.00%) 
+INFO  23:52:35,337 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:52:35,338 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:52:35,338 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:52:35,908 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:52:37,714 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:52:37,716 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:52:37,717 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:52:37,717 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:52:37,720 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:52:37,726 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:52:37,726 HelpFormatter - Date/Time: 2019/12/09 23:52:37 
+INFO  23:52:37,727 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:52:37,727 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:52:38,269 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:52:38,414 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:52:38,420 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:52:38,575 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:52:38,693 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:52:38,697 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:52:38,698 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:52:38,698 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:52:38,698 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:52:38,783 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:52:38,784 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:53:09,807 ProgressMeter - SczhEnG_764:364556   2370645.0    31.0 s      13.0 s       18.7%     2.8 m       2.2 m 
+INFO  23:53:39,900 ProgressMeter - SczhEnG_1531:170316   4588503.0    61.0 s      13.0 s       34.4%     3.0 m     116.0 s 
+INFO  23:54:09,901 ProgressMeter - SczhEnG_2225:294707   6939432.0    91.0 s      13.0 s       50.1%     3.0 m      90.0 s 
+INFO  23:54:39,903 ProgressMeter - SczhEnG_2848:1055   9008992.0     2.0 m      13.0 s       64.8%     3.1 m      65.0 s 
+INFO  23:55:10,438 ProgressMeter - SczhEnG_3473:257   1.0968343E7     2.5 m      13.0 s       78.5%     3.2 m      41.0 s 
+INFO  23:55:40,532 ProgressMeter - SczhEnG_4110:113   1.3428368E7     3.0 m      13.0 s       94.1%     3.2 m      11.0 s 
+INFO  23:56:10,544 ProgressMeter - SczhEnG_4410:2338   1.4254952E7     3.5 m      14.0 s      100.0%     3.5 m       0.0 s 
+INFO  23:56:40,546 ProgressMeter - SczhEnG_4410:2338   1.4254952E7     4.0 m      16.0 s      100.0%     4.0 m       0.0 s 
+INFO  23:57:09,362 ProgressMeter -            done   1.4255005E7     4.5 m      18.0 s      100.0%     4.5 m       0.0 s 
+INFO  23:57:09,362 ProgressMeter - Total runtime 270.66 secs, 4.51 min, 0.08 hours 
+INFO  23:57:09,366 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 14255005 total reads (0.00%) 
+INFO  23:57:09,366 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  23:57:09,366 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  23:57:09,366 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  23:57:09,927 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  23:57:11,859 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:57:11,862 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  23:57:11,862 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  23:57:11,862 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  23:57:11,866 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  23:57:11,872 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  23:57:11,873 HelpFormatter - Date/Time: 2019/12/09 23:57:11 
+INFO  23:57:11,873 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:57:11,874 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  23:57:12,430 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  23:57:12,577 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  23:57:12,584 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  23:57:12,734 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  23:57:12,868 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  23:57:12,872 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  23:57:12,873 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  23:57:12,873 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  23:57:12,874 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  23:57:12,961 ReadShardBalancer$1 - Loading BAM index data 
+INFO  23:57:12,963 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  23:57:42,896 ProgressMeter - SczhEnG_624:694262   1795664.0    30.0 s      16.0 s       15.9%     3.1 m       2.6 m 
+INFO  23:58:12,986 ProgressMeter - SczhEnG_1415:1671826   3758969.0    60.0 s      15.0 s       31.9%     3.1 m       2.1 m 
+INFO  23:58:44,108 ProgressMeter - SczhEnG_2067:292   5948882.0    91.0 s      15.0 s       47.1%     3.2 m     102.0 s 
+INFO  23:59:14,110 ProgressMeter - SczhEnG_2794:143   7909367.0     2.0 m      15.0 s       62.9%     3.2 m      71.0 s 
+INFO  23:59:44,928 ProgressMeter - SczhEnG_3491:314200   1.007541E7     2.5 m      15.0 s       79.1%     3.2 m      40.0 s 
+INFO  00:00:14,930 ProgressMeter - SczhEnG_4227:389   1.2415621E7     3.0 m      14.0 s       96.6%     3.1 m       6.0 s 
+INFO  00:00:44,932 ProgressMeter - SczhEnG_4411:861   1.2851432E7     3.5 m      16.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:01:14,944 ProgressMeter - SczhEnG_4411:861   1.2851432E7     4.0 m      18.0 s      100.0%     4.0 m       0.0 s 
+INFO  00:01:33,696 ProgressMeter -            done   1.2851434E7     4.3 m      20.0 s      100.0%     4.3 m       0.0 s 
+INFO  00:01:33,696 ProgressMeter - Total runtime 260.82 secs, 4.35 min, 0.07 hours 
+INFO  00:01:33,699 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12851434 total reads (0.00%) 
+INFO  00:01:33,700 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:01:33,700 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:01:33,701 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:01:34,258 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:01:36,206 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:01:36,208 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:01:36,208 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:01:36,208 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:01:36,212 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-5c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:01:36,217 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:01:36,218 HelpFormatter - Date/Time: 2019/12/10 00:01:36 
+INFO  00:01:36,218 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:01:36,218 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:01:36,732 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:01:36,886 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:01:36,893 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:01:37,043 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  00:01:37,164 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:01:37,168 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:01:37,169 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:01:37,169 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:01:37,170 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:01:37,264 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:01:37,265 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:02:07,172 ProgressMeter - SczhEnG_828:982484   2041169.0    30.0 s      14.0 s       20.1%     2.5 m     119.0 s 
+INFO  00:02:37,174 ProgressMeter - SczhEnG_1599:42   4221398.0    60.0 s      14.0 s       35.8%     2.8 m     107.0 s 
+INFO  00:03:07,219 ProgressMeter - SczhEnG_2420:946   6391577.0    90.0 s      14.0 s       55.6%     2.7 m      71.0 s 
+INFO  00:03:37,321 ProgressMeter - SczhEnG_3206:1148199   8159549.0   120.0 s      14.0 s       72.0%     2.8 m      46.0 s 
+INFO  00:04:08,005 ProgressMeter - SczhEnG_3858:423   1.0366076E7     2.5 m      14.0 s       87.7%     2.9 m      21.0 s 
+INFO  00:04:38,006 ProgressMeter - SczhEnG_4411:862   1.1849154E7     3.0 m      15.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:05:08,008 ProgressMeter - SczhEnG_4411:862   1.1849154E7     3.5 m      17.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:05:32,807 ProgressMeter -            done   1.1849156E7     3.9 m      19.0 s      100.0%     3.9 m       0.0 s 
+INFO  00:05:32,807 ProgressMeter - Total runtime 235.64 secs, 3.93 min, 0.07 hours 
+INFO  00:05:32,811 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 11849156 total reads (0.00%) 
+INFO  00:05:32,811 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:05:32,811 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:05:32,812 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:05:33,372 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:05:35,262 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:05:35,265 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:05:35,265 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:05:35,265 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:05:35,269 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:05:35,275 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:05:35,275 HelpFormatter - Date/Time: 2019/12/10 00:05:35 
+INFO  00:05:35,275 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:05:35,275 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:05:35,838 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:05:35,989 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:05:35,996 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:05:36,150 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  00:05:36,267 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:05:36,271 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:05:36,272 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:05:36,272 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:05:36,273 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:05:36,361 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:05:36,362 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:06:07,453 ProgressMeter - SczhEnG_787:140   2194294.0    31.0 s      14.0 s       18.8%     2.7 m       2.2 m 
+INFO  00:06:37,454 ProgressMeter - SczhEnG_1531:170176   4204917.0    61.0 s      14.0 s       34.4%     3.0 m     116.0 s 
+INFO  00:07:07,456 ProgressMeter - SczhEnG_2244:4207   6621045.0    91.0 s      13.0 s       51.2%     3.0 m      86.0 s 
+INFO  00:07:37,459 ProgressMeter - SczhEnG_2978:517862   8682300.0     2.0 m      13.0 s       67.3%     3.0 m      58.0 s 
+INFO  00:08:07,460 ProgressMeter - SczhEnG_3639:136   1.1078559E7     2.5 m      13.0 s       82.9%     3.0 m      31.0 s 
+INFO  00:08:37,735 ProgressMeter - SczhEnG_4373:65   1.3247355E7     3.0 m      13.0 s       99.3%     3.0 m       1.0 s 
+INFO  00:09:07,749 ProgressMeter - SczhEnG_4411:1514   1.3349942E7     3.5 m      15.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:09:37,750 ProgressMeter - SczhEnG_4411:1514   1.3349942E7     4.0 m      18.0 s      100.0%     4.0 m       0.0 s 
+INFO  00:09:55,987 ProgressMeter -            done   1.3349944E7     4.3 m      19.0 s      100.0%     4.3 m       0.0 s 
+INFO  00:09:55,987 ProgressMeter - Total runtime 259.72 secs, 4.33 min, 0.07 hours 
+INFO  00:09:55,990 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 13349944 total reads (0.00%) 
+INFO  00:09:55,991 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:09:55,991 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:09:55,991 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:09:56,635 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:09:58,445 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:09:58,447 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:09:58,447 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:09:58,447 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:09:58,451 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:09:58,456 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:09:58,456 HelpFormatter - Date/Time: 2019/12/10 00:09:58 
+INFO  00:09:58,457 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:09:58,457 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:09:59,010 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:09:59,156 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:09:59,163 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:09:59,322 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  00:09:59,435 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:09:59,439 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:09:59,440 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:09:59,440 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:09:59,440 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:09:59,523 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:09:59,524 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:10:29,891 ProgressMeter - SczhEnG_764:125680   1996019.0    30.0 s      15.0 s       18.6%     2.7 m       2.2 m 
+INFO  00:10:59,892 ProgressMeter - SczhEnG_1560:89039   4167886.0    60.0 s      14.0 s       34.8%     2.9 m     112.0 s 
+INFO  00:11:30,051 ProgressMeter - SczhEnG_2392:298064   6528252.0    90.0 s      13.0 s       55.1%     2.7 m      73.0 s 
+INFO  00:12:00,053 ProgressMeter - SczhEnG_3206:479961   8466154.0   120.0 s      14.0 s       71.7%     2.8 m      47.0 s 
+INFO  00:12:30,189 ProgressMeter - SczhEnG_3862:757   1.07709E7     2.5 m      13.0 s       87.8%     2.8 m      20.0 s 
+INFO  00:13:00,191 ProgressMeter - SczhEnG_4410:3183   1.2249743E7     3.0 m      14.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:13:30,192 ProgressMeter - SczhEnG_4410:3183   1.2249743E7     3.5 m      17.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:13:59,659 ProgressMeter -            done   1.2249763E7     4.0 m      19.0 s      100.0%     4.0 m       0.0 s 
+INFO  00:13:59,660 ProgressMeter - Total runtime 240.22 secs, 4.00 min, 0.07 hours 
+INFO  00:13:59,663 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 12249763 total reads (0.00%) 
+INFO  00:13:59,663 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:13:59,664 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:13:59,664 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:14:00,240 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:14:02,065 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:14:02,067 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:14:02,067 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:14:02,067 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:14:02,071 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw1-6c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:14:02,076 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:14:02,077 HelpFormatter - Date/Time: 2019/12/10 00:14:02 
+INFO  00:14:02,077 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:14:02,077 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:14:02,627 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:14:02,771 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:14:02,778 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:14:02,923 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.14 
+INFO  00:14:03,033 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:14:03,038 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:14:03,038 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:14:03,039 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:14:03,039 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:14:03,121 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:14:03,122 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:14:33,590 ProgressMeter - SczhEnG_1028:37994   2263832.0    30.0 s      13.0 s       24.0%     2.1 m      95.0 s 
+INFO  00:15:03,591 ProgressMeter - SczhEnG_2013:829345   4614884.0    60.0 s      13.0 s       45.8%     2.2 m      70.0 s 
+INFO  00:15:33,819 ProgressMeter - SczhEnG_2894:2189   6570586.0    90.0 s      13.0 s       65.4%     2.3 m      47.0 s 
+INFO  00:16:04,855 ProgressMeter - SczhEnG_3953:988   9142249.0     2.0 m      13.0 s       89.2%     2.3 m      14.0 s 
+INFO  00:16:34,857 ProgressMeter - SczhEnG_4411:829   1.0231838E7     2.5 m      14.0 s      100.0%     2.5 m       0.0 s 
+INFO  00:17:04,859 ProgressMeter - SczhEnG_4411:829   1.0231838E7     3.0 m      17.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:17:17,191 ProgressMeter -            done   1.0231843E7     3.2 m      18.0 s      100.0%     3.2 m       0.0 s 
+INFO  00:17:17,191 ProgressMeter - Total runtime 194.15 secs, 3.24 min, 0.05 hours 
+INFO  00:17:17,194 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 10231843 total reads (0.00%) 
+INFO  00:17:17,195 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:17:17,195 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:17:17,195 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:17:17,808 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:17:19,686 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:17:19,689 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:17:19,689 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:17:19,689 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:17:19,693 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:17:19,698 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:17:19,699 HelpFormatter - Date/Time: 2019/12/10 00:17:19 
+INFO  00:17:19,699 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:17:19,699 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:17:20,251 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:17:20,407 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:17:20,415 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:17:20,577 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  00:17:20,703 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:17:20,708 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:17:20,708 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:17:20,709 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:17:20,709 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:17:20,800 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:17:20,801 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:17:50,712 ProgressMeter - SczhEnG_1415:1104093   2188773.0    30.0 s      13.0 s       31.6%    94.0 s      64.0 s 
+INFO  00:18:21,226 ProgressMeter - SczhEnG_2817:16188   4414151.0    60.0 s      13.0 s       63.1%    95.0 s      35.0 s 
+INFO  00:18:51,228 ProgressMeter - SczhEnG_4171:1096   6769485.0    90.0 s      13.0 s       95.2%    94.0 s       4.0 s 
+INFO  00:19:21,230 ProgressMeter - SczhEnG_4411:840   7078176.0   120.0 s      17.0 s      100.0%   120.0 s       0.0 s 
+INFO  00:19:38,336 ProgressMeter -            done   7078177.0     2.3 m      19.0 s      100.0%     2.3 m       0.0 s 
+INFO  00:19:38,337 ProgressMeter - Total runtime 137.63 secs, 2.29 min, 0.04 hours 
+INFO  00:19:38,340 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7078177 total reads (0.00%) 
+INFO  00:19:38,340 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:19:38,341 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:19:38,341 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:19:38,936 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:19:40,791 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:19:40,794 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:19:40,794 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:19:40,794 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:19:40,798 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:19:40,804 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:19:40,805 HelpFormatter - Date/Time: 2019/12/10 00:19:40 
+INFO  00:19:40,805 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:19:40,805 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:19:41,372 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:19:41,540 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:19:41,547 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:19:41,714 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  00:19:41,845 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:19:41,850 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:19:41,851 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:19:41,851 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:19:41,851 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:19:41,951 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:19:41,952 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:20:11,854 ProgressMeter - SczhEnG_800:251   1868756.0    30.0 s      16.0 s       19.4%     2.6 m       2.1 m 
+INFO  00:20:41,856 ProgressMeter - SczhEnG_1663:587   3736610.0    60.0 s      16.0 s       37.1%     2.7 m     101.0 s 
+INFO  00:21:12,648 ProgressMeter - SczhEnG_2729:67593   5809595.0    90.0 s      15.0 s       61.1%     2.5 m      57.0 s 
+INFO  00:21:42,900 ProgressMeter - SczhEnG_3491:313983   7736417.0     2.0 m      15.0 s       79.1%     2.5 m      31.0 s 
+INFO  00:22:12,902 ProgressMeter - SczhEnG_4411:1075   9737782.0     2.5 m      15.0 s      100.0%     2.5 m       0.0 s 
+INFO  00:22:42,904 ProgressMeter - SczhEnG_4411:1075   9737782.0     3.0 m      18.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:23:05,945 ProgressMeter -            done   9737783.0     3.4 m      20.0 s      100.0%     3.4 m       0.0 s 
+INFO  00:23:05,946 ProgressMeter - Total runtime 204.10 secs, 3.40 min, 0.06 hours 
+INFO  00:23:05,949 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9737783 total reads (0.00%) 
+INFO  00:23:05,950 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:23:05,950 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:23:05,950 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:23:06,533 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:23:08,437 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:23:08,440 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:23:08,440 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:23:08,440 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:23:08,444 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-1c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:23:08,450 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:23:08,450 HelpFormatter - Date/Time: 2019/12/10 00:23:08 
+INFO  00:23:08,450 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:23:08,451 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:23:08,997 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:23:09,146 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:23:09,154 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:23:09,305 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  00:23:09,423 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:23:09,428 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:23:09,428 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:23:09,429 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:23:09,429 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:23:09,524 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:23:09,526 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:23:39,432 ProgressMeter - SczhEnG_855:379   1986805.0    30.0 s      15.0 s       20.8%     2.4 m     113.0 s 
+INFO  00:24:09,433 ProgressMeter - SczhEnG_1871:1130   4172599.0    60.0 s      14.0 s       42.2%     2.4 m      82.0 s 
+INFO  00:24:40,194 ProgressMeter - SczhEnG_2840:55   6081126.0    90.0 s      14.0 s       64.2%     2.3 m      50.0 s 
+INFO  00:25:11,343 ProgressMeter - SczhEnG_3701:999196   8228949.0     2.0 m      14.0 s       84.5%     2.4 m      22.0 s 
+INFO  00:25:41,345 ProgressMeter - SczhEnG_4410:3327   9706857.0     2.5 m      15.0 s      100.0%     2.5 m       0.0 s 
+INFO  00:26:11,346 ProgressMeter - SczhEnG_4410:3327   9706857.0     3.0 m      18.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:26:27,640 ProgressMeter -            done   9706858.0     3.3 m      20.0 s      100.0%     3.3 m       0.0 s 
+INFO  00:26:27,640 ProgressMeter - Total runtime 198.21 secs, 3.30 min, 0.06 hours 
+INFO  00:26:27,643 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9706858 total reads (0.00%) 
+INFO  00:26:27,644 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:26:27,644 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:26:27,644 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:26:28,255 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:26:30,161 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:26:30,164 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:26:30,164 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:26:30,164 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:26:30,168 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:26:30,174 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:26:30,175 HelpFormatter - Date/Time: 2019/12/10 00:26:30 
+INFO  00:26:30,175 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:26:30,175 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:26:30,740 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:26:30,893 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:26:30,901 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:26:31,066 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  00:26:31,187 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:26:31,192 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:26:31,193 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:26:31,193 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:26:31,194 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:26:31,281 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:26:31,282 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:27:01,196 ProgressMeter - SczhEnG_2067:267   2335942.0    30.0 s      12.0 s       47.1%    63.0 s      33.0 s 
+INFO  00:27:31,198 ProgressMeter - SczhEnG_3995:53   4669576.0    60.0 s      12.0 s       90.4%    66.0 s       6.0 s 
+INFO  00:28:01,200 ProgressMeter - SczhEnG_4410:3262   5170789.0    90.0 s      17.0 s      100.0%    90.0 s       0.0 s 
+INFO  00:28:09,186 ProgressMeter -            done   5170790.0    97.0 s      18.0 s      100.0%    97.0 s       0.0 s 
+INFO  00:28:09,186 ProgressMeter - Total runtime 97.99 secs, 1.63 min, 0.03 hours 
+INFO  00:28:09,190 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 5170790 total reads (0.00%) 
+INFO  00:28:09,190 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:28:09,191 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:28:09,191 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:28:09,763 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:28:11,611 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:28:11,614 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:28:11,614 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:28:11,614 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:28:11,618 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:28:11,623 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:28:11,623 HelpFormatter - Date/Time: 2019/12/10 00:28:11 
+INFO  00:28:11,623 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:28:11,624 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:28:12,169 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:28:12,317 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:28:12,324 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:28:12,477 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  00:28:12,592 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:28:12,597 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:28:12,598 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:28:12,598 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:28:12,598 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:28:12,684 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:28:12,686 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:28:44,200 ProgressMeter - SczhEnG_1482:261208   2258139.0    31.0 s      13.0 s       33.3%    93.0 s      62.0 s 
+INFO  00:29:14,202 ProgressMeter - SczhEnG_2834:40744   4622015.0    61.0 s      13.0 s       63.9%    95.0 s      34.0 s 
+INFO  00:29:44,204 ProgressMeter - SczhEnG_4103:559315   6965602.0    91.0 s      13.0 s       93.7%    97.0 s       6.0 s 
+INFO  00:30:14,206 ProgressMeter - SczhEnG_4411:1075   7426531.0     2.0 m      16.0 s      100.0%     2.0 m       0.0 s 
+INFO  00:30:36,930 ProgressMeter -            done   7426532.0     2.4 m      19.0 s      100.0%     2.4 m       0.0 s 
+INFO  00:30:36,931 ProgressMeter - Total runtime 144.33 secs, 2.41 min, 0.04 hours 
+INFO  00:30:36,934 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 7426532 total reads (0.00%) 
+INFO  00:30:36,934 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:30:36,935 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:30:36,935 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:30:37,673 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:30:39,534 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:30:39,536 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:30:39,537 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:30:39,537 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:30:39,541 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-4c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:30:39,546 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:30:39,547 HelpFormatter - Date/Time: 2019/12/10 00:30:39 
+INFO  00:30:39,547 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:30:39,547 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:30:40,098 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:30:40,263 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:30:40,270 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:30:40,436 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  00:30:40,559 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:30:40,564 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:30:40,565 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:30:40,565 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:30:40,565 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:30:40,659 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:30:40,660 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:31:11,078 ProgressMeter - SczhEnG_1415:1956816   1924347.0    30.0 s      15.0 s       32.0%    93.0 s      63.0 s 
+INFO  00:31:41,080 ProgressMeter - SczhEnG_2826:46   4215421.0    60.0 s      14.0 s       63.8%    94.0 s      34.0 s 
+INFO  00:32:11,517 ProgressMeter - SczhEnG_4037:594659   6336322.0    90.0 s      14.0 s       91.4%    98.0 s       8.0 s 
+INFO  00:32:41,519 ProgressMeter - SczhEnG_4411:842   6927084.0   120.0 s      17.0 s      100.0%   120.0 s       0.0 s 
+INFO  00:33:02,706 ProgressMeter -            done   6927085.0     2.4 m      20.0 s      100.0%     2.4 m       0.0 s 
+INFO  00:33:02,706 ProgressMeter - Total runtime 142.14 secs, 2.37 min, 0.04 hours 
+INFO  00:33:02,710 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 6927085 total reads (0.00%) 
+INFO  00:33:02,710 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:33:02,710 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:33:02,711 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:33:03,262 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:33:05,138 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:33:05,141 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:33:05,141 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:33:05,141 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:33:05,145 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5a_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5a_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:33:05,152 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:33:05,152 HelpFormatter - Date/Time: 2019/12/10 00:33:05 
+INFO  00:33:05,153 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:33:05,153 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:33:05,730 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:33:05,887 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:33:05,894 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:33:06,062 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  00:33:06,193 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:33:06,197 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:33:06,198 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:33:06,198 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:33:06,199 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:33:06,296 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:33:06,298 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:33:37,951 ProgressMeter -  SczhEnG_765:76   1866821.0    31.0 s      17.0 s       18.7%     2.8 m       2.2 m 
+INFO  00:34:08,106 ProgressMeter - SczhEnG_1560:66562   3765025.0    61.0 s      16.0 s       34.8%     2.9 m     114.0 s 
+INFO  00:34:38,212 ProgressMeter - SczhEnG_2423:532   6057290.0    92.0 s      15.0 s       56.0%     2.7 m      72.0 s 
+INFO  00:35:08,214 ProgressMeter - SczhEnG_3254:1179   8021299.0     2.0 m      15.0 s       73.2%     2.8 m      44.0 s 
+INFO  00:35:38,216 ProgressMeter - SczhEnG_4038:43   1.0280978E7     2.5 m      14.0 s       91.4%     2.8 m      14.0 s 
+INFO  00:36:08,267 ProgressMeter - SczhEnG_4411:855   1.1211121E7     3.0 m      16.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:36:38,269 ProgressMeter - SczhEnG_4411:855   1.1211121E7     3.5 m      18.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:36:56,192 ProgressMeter -            done   1.1211122E7     3.8 m      20.0 s      100.0%     3.8 m       0.0 s 
+INFO  00:36:56,202 ProgressMeter - Total runtime 230.00 secs, 3.83 min, 0.06 hours 
+INFO  00:36:56,206 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 11211122 total reads (0.00%) 
+INFO  00:36:56,206 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:36:56,206 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:36:56,207 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:36:56,889 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:36:58,755 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:36:58,758 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:36:58,758 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:36:58,758 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:36:58,762 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:36:58,768 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:36:58,768 HelpFormatter - Date/Time: 2019/12/10 00:36:58 
+INFO  00:36:58,768 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:36:58,769 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:36:59,321 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:36:59,475 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:36:59,482 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:36:59,641 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  00:36:59,766 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:36:59,771 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:36:59,771 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:36:59,771 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:36:59,772 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:36:59,857 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:36:59,858 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:37:31,260 ProgressMeter - SczhEnG_548:548   1883796.0    31.0 s      16.0 s       14.1%     3.7 m       3.1 m 
+INFO  00:38:01,413 ProgressMeter - SczhEnG_1354:367   4010033.0    61.0 s      15.0 s       30.6%     3.3 m       2.3 m 
+INFO  00:38:31,415 ProgressMeter - SczhEnG_1812:754158   5887621.0    91.0 s      15.0 s       41.4%     3.7 m       2.1 m 
+INFO  00:39:01,417 ProgressMeter - SczhEnG_2505:53   8045605.0     2.0 m      15.0 s       57.3%     3.5 m      90.0 s 
+INFO  00:39:31,418 ProgressMeter - SczhEnG_3058:511320   9571080.0     2.5 m      15.0 s       69.2%     3.6 m      67.0 s 
+INFO  00:40:01,727 ProgressMeter - SczhEnG_3507:97   1.1413868E7     3.0 m      15.0 s       79.5%     3.8 m      46.0 s 
+INFO  00:40:32,761 ProgressMeter - SczhEnG_4090:127   1.3585205E7     3.5 m      15.0 s       93.4%     3.8 m      14.0 s 
+INFO  00:41:02,763 ProgressMeter - SczhEnG_4411:1925   1.450189E7     4.0 m      16.0 s      100.0%     4.0 m       0.0 s 
+INFO  00:41:32,765 ProgressMeter - SczhEnG_4411:1925   1.450189E7     4.5 m      18.0 s      100.0%     4.5 m       0.0 s 
+INFO  00:42:02,767 ProgressMeter - SczhEnG_4411:1925   1.450189E7     5.0 m      20.0 s      100.0%     5.0 m       0.0 s 
+INFO  00:42:12,338 ProgressMeter -            done   1.4501891E7     5.2 m      21.0 s      100.0%     5.2 m       0.0 s 
+INFO  00:42:12,338 ProgressMeter - Total runtime 312.57 secs, 5.21 min, 0.09 hours 
+INFO  00:42:12,342 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 14501891 total reads (0.00%) 
+INFO  00:42:12,342 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:42:12,342 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:42:12,343 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:42:12,906 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:42:14,815 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:42:14,818 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:42:14,818 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:42:14,818 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:42:14,822 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-5c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:42:14,828 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:42:14,829 HelpFormatter - Date/Time: 2019/12/10 00:42:14 
+INFO  00:42:14,829 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:42:14,829 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:42:15,392 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:42:15,546 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:42:15,553 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:42:15,715 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.16 
+INFO  00:42:15,833 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:42:15,838 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:42:15,838 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:42:15,839 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:42:15,839 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:42:15,928 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:42:15,929 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:42:45,842 ProgressMeter - SczhEnG_863:484   1891797.0    30.0 s      15.0 s       21.2%     2.4 m     111.0 s 
+INFO  00:43:15,988 ProgressMeter - SczhEnG_1707:3136   3763015.0    60.0 s      15.0 s       38.1%     2.6 m      97.0 s 
+INFO  00:43:45,989 ProgressMeter - SczhEnG_2713:167   5844858.0    90.0 s      15.0 s       60.6%     2.5 m      58.0 s 
+INFO  00:44:17,767 ProgressMeter - SczhEnG_3537:284763   7921365.0     2.0 m      15.0 s       80.5%     2.5 m      29.0 s 
+INFO  00:44:48,772 ProgressMeter - SczhEnG_4411:840   9906530.0     2.5 m      15.0 s      100.0%     2.5 m       0.0 s 
+INFO  00:45:18,774 ProgressMeter - SczhEnG_4411:840   9906530.0     3.0 m      18.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:45:43,267 ProgressMeter -            done   9906533.0     3.5 m      20.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:45:43,267 ProgressMeter - Total runtime 207.43 secs, 3.46 min, 0.06 hours 
+INFO  00:45:43,271 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9906533 total reads (0.00%) 
+INFO  00:45:43,271 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:45:43,272 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:45:43,272 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:45:43,878 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:45:45,762 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:45:45,764 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:45:45,765 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:45:45,765 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:45:45,768 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-6b_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-6b_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:45:45,773 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:45:45,774 HelpFormatter - Date/Time: 2019/12/10 00:45:45 
+INFO  00:45:45,774 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:45:45,774 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:45:46,331 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:45:46,489 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:45:46,496 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:45:46,644 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.15 
+INFO  00:45:46,774 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:45:46,779 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:45:46,779 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:45:46,779 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:45:46,780 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:45:46,866 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:45:46,867 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:46:17,778 ProgressMeter -  SczhEnG_680:78   2145331.0    30.0 s      14.0 s       17.1%     2.9 m       2.4 m 
+INFO  00:46:47,779 ProgressMeter - SczhEnG_1531:187   4293053.0    61.0 s      14.0 s       34.3%     3.0 m     116.0 s 
+INFO  00:47:17,839 ProgressMeter - SczhEnG_2243:1047306   6701858.0    91.0 s      13.0 s       51.1%     3.0 m      87.0 s 
+INFO  00:47:47,845 ProgressMeter - SczhEnG_2925:41462   8654103.0     2.0 m      13.0 s       65.7%     3.1 m      63.0 s 
+INFO  00:48:17,902 ProgressMeter - SczhEnG_3640:265   1.1127341E7     2.5 m      13.0 s       82.9%     3.0 m      31.0 s 
+INFO  00:48:47,904 ProgressMeter - SczhEnG_4411:818   1.3439824E7     3.0 m      13.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:49:17,917 ProgressMeter - SczhEnG_4411:818   1.3439824E7     3.5 m      15.0 s      100.0%     3.5 m       0.0 s 
+INFO  00:49:47,919 ProgressMeter - SczhEnG_4411:818   1.3439824E7     4.0 m      17.0 s      100.0%     4.0 m       0.0 s 
+INFO  00:50:05,748 ProgressMeter -            done   1.3439825E7     4.3 m      19.0 s      100.0%     4.3 m       0.0 s 
+INFO  00:50:05,748 ProgressMeter - Total runtime 258.97 secs, 4.32 min, 0.07 hours 
+INFO  00:50:05,751 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 13439825 total reads (0.00%) 
+INFO  00:50:05,752 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:50:05,752 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:50:05,752 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:50:06,327 GATKRunReport - Uploaded run statistics report to AWS S3 
+Picked up _JAVA_OPTIONS: -Xmx2g
+INFO  00:50:08,225 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:50:08,228 HelpFormatter - The Genome Analysis Toolkit (GATK) v3.4-0-g7e26428, Compiled 2015/05/15 03:25:41 
+INFO  00:50:08,228 HelpFormatter - Copyright (c) 2010 The Broad Institute 
+INFO  00:50:08,228 HelpFormatter - For support and documentation go to http://www.broadinstitute.org/gatk 
+INFO  00:50:08,232 HelpFormatter - Program Args: -T SplitNCigarReads -I /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-6c_PdamAligned.sorted.out.md.rg.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/outputs/phylotrans_Pdam/Hw2-6c_PdamAligned.sorted.out.md.rg.splitN.bam -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS 
+INFO  00:50:08,238 HelpFormatter - Executing as m.connelly@n136 on Linux 2.6.32-431.el6.x86_64 amd64; Java HotSpot(TM) 64-Bit Server VM 1.8.0_60-b27. 
+INFO  00:50:08,239 HelpFormatter - Date/Time: 2019/12/10 00:50:08 
+INFO  00:50:08,239 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:50:08,239 HelpFormatter - -------------------------------------------------------------------------------- 
+INFO  00:50:08,803 GenomeAnalysisEngine - Strictness is SILENT 
+INFO  00:50:08,962 GenomeAnalysisEngine - Downsampling Settings: No downsampling 
+INFO  00:50:08,969 SAMDataSource$SAMReaders - Initializing SAMRecords in serial 
+INFO  00:50:09,144 SAMDataSource$SAMReaders - Done initializing BAM readers: total time 0.17 
+INFO  00:50:09,269 GenomeAnalysisEngine - Preparing for traversal over 1 BAM files 
+INFO  00:50:09,273 GenomeAnalysisEngine - Done preparing for traversal 
+INFO  00:50:09,274 ProgressMeter - [INITIALIZATION COMPLETE; STARTING PROCESSING] 
+INFO  00:50:09,274 ProgressMeter -                 | processed |    time |    per 1M |           |   total | remaining 
+INFO  00:50:09,274 ProgressMeter -        Location |     reads | elapsed |     reads | completed | runtime |   runtime 
+INFO  00:50:09,369 ReadShardBalancer$1 - Loading BAM index data 
+INFO  00:50:09,371 ReadShardBalancer$1 - Done loading BAM index data 
+INFO  00:50:39,278 ProgressMeter - SczhEnG_844:155   1871851.0    30.0 s      16.0 s       20.8%     2.4 m     114.0 s 
+INFO  00:51:09,589 ProgressMeter - SczhEnG_1725:205600   3880418.0    60.0 s      15.0 s       39.1%     2.6 m      93.0 s 
+INFO  00:51:39,591 ProgressMeter - SczhEnG_2750:1161   6056177.0    90.0 s      14.0 s       62.1%     2.4 m      54.0 s 
+INFO  00:52:09,698 ProgressMeter - SczhEnG_3607:57753   8193937.0   120.0 s      14.0 s       82.2%     2.4 m      26.0 s 
+INFO  00:52:39,700 ProgressMeter - SczhEnG_4411:1505   9992246.0     2.5 m      15.0 s      100.0%     2.5 m       0.0 s 
+INFO  00:53:09,701 ProgressMeter - SczhEnG_4411:1505   9992246.0     3.0 m      18.0 s      100.0%     3.0 m       0.0 s 
+INFO  00:53:32,312 ProgressMeter -            done   9992247.0     3.4 m      20.0 s      100.0%     3.4 m       0.0 s 
+INFO  00:53:32,312 ProgressMeter - Total runtime 203.04 secs, 3.38 min, 0.06 hours 
+INFO  00:53:32,315 MicroScheduler - 0 reads were filtered out during the traversal out of approximately 9992247 total reads (0.00%) 
+INFO  00:53:32,316 MicroScheduler -   -> 0 reads (0.00% of total) failing BadCigarFilter 
+INFO  00:53:32,316 MicroScheduler -   -> 0 reads (0.00% of total) failing MalformedReadFilter 
+INFO  00:53:32,316 MicroScheduler -   -> 0 reads (0.00% of total) failing ReassignOneMappingQualityFilter 
+INFO  00:53:32,971 GATKRunReport - Uploaded run statistics report to AWS S3 
+Job is submitted to <transcriptomics> project.
