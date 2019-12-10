@@ -161,7 +161,6 @@ mcols(dds_anti) <- cbind(mcols(dds_anti), genefeatures)
 mcols(dds_heat) <- cbind(mcols(dds_heat), genefeatures)
 mcols(dds_anti.heat) <- cbind(mcols(dds_anti.heat), genefeatures)
 mcols(dds_antixheat) <- cbind(mcols(dds_antixheat), genefeatures)
-names(mcols(dds_antixheat))
 ```
 ```{r}
 mcols(dds_HW1) <- cbind(mcols(dds_HW1), genefeatures)
@@ -216,107 +215,55 @@ mcols(dds_WT2) <- cbind(mcols(dds_WT2), genefeatures)
 ## Check output of Antibiotics DESeq2 analysis to ensure quality
 ```{r}
 resultsNames(dds_anti)
-```
-```{r}
 summary(res_anti)
-```
-```{r}
-mcols(dds_anti)
-```
-```{r}
-rownames(dds_anti)
 ```
 ```{r}
 res_anti$IDGeneInfo <- mcols(dds_anti)$IDGeneInfo
 res_anti$IDGeneInfo <- as.character(res_anti$IDGeneInfo)
 ```
 ```{r}
-colnames(res_anti)
-```
-```{r}
 plotDispEsts(dds_anti)
-```
-```{r}
 plotMA(res_anti, ylim = c(-20, 20))
 ```
 
 ## Check output of Heat DESeq2 analysis to ensure quality
 ```{r}
 resultsNames(dds_heat)
-```
-```{r}
 summary(res_heat)
-```
-```{r}
-mcols(dds_heat)
-```
-```{r}
-rownames(dds_heat)
 ```
 ```{r}
 res_heat$IDGeneInfo <- mcols(dds_heat)$IDGeneInfo
 res_heat$IDGeneInfo <- as.character(res_heat$IDGeneInfo)
 ```
 ```{r}
-colnames(res_heat)
-```
-```{r}
 plotDispEsts(dds_heat)
-```
-```{r}
 plotMA(res_heat, ylim = c(-20, 20))
 ```
 
 ## Check output of Antibiotics.Heat DESeq2 analysis to ensure quality
 ```{r}
 resultsNames(dds_anti.heat)
-```
-```{r}
 summary(res_anti.heat)
-```
-```{r}
-mcols(dds_anti.heat)
-```
-```{r}
-rownames(dds_anti.heat)
 ```
 ```{r}
 res_anti.heat$IDGeneInfo <- mcols(dds_anti.heat)$IDGeneInfo
 res_anti.heat$IDGeneInfo <- as.character(res_anti.heat$IDGeneInfo)
 ```
 ```{r}
-colnames(res_anti.heat)
-```
-```{r}
 plotDispEsts(dds_anti.heat)
-```
-```{r}
 plotMA(res_anti.heat, ylim = c(-20, 20))
 ```
 
 ## Check output of AntibioticsXHeat DESeq2 analysis to ensure quality
 ```{r}
 resultsNames(dds_antixheat)
-```
-```{r}
 summary(res_antixheat)
-```
-```{r}
-mcols(dds_antixheat)
-```
-```{r}
-rownames(dds_antixheat)
 ```
 ```{r}
 res_antixheat$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
 res_antixheat$IDGeneInfo <- as.character(res_antixheat$IDGeneInfo)
 ```
 ```{r}
-colnames(res_antixheat)
-```
-```{r}
 plotDispEsts(dds_antixheat)
-```
-```{r}
 plotMA(res_antixheat, ylim = c(-20, 20))
 ```

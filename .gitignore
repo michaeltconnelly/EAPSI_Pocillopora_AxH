@@ -13,3 +13,4 @@ bash/jobs/
 .Rhistory
 .RData
 Rmd/*.html
+outputs/DESeq-results/
