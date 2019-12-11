@@ -21,9 +21,21 @@ EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1
 #lets me know which files are being processed
 echo "These are the bam files to be processed : $EAPSIsamples"
 
+#loop to automate generation of scripts to direct sample variant filtering
 for EAPSIsample in $EAPSIsamples
 do \
-java \
+echo "Fitlering variants in ${EAPSIsample}"
+
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -q general' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -J '"${EAPSIsample}"_gatkVF_pdam'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$EAPSIsample"gatkVF_pdam%J.out'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$EAPSIsample"gatkVF_pdam%J.err'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+#input command to run GATK VariantFiltration
+echo java \
 -jar /share/apps/GATK/3.4.0/GenomeAnalysisTK.jar \
 -T VariantFiltration \
 -R ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.fasta \
@@ -34,5 +46,10 @@ java \
 -filter "FS > 30.0" \
 -filterName QD \
 -filter "QD < 2.0" \
--o  ${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}.filtered.vcf.gz
+-o  ${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}.filtered.vcf.gz >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.jobs
+#lets me know file is done
+echo 'echo' "Variant calling of $EAPSIsample complete"'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo "GATK HaplotypeCaller script of $EAPSIsample submitted"
+#   submit generated trimming script to job queue
+bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 done
