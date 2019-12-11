@@ -13,3 +13,5 @@ bash/jobs/
 .Rhistory
 .RData
 Rmd/*.html
+core*
+hs*
