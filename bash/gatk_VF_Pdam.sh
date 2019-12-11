@@ -46,10 +46,10 @@ echo java \
 -filter "FS > 30.0" \
 -filterName QD \
 -filter "QD < 2.0" \
--o  ${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}.filtered.vcf.gz >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.jobs
+-o  ${prodir}/outputs/phylotrans_Pdam/${EAPSIsample}.filtered.vcf.gz >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 #lets me know file is done
-echo 'echo' "Variant calling of $EAPSIsample complete"'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
-echo "GATK HaplotypeCaller script of $EAPSIsample submitted"
+echo 'echo' "Variant filtration of $EAPSIsample complete"'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo "GATK VariantFiltration script of $EAPSIsample submitted"
 #   submit generated trimming script to job queue
 bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 done
