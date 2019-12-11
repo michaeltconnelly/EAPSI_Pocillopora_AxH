@@ -1,0 +1,231 @@
+Sender: LSF System <lsfadmin@n260>
+Subject: Job 23132868: <gatk_VFwrapper_pdam> in cluster <mk2> Done
+
+Job <gatk_VFwrapper_pdam> was submitted from host <n323> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n260>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH> was used as the working directory.
+Started at Wed Dec 11 10:25:22 2019
+Results reported on Wed Dec 11 10:25:26 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/gatk_VFwrapper_Pdam.sh
+#purpose: hard-filter variants for EAPSI SNP phylotranscriptomics analysis
+#To start this job from the EAPSI_Pocillopora_AxH directory, use:
+#bsub -P transcriptomics < ./bash/gatk_VFwrapper_Pdam.sh
+
+#BSUB -J gatk_VFwrapper_pdam
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o gatk_VFwrapper_pdam%J.out
+#BSUB -e gatk_VFwrapper_pdam%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH"
+exp="AxH"
+EAPSIsamples="Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c"
+
+#lets me know which files are being processed
+echo "These are the bam files to be processed : $EAPSIsamples"
+
+#loop to automate generation of scripts to direct sample variant filtering
+for EAPSIsample in $EAPSIsamples
+do \
+echo "Fitlering variants in ${EAPSIsample}"
+
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -q general' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -J '"${EAPSIsample}"_gatkVF_pdam'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$EAPSIsample"gatkVF_pdam%J.out'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$EAPSIsample"gatkVF_pdam%J.err'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+#input command to run GATK VariantFiltration
+echo "java \
+-jar /share/apps/GATK/3.4.0/GenomeAnalysisTK.jar \
+-T VariantFiltration \
+-R ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.fasta \
+-V "${prodir}"/outputs/phylotrans_Pdam/"${EAPSIsample}".g.vcf.gz \
+-window 35 \
+-cluster 3 \
+-filterName FS \
+-filter \"FS > 30.0\" \
+-filterName QD \
+-filter \"QD < 2.0\" \
+-o  "${prodir}"/outputs/phylotrans_Pdam/"${EAPSIsample}".filtered.vcf.gz" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+#lets me know file is done
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1.04 sec.
+    Max Memory :                                 2 MB
+    Average Memory :                             2.00 MB
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               11998.00 MB
+    Max Swap :                                   234 MB
+    Max Processes :                              3
+    Max Threads :                                4
+
+The output (if any) follows:
+
+These are the bam files to be processed : Wt1-1a Wt1-1b Wt1-1c Wt1-4a Wt1-4b Wt1-4c Wt1-5a Wt1-5b Wt1-5c Wt1-6a Wt1-6b Wt1-6c Wt2-1a Wt2-1b Wt2-1c Wt2-4a Wt2-4b Wt2-4c Wt2-5a Wt2-5b Wt2-5c Wt2-6a Wt2-6b Wt2-6c Hw1-1a Hw1-1b Hw1-1c Hw1-4a Hw1-4b Hw1-4c Hw1-5a Hw1-5b Hw1-5c Hw1-6a Hw1-6b Hw1-6c Hw2-1a Hw2-1b Hw2-1c Hw2-4a Hw2-4b Hw2-4c Hw2-5a Hw2-5b Hw2-5c Hw2-6b Hw2-6c
+Fitlering variants in Wt1-1a
+GATK VariantFiltration script of Wt1-1a submitted
+Job <23132869> is submitted to queue <general>.
+Fitlering variants in Wt1-1b
+GATK VariantFiltration script of Wt1-1b submitted
+Job <23132870> is submitted to queue <general>.
+Fitlering variants in Wt1-1c
+GATK VariantFiltration script of Wt1-1c submitted
+Job <23132871> is submitted to queue <general>.
+Fitlering variants in Wt1-4a
+GATK VariantFiltration script of Wt1-4a submitted
+Job <23132872> is submitted to queue <general>.
+Fitlering variants in Wt1-4b
+GATK VariantFiltration script of Wt1-4b submitted
+Job <23132873> is submitted to queue <general>.
+Fitlering variants in Wt1-4c
+GATK VariantFiltration script of Wt1-4c submitted
+Job <23132874> is submitted to queue <general>.
+Fitlering variants in Wt1-5a
+GATK VariantFiltration script of Wt1-5a submitted
+Job <23132875> is submitted to queue <general>.
+Fitlering variants in Wt1-5b
+GATK VariantFiltration script of Wt1-5b submitted
+Job <23132876> is submitted to queue <general>.
+Fitlering variants in Wt1-5c
+GATK VariantFiltration script of Wt1-5c submitted
+Job <23132877> is submitted to queue <general>.
+Fitlering variants in Wt1-6a
+GATK VariantFiltration script of Wt1-6a submitted
+Job <23132878> is submitted to queue <general>.
+Fitlering variants in Wt1-6b
+GATK VariantFiltration script of Wt1-6b submitted
+Job <23132879> is submitted to queue <general>.
+Fitlering variants in Wt1-6c
+GATK VariantFiltration script of Wt1-6c submitted
+Job <23132880> is submitted to queue <general>.
+Fitlering variants in Wt2-1a
+GATK VariantFiltration script of Wt2-1a submitted
+Job <23132881> is submitted to queue <general>.
+Fitlering variants in Wt2-1b
+GATK VariantFiltration script of Wt2-1b submitted
+Job <23132882> is submitted to queue <general>.
+Fitlering variants in Wt2-1c
+GATK VariantFiltration script of Wt2-1c submitted
+Job <23132883> is submitted to queue <general>.
+Fitlering variants in Wt2-4a
+GATK VariantFiltration script of Wt2-4a submitted
+Job <23132884> is submitted to queue <general>.
+Fitlering variants in Wt2-4b
+GATK VariantFiltration script of Wt2-4b submitted
+Job <23132885> is submitted to queue <general>.
+Fitlering variants in Wt2-4c
+GATK VariantFiltration script of Wt2-4c submitted
+Job <23132886> is submitted to queue <general>.
+Fitlering variants in Wt2-5a
+GATK VariantFiltration script of Wt2-5a submitted
+Job <23132887> is submitted to queue <general>.
+Fitlering variants in Wt2-5b
+GATK VariantFiltration script of Wt2-5b submitted
+Job <23132888> is submitted to queue <general>.
+Fitlering variants in Wt2-5c
+GATK VariantFiltration script of Wt2-5c submitted
+Job <23132889> is submitted to queue <general>.
+Fitlering variants in Wt2-6a
+GATK VariantFiltration script of Wt2-6a submitted
+Job <23132890> is submitted to queue <general>.
+Fitlering variants in Wt2-6b
+GATK VariantFiltration script of Wt2-6b submitted
+Job <23132891> is submitted to queue <general>.
+Fitlering variants in Wt2-6c
+GATK VariantFiltration script of Wt2-6c submitted
+Job <23132892> is submitted to queue <general>.
+Fitlering variants in Hw1-1a
+GATK VariantFiltration script of Hw1-1a submitted
+Job <23132893> is submitted to queue <general>.
+Fitlering variants in Hw1-1b
+GATK VariantFiltration script of Hw1-1b submitted
+Job <23132894> is submitted to queue <general>.
+Fitlering variants in Hw1-1c
+GATK VariantFiltration script of Hw1-1c submitted
+Job <23132895> is submitted to queue <general>.
+Fitlering variants in Hw1-4a
+GATK VariantFiltration script of Hw1-4a submitted
+Job <23132896> is submitted to queue <general>.
+Fitlering variants in Hw1-4b
+GATK VariantFiltration script of Hw1-4b submitted
+Job <23132897> is submitted to queue <general>.
+Fitlering variants in Hw1-4c
+GATK VariantFiltration script of Hw1-4c submitted
+Job <23132898> is submitted to queue <general>.
+Fitlering variants in Hw1-5a
+GATK VariantFiltration script of Hw1-5a submitted
+Job <23132899> is submitted to queue <general>.
+Fitlering variants in Hw1-5b
+GATK VariantFiltration script of Hw1-5b submitted
+Job <23132900> is submitted to queue <general>.
+Fitlering variants in Hw1-5c
+GATK VariantFiltration script of Hw1-5c submitted
+Job <23132901> is submitted to queue <general>.
+Fitlering variants in Hw1-6a
+GATK VariantFiltration script of Hw1-6a submitted
+Job <23132902> is submitted to queue <general>.
+Fitlering variants in Hw1-6b
+GATK VariantFiltration script of Hw1-6b submitted
+Job <23132903> is submitted to queue <general>.
+Fitlering variants in Hw1-6c
+GATK VariantFiltration script of Hw1-6c submitted
+Job <23132904> is submitted to queue <general>.
+Fitlering variants in Hw2-1a
+GATK VariantFiltration script of Hw2-1a submitted
+Job <23132905> is submitted to queue <general>.
+Fitlering variants in Hw2-1b
+GATK VariantFiltration script of Hw2-1b submitted
+Job <23132906> is submitted to queue <general>.
+Fitlering variants in Hw2-1c
+GATK VariantFiltration script of Hw2-1c submitted
+Job <23132907> is submitted to queue <general>.
+Fitlering variants in Hw2-4a
+GATK VariantFiltration script of Hw2-4a submitted
+Job <23132908> is submitted to queue <general>.
+Fitlering variants in Hw2-4b
+GATK VariantFiltration script of Hw2-4b submitted
+Job <23132909> is submitted to queue <general>.
+Fitlering variants in Hw2-4c
+GATK VariantFiltration script of Hw2-4c submitted
+Job <23132910> is submitted to queue <general>.
+Fitlering variants in Hw2-5a
+GATK VariantFiltration script of Hw2-5a submitted
+Job <23132911> is submitted to queue <general>.
+Fitlering variants in Hw2-5b
+GATK VariantFiltration script of Hw2-5b submitted
+Job <23132912> is submitted to queue <general>.
+Fitlering variants in Hw2-5c
+GATK VariantFiltration script of Hw2-5c submitted
+Job <23132913> is submitted to queue <general>.
+Fitlering variants in Hw2-6b
+GATK VariantFiltration script of Hw2-6b submitted
+Job <23132914> is submitted to queue <general>.
+Fitlering variants in Hw2-6c
+GATK VariantFiltration script of Hw2-6c submitted
+Job <23132915> is submitted to queue <general>.
+
+
+PS:
+
+Read file <gatk_VFwrapper_pdam23132868.err> for stderr output of this job.
+
