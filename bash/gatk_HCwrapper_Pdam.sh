@@ -48,7 +48,7 @@ echo java \
 -dontUseSoftClippedBases >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkHC_pdam.job
 
 #lets me know file is done
-echo 'echo' "Variant calling of $EAPSIsample complete"'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkHC_pdam.job
+echo 'echo' "Variant calling of $EAPSIsample complete" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkHC_pdam.job
 echo "GATK HaplotypeCaller script of $EAPSIsample submitted"
 #   submit generated trimming script to job queue
 bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkHC_pdam.job
