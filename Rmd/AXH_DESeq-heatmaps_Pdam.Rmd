@@ -9,31 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_AntiXHeat-master")
 ```
-## Setup packages and working directories
-```{r packages, error=FALSE, warning=FALSE, message=FALSE}
-library("tidyverse")
-library("ggplot2")
-library("ggrepel")
-library("calibrate")
-library("pheatmap")
-library("RColorBrewer")
-library("genefilter")
-```
-## Set general ggplot2 colors 
-```{r}
-theme_set(theme_bw())
-#Treatment color and fill scheme
-condcolors <- c("#0000FF", "#00CCCC", "#FF6600", "#FFCC33", "#CC0033", "#FF66FF")
-condcolors_anti <- c("#00CCCC", "#0000FF")
-condcolors_heat <- c("#0000FF", "#FF6600")
-condcolors_anti.heat <- c("#FFCC33", "#0000FF")
-condcolors_antixheat <- c("#0000FF", "#00CCCC", "#FF6600", "#FFCC33")
-###
-condfillcolors <- c("#99FFFF", "#FFFF66", "#FF6666", "#99CCFF", "#FFCC99", "#FFCCFF")
-condfillcolors_antixheat <- c("#99CCFF", "#99FFFF", "#FFCC99", "#FFFF66")
-colshapes <- c(18, 9, 16, 10)
-colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#CCCCFF")
-```
+
 ### Create colony and condition annotation colors
 ```{r}
 anno_colors <- list(
