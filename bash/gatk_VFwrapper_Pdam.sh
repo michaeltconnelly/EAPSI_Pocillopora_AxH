@@ -35,7 +35,7 @@ echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$EAPSIsample"gatkVF_pdam%J.err''
 echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 #input command to run GATK VariantFiltration
-echo java \
+echo "java \
 -jar /share/apps/GATK/3.4.0/GenomeAnalysisTK.jar \
 -T VariantFiltration \
 -R ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.fasta \
@@ -43,10 +43,10 @@ echo java \
 -window 35 \
 -cluster 3 \
 -filterName FS \
--filter "FS > 30.0" \
+-filter \"FS > 30.0\" \
 -filterName QD \
--filter "QD < 2.0" \
--o  "${prodir}"/outputs/phylotrans_Pdam/"${EAPSIsample}".filtered.vcf.gz >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
+-filter \"QD < 2.0\" \
+-o  "${prodir}"/outputs/phylotrans_Pdam/"${EAPSIsample}".filtered.vcf.gz" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 #lets me know file is done
 echo 'echo' "Variant filtration of $EAPSIsample complete" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_gatkVF_pdam.job
 echo "GATK VariantFiltration script of $EAPSIsample submitted"
