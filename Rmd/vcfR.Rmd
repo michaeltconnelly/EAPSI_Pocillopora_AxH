@@ -1,0 +1,173 @@
+---
+title: "EAPSI_vcfR"
+author: "Mike Connelly"
+date: "11/14/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH/")
+```
+```{r}
+library(tidyverse)
+library(vcfR)
+library(SNPRelate)
+library(phangorn)
+library(poppr)
+library(ape)
+library(dendextend)
+```
+```{r}
+colshapes <- c(16, 17, 15, 18)
+colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
+theme_set(theme_bw())
+```
+
+vcfR section
+```{r}
+#pdam_genome <- ape::read.dna("/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome.fasta", format = "fasta")
+```
+```{r}
+#pdam_gff <- read.table("/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome.gff", sep="\t", quote="")
+```
+```{r}
+#vcf_Hw1a <- vcfR::read.vcfR(file = "./Hw1-6a.filtered.vcf.gz")
+#vcf_Hw2b <- vcfR::read.vcfR(file = "./Hw2-6b.filtered.vcf.gz")
+#vcf_Wt1a <- vcfR::read.vcfR(file = "./Wt1-6a.filtered.vcf.gz")
+#vcf_Wt2a <- vcfR::read.vcfR(file = "./Wt2-6a.filtered.vcf.gz")
+```
+```{r}
+#chrom <- create.chromR(name='Supercontig', vcf=vcf_Hw1a, seq=pdam_genome, ann=pdam_gff)
+```
+
+## SNPrelate
+Read in vcf files 
+```{r}
+vcfs <- list.files("./outputs/phylotrans_Pdam/", pattern=".vcf$")
+samples <- gsub(".filtered.vcf", "", vcfs)
+vcfs.list <- list()
+for (i in 1:length(vcfs)) {
+ vcfs.list[[i]] <- snpgdsVCF2GDS(vcf.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], sep = ''), out.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], '.gds', sep = ''), method = "biallelic.only")
+}
+names(vcfs.list) <- samples
+vcfs.list[[37]]
+```
+
+```{r}
+gdss <- list.files("./outputs/phylotrans_Pdam/", pattern=".gds$")
+gdsss <- gsub('^', './outputs/phylotrans_Pdam/', gdss)
+gdsfile <- snpgdsCombineGeno(gds.fn = gdsss, out.fn ='./outputs/phylo/genofile.gds', method = "position", verbose = TRUE)
+```
+```{r}
+snpgdsSummary("./outputs/phylo/genofile.gds")
+```
+```{r}
+genofile <- snpgdsOpen('./outputs/phylo/genofile.gds', allow.duplicate = TRUE)
+snpgdsClose(genofile)
+samp_id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+```
+```{r}
+# Try different LD thresholds for sensitivity analysis
+snpset <- snpgdsLDpruning(genofile, ld.threshold=0.2)
+```
+```{r}
+# Run PCA
+pca <- snpgdsPCA(genofile, num.thread=2)
+# snp.id=snpset.id,
+# variance proportion (%)
+pc.percent <- pca$varprop*100
+head(round(pc.percent, 2))
+# make a data.frame
+tab <- data.frame(sample.id = pca$sample.id,
+    EV1 = pca$eigenvect[,1],    # the first eigenvector
+    EV2 = pca$eigenvect[,2],    # the second eigenvector
+    stringsAsFactors = FALSE)
+head(tab)
+# Draw
+plot(tab$EV2, tab$EV1, xlab="eigenvector 2", ylab="eigenvector 1")
+```
+```{r}
+# Get sample id
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+
+# Get population information
+#   or pop_code <- scan("pop.txt", what=character())
+#   if it is stored in a text file "pop.txt"
+pop_code <- read.gdsn(index.gdsn(genofile, "sample.annot/pop.group"))
+
+# assume the order of sample IDs is as the same as population codes
+head(cbind(sample.id, pop_code))
+# Make a data.frame
+tab <- data.frame(sample.id = pca$sample.id,
+    pop = factor(pop_code)[match(pca$sample.id, sample.id)],
+    EV1 = pca$eigenvect[,1],    # the first eigenvector
+    EV2 = pca$eigenvect[,2],    # the second eigenvector
+    stringsAsFactors = FALSE)
+head(tab)
+```
+```{r}
+genofile <- snpgdsOpen("./simple2.gds")
+```
+```{r}
+#pca
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+pop_code <- read.gdsn(index.gdsn(genofile, "sample.id"))
+genotype <- gsub("-[0-9][abc]", "", pop_code)
+
+pca <- snpgdsPCA(genofile)
+
+tab <- data.frame(sample.id = pca$sample.id,
+                  geno = factor(genotype)[match(pca$sample.id, sample.id)],
+                  EV1 = pca$eigenvect[,1],
+                  EV2 = pca$eigenvect[,2],
+                  stringsAsFactors = FALSE)
+```
+```{r}
+pdf("./outputs/phylotrans_Pdam/EAPSI_AxH_SNP_PCA.pdf", width = 6, height = 6)
+tab %>% ggplot(aes(EV1, EV2)) +
+  geom_point(aes(shape = genotype, color = genotype), size = 6) + 
+  scale_shape_manual(values = colshapes) + 
+  scale_color_manual(values = colcolors)
+```
+```{r}
+ibs.hc<-snpgdsHCluster(snpgdsIBS(genofile,num.thread=2, autosome.only=FALSE))
+```
+```{r}
+rv <- snpgdsCutTree(ibs.hc)
+```
+```{r}
+dend <- rv$dendrogram
+```
+
+```{r}
+pdf("./outputs/phylotrans_Pdam/EAPSI_SNP_tree.pdf", width = 11, height = 8.5)
+plot(dend,
+     horiz = TRUE,
+     main = "Taiwan Pocillopora AxH samples SNP clustering tree")
+```
+
+```{r}
+#LD based SNP pruning
+set.seed(1000)
+snpset <- snpgdsLDpruning(genofile, ld.threshold = 0.8)
+snp.id <- unlist(snpset)
+
+# distance matrix - use IBS
+dissMatrix  =  snpgdsIBS(genofile,
+                         sample.id=NULL,
+                         snp.id=snp.id,
+                         autosome.only=TRUE, 
+    remove.monosnp=TRUE,  maf=NaN, missing.rate=NaN, num.thread=2, verbose=TRUE)
+snpgdsClose(genofile)
+
+snpHCluster =  snpgdsHCluster(dissMatrix, sample.id=NULL, need.mat=TRUE, hang=0.01)
+
+cutTree = snpgdsCutTree(snpHCluster, z.threshold=15, outlier.n=5, n.perm = 5000, samp.group=NULL, 
+    col.outlier="red", col.list=NULL, pch.outlier=4, pch.list=NULL,label.H=FALSE, label.Z=TRUE, 
+    verbose=TRUE)
+
+snpgdsDrawTree(cutTree,
+               main = "Taiwan Pocillopora SNP phylogenetic tree",
+               edgePar=list(col=rgb(0.5,0.5,0.5,0.75), t.col="black"),y.label.kinship=T,leaflab="perpendicular")
+```

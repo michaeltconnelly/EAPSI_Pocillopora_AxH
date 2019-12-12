@@ -16,3 +16,4 @@ Rmd/*.html
 core*
 hs*
 outputs/DESeq-results/
+outputs/phylo/
