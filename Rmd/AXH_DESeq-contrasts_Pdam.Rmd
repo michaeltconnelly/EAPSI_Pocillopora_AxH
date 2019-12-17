@@ -546,5 +546,3 @@ write.csv(as.data.frame(ressig_WT2_anti.heat_ctrl_dn[order(ressig_WT2_anti.heat_
 colnames(res_WT2_anti.heat_heat)
 summary(res_WT2_anti.heat_heat)
 ```
-
-# Overall and genotype-specific combined results table

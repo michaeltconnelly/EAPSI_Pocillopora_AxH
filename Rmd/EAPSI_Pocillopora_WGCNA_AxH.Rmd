@@ -1,0 +1,361 @@
+---
+title: "AXH_WGCNA_Pdam"
+author: "Mike Connelly"
+date: "12/16/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
+```
+
+# Load packages, set plotting themes, colors, and shapes
+```{r, error=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(genefilter)
+library(WGCNA)
+library(dynamicTreeCut)
+library(flashClust)
+options(stringsAsFactors = FALSE)
+allowWGCNAThreads(nThreads = 4)
+```
+## Import sample and trait metadata
+```{r, echo=FALSE}
+stable_samples <- read.table("EAPSIsamples_stable_meta.txt", header = TRUE)
+rownames(stable_samples) <- stable_samples$sample
+stable_samples$sample <- NULL
+```
+## Import counts data 
+```{r}
+countdata_vst <- read.delim("alltreatments_stable.norm.vst.counts.csv", sep = ",", comment.char="#")
+row.names(countdata_vst) <- countdata_vst$X
+countdata_vst <- select(countdata_vst, -X)
+#To select which treatments to use in network construction
+#countdata_vst <- select(countdata_vst, matches("[:alpha:]*[3,6]"))
+```
+### Make expression matrix sample names match metadata
+```{r}
+colnames(countdata_vst) <- stable_samples$sample
+```
+## Convert to matrix and transpose
+```{r}
+datExpr <- t(countdata_vst)
+```
+## Filter for expression
+```{r}
+datExpr <- datExpr[,apply(datExpr,2,mean)>4]
+```
+```{r}
+rownames(datExpr) <- rownames(stable_samples)
+ncol(datExpr)
+```
+This returns 17387 genes for network analysis
+ 
+## Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
+```{r}
+sft <- pickSoftThreshold(datExpr, verbose=5)
+```
+## Plot scale-free topology fit and mean connectivity as functions of the soft-thresholding power
+```{r}
+par(mfrow = c(1,2))
+powers <- c(c(1:10), seq(from = 12, to = 20, by = 2))
+cex1 = 0.9;
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], xlab="Soft Threshold (power)", ylab="Scale Free Topology Model Fit, signed R^2", type = "n", main = paste("Scale Independence"));
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], labels = powers, col = "red");
+abline(h=0.90, col = "red")
+plot(sft$fitIndices[,1], sft$fitIndices[,5], xlab="Soft Threshold (power)", ylab = "Mean Connectivity", type = "n", main = paste("Mean Connectivity"));
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels = powers, col = "red")
+```
+```{r}
+sft$powerEstimate
+```
+
+## Cluster genes into coexpressed modules
+"Base" clustering parameters
+  corType = "bicor"
+  networkType = "signed"
+  maxBlockSize = 27000
+  deepSplit = 2
+  detectCutHeight = 0.99
+  minModuleSize = 20
+  mergeCutHeight = 0.15
+Modify blocksizes
+```{r}
+net <- blockwiseModules(datExpr, 
+                          weights=NULL, 
+                          corType = "bicor",
+                          power=sft$powerEstimate,
+                          networkType = "signed",
+                          maxBlockSize = 20000,
+                          deepSplit = 2,
+                          detectCutHeight = 0.99,
+                          minModuleSize = min(20, ncol(datExpr)/2 ),
+                          mergeCutHeight = 0.15,
+                          TOMType = "signed",
+                          saveTOMs = FALSE,
+                          saveTOMFileBase = "EAPSI_TOM",
+                          numericLabels=T, 
+                          checkMissingData = TRUE, verbose=5)
+```
+## Inspect network results
+```{r}
+table(net$colors)
+```
+## Convert labels to standard WGCNA colors for plotting
+```{r}
+moduleColors <- labels2colors(net$colors, colorSeq = standardColors())
+colorstable <- as.data.frame(table(moduleColors))
+```
+## Save module assignment and eigengene information for subsequent analysis
+```{r}
+moduleLabels <- net$colors
+```
+```{r}
+MEs <- net$MEs
+rownames(MEs) <- rownames(stable_samples)
+```
+```{r}
+MEs <- orderMEs(MEs, greyLast = TRUE)
+```
+## Recalculate ME with color labels
+```{r}
+MEs1 <- moduleEigengenes(expr = datExpr, colors = moduleColors, softPower = sft$powerEstimate)$eigengenes
+rownames(MEs1) <- rownames(stable_samples)
+```
+```{r}
+MEs1 <- orderMEs(MEs1, greyLast = TRUE)
+```
+
+## Identify all unique and interesting modules based on trait correlations
+```{r}
+#Generate GeneIDs
+Genes <- colnames(datExpr)
+#Extract all unique modules
+uniqModules = setdiff(unique(moduleColors), "grey")
+uniqModules
+```
+
+## Output interesting module gene lists for GO enrichment tests
+```{r}
+setwd("./WGCNAmodules_Pdam/lists")
+for (module in uniqModules)
+{
+# Select module probes
+inModule <- (moduleColors==module)
+# Get their entrez ID codes
+modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
+# Write them into a file
+fileName = paste(module, "_ID", ".txt", sep="");
+write.table(as.data.frame(modGeneIDs), file = fileName,
+row.names = FALSE, col.names = FALSE)
+}
+```
+## Remove quotations from list gene IDs and search for gene notes 
+```{bash}
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam/lists/*_ID.txt
+rm ./WGCNAmodules_Pdam/lists/*_ID.txt-e
+```
+## Search module gene notes from ID lists
+```{bash}
+MODULES=./WGCNAmodules_Pdam/lists/*_ID.txt
+for module in $MODULES
+do
+  grep -f $module ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ${module}_notes.txt
+done
+mv ./WGCNAmodules_Pdam/lists/*_notes.txt ./WGCNAmodules_Pdam/notes
+```
+## Choose top hub gene in each module
+```{r}
+hubs <- chooseTopHubInEachModule(datExpr = datExpr, colorh = moduleColors, power = sft$powerEstimate, type = "signed")
+hubs <- as.data.frame(hubs)
+write.csv(hubs, file = "./WGCNAmodules_Pdam/hubgenes/hubs.csv")
+```
+## Search module gene notes from ID lists
+```{bash}
+awk -F "," '{print $2}' ./WGCNAmodules_Pdam/hubgenes/hubs.csv > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt
+sed -i -e 's/"//g' ./WGCNAmodules_Pdam/hubgenes/*.txt
+grep -f ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt
+sed -i -e 's/ID=//g' ./WGCNAmodules_Pdam/hubgenes/*notes.txt
+awk -F " Note=" '{print $1"\t"$2}' ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt > ./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt
+rm ./WGCNAmodules_Pdam/hubgenes/*txt-e
+```
+```{r}
+hubs_IDsnotes <- read.delim("./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt", header=FALSE)
+hubs$notes <- hubs_IDsnotes$V2[match(hubs$hubs, hubs_IDsnotes$V1)]
+write.csv(hubs, file = "./WGCNAmodules_Pdam/hubgenes/modulehubs.csv")
+```
+
+After network construction and module eigengene calculation...
+
+## Plot the dendrogram and the module colors underneath
+```{r}
+geneTree <- net$dendrograms[[1]]
+```
+```{r}
+plotDendroAndColors(dendro = net$dendrograms[[1]], colors = moduleColors[net$blockGenes[[1]]],
+"Module Colors",
+dendroLabels = FALSE, hang = 0.03,
+addGuide = TRUE, guideHang = 0.15,
+abHeight = c(0.95))
+```
+## Visualize eigengene network
+```{r}
+plotEigengeneNetworks(MEs, "Eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, excludeGrey = TRUE)
+```
+```{r}
+plotEigengeneNetworks(MEs, "Eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, colorLabels = TRUE, xLabelsAngle = 90, excludeGrey = TRUE)
+```
+```{r}
+plotEigengeneNetworks(MEs1, "Eigengene dendrogram", marDendro = c(0,4,2,0),
+plotHeatmaps = FALSE, colorLabels = TRUE, excludeGrey = TRUE)
+```
+```{r}
+plotEigengeneNetworks(MEs1, "Eigengene adjacency heatmap", marHeatmap = c(3,4,2,2),
+plotDendrograms = FALSE, xLabelsAngle = 90)
+```
+
+## Topological Overlap Map
+```{r}
+load("EAPSI_TOM-block.1.RData")
+```
+```{r}
+dissTOM <- 1 - as.matrix(TOM)
+```
+```{r}
+# Transform dissTOM with a power to make moderately strong connections more visible in the heatmap
+plotTOM <- dissTOM^7;
+# Set diagonal to NA for a nicer plot
+diag(plotTOM) = NA;
+```
+```{r}
+rm(dissTOM)
+```
+```{r}
+TOMplot(dissim = plotTOM, dendro = geneTree, Colors = moduleColors, setLayout = TRUE, main = "Network heatmap plot, all genes")
+```
+
+## Quantify module-trait associations
+```{r}
+datTraits <- select(stable_samples, -treatment, -genotype) 
+#-allheat, -allanti, -alllps, -W1, -W2)
+rownames(datTraits) <- rownames(stable_samples)
+#Define numbers of genes and samples
+nGenes <- ncol(datExpr);
+nSamples <- nrow(datExpr);
+```
+## Correlate module eigengene-trait associations
+```{r}
+moduleTraitCor <- cor(MEs1, datTraits, use = "p")
+moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
+moduleCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
+```
+## Create ME-trait heatmap
+```{r}
+setwd("./WGCNAmodules_Pdam_ctrl-LPS")
+pdf("ModuleCorrelations_ctrl-LPS", width = 11, height = 16)
+# Will display correlations and their p-values
+textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
+signif(moduleTraitPvalue, 2), ")", sep = "");
+dim(textMatrix) = dim(moduleTraitCor)
+par(mar = c(6, 8.5, 3, 3));
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = moduleTraitCor,
+xLabels = names(datTraits),
+yLabels = names(MEs1),
+yLabelsPosition = "left",
+ySymbols = names(MEs1),
+yColorWidth = 0.005,
+colorLabels = FALSE,
+colors = blueWhiteRed(50),
+textMatrix = textMatrix,
+setStdMargins = FALSE,
+plotLegend = FALSE,
+cex.text = 0.5,
+zlim = c(-1,1),
+main = paste("Module-treatment correlations"))
+dev.off()
+```
+## Create ME-trait heatmaps for interesting modules only
+```{r}
+for (module in immModules)
+{
+which.module <- module
+intMEs <- MEs1[, paste("ME", which.module, sep="")]
+intmoduleTraitCor <- cor(intMEs, datTraits, use = "p")
+intmoduleTraitPvalue <- corPvalueStudent(intmoduleTraitCor, nSamples)
+# Will display correlations and their p-values
+textMatrix = paste(signif(intmoduleTraitCor, 2), "\n(",
+signif(intmoduleTraitPvalue, 1), ")", sep = "");
+dim(textMatrix) = dim(intmoduleTraitCor)
+par(mar = c(6, 8.5, 3, 3));
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = intmoduleTraitCor,
+xLabels = names(datTraits),
+yLabels = names(intMEs),
+yLabelsPosition = "left",
+ySymbols = names(intMEs),
+yColorWidth = 0.005,
+colorLabels = FALSE,
+colors = blueWhiteRed(50),
+textMatrix = textMatrix,
+setStdMargins = FALSE,
+plotLegend = FALSE,
+cex.text = 0.6,
+zlim = c(-1,1),
+main = paste(which.module, "Module-trait relationships"))
+}
+```
+## Barplots of interesting module eigengene expression
+### Set treatment colors
+```{r}
+treatcolors <- c(rep("#FFCC33",3), rep("#CC0033",2), rep("#FF66FF",3), rep("#FF6600",3), rep ("#00CCCC",3), rep("#0000FF",2), 
+                 rep("#FFCC33",3), rep("#CC0033",2), rep("#FF66FF",3), rep("#FF6600",1), rep ("#00CCCC",3), rep("#0000FF",3))
+
+gencolors <- c(rep("black", 3), rep("white", 2), 
+               rep("black", 3), rep("white", 3), 
+               rep("black", 3), rep("white", 1),
+               rep("black", 3), rep("white", 3),
+               rep("black", 3), rep("white", 3),
+               rep("black", 2), rep("white", 2))
+
+gendensity <- c(rep(200, 3), rep(30, 2), rep(200, 3), rep(30, 3), rep(200, 3), rep(30, 1), rep(200, 3), rep(30, 3), rep(200, 3), rep(30, 3), rep(200, 2), rep(30, 2))
+
+condcolors <- c(rep("#0000FF",5), rep ("#00CCCC",6), rep("#FF6600",4), rep("#FF66FF",6), rep("#FFCC33",6), rep("#CC0033",4))
+```
+```{r}
+par(mfrow = c(1,1)  
+    #mar = c(8,2,2,2)
+    )
+for (module in intModules)
+{
+which.module <- module
+ME <- MEs1[, paste("ME", which.module, sep="")]
+barplot(ME, col = condcolors, 
+        #border =  gencolors,
+        density = gendensity,
+        main = which.module, ylim = c(-0.6,0.6), 
+        ylab = "eigengene expression", 
+        axes = TRUE, 
+        #names.arg = WTsamples$condition, 
+        cex.lab = 0.01, las = 3)
+}
+```
+
+ME <- as.data.frame(ME)
+g <- ggplot(ME, aes(y = ME))
+g + geom_point()
+
+## Heatmaps of interesting module gene expression
+```{r}
+for (module in immModules)
+{
+which.module <- module
+ME <- MEs1[, paste("ME", which.module, sep="")]
+par(mfrow = c(1,1), mar = c(1,2,4,1))
+plotMat(t(scale(datExpr[,moduleColors==which.module ]) ), nrgcols = 30, rlabels = T, clabels = rownames(WTsamples), rcols = which.module, title = which.module)
+}
+```

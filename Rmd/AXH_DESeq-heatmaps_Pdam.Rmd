@@ -1,13 +1,13 @@
 ---
-title: "AXH_DEseq-heatmaps_Pdam"
+title: "AXH_DESeq-heatmaps_Pdam"
 author: "Mike Connelly"
-date: "9/21/2019"
+date: "12/16/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI_AntiXHeat-master")
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 
 ### Create colony and condition annotation colors
