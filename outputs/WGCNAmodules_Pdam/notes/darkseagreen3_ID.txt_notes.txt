@@ -1,0 +1,31 @@
+pdam_00004850 tmem104: Transmembrane protein 104 homolog (Dictyostelium discoideum)
+pdam_00020939 MATN2: Matrilin-2 (Homo sapiens)
+pdam_00004582 TMEM181: Transmembrane protein 181 (Homo sapiens)
+pdam_00007802 VTI1B: Vesicle transport through interaction with t-SNAREs homolog 1B (Bos taurus)
+pdam_00000269 unknown function
+pdam_00008071 Ptchd3: Patched domain-containing protein 3 (Mus musculus)
+pdam_00020194 unknown function
+pdam_00002173 Uncharacterized skeletal organic matrix protein 8 (Acropora millepora)
+pdam_00017636 MAM and LDL-receptor class A domain-containing protein 1 (Fragment) (Acropora millepora)
+pdam_00022703 ABR: Active breakpoint cluster region-related protein (Bos taurus)
+pdam_00017388 Snx21: Sorting nexin-21 (Mus musculus)
+pdam_00006392 ets1-b: Protein c-ets-1-B (Fragment) (Xenopus laevis)
+pdam_00008776 MFSD11: UNC93-like protein MFSD11 (Macaca fascicularis)
+pdam_00018023 Gipc1: PDZ domain-containing protein GIPC1 (Rattus norvegicus)
+pdam_00008269 At1g78280: F-box protein At1g78280 (Arabidopsis thaliana)
+pdam_00006458 unknown function
+pdam_00016189 Atf6b: Cyclic AMP-dependent transcription factor ATF-6 beta (Mus musculus)
+pdam_00019344 NPDC1: Neural proliferation differentiation and control protein 1 (Homo sapiens)
+pdam_00004149 F8: Coagulation factor VIII (Canis lupus familiaris)
+pdam_00004192 SLC7A1: High affinity cationic amino acid transporter 1 (Homo sapiens)
+pdam_00004954 FOXP4: Forkhead box protein P4 (Homo sapiens)
+pdam_00011633 unknown function
+pdam_00016910 AKAP10: A-kinase anchor protein 10%2C mitochondrial (Homo sapiens)
+pdam_00016582 v1g178517: 3-hydroxyanthranilate 3%2C4-dioxygenase (Nematostella vectensis)
+pdam_00012540 unknown function
+pdam_00024614 Card11: Caspase recruitment domain-containing protein 11 (Mus musculus)
+pdam_00023937 unknown function
+pdam_00019778 PC3-like endoprotease variant B (Hydra vulgaris)
+pdam_00009048 PCSK5: Proprotein convertase subtilisin/kexin type 5 (Homo sapiens)
+pdam_00002823 ANXA6: Annexin A6 (Gallus gallus)
+pdam_00022693 unknown function

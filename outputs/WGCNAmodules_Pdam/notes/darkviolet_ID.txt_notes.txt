@@ -1,0 +1,45 @@
+pdam_00018358 SLC25A16: Graves disease carrier protein (Homo sapiens)
+pdam_00020663 unknown function
+pdam_00022704 BP10: Blastula protease 10 (Paracentrotus lividus)
+pdam_00015946 Tgfbi: Transforming growth factor-beta-induced protein ig-h3 (Mus musculus)
+pdam_00015728 C3: Complement C3 (Fragment) (Lethenteron camtschaticum)
+pdam_00021752 RAB38: Ras-related protein Rab-38 (Homo sapiens)
+pdam_00008064 syf2: Pre-mRNA-splicing factor syf2 (Danio rerio)
+pdam_00012165 SFRP5: Secreted frizzled-related protein 5 (Bos taurus)
+pdam_00014169 CTSB: Cathepsin B (Sus scrofa)
+pdam_00014163 Ror1: Inactive tyrosine-protein kinase transmembrane receptor ROR1 (Mus musculus)
+pdam_00008388 TPM2: Tropomyosin-2 (Podocoryna carnea)
+pdam_00011894 cyb5d1: Cytochrome b5 domain-containing protein 1 (Danio rerio)
+pdam_00003471 unknown function
+pdam_00003157 brn: Beta-1%2C3-galactosyltransferase brn (Drosophila melanogaster)
+pdam_00003201 unknown function
+pdam_00015633 MAGEE1: Melanoma-associated antigen E1 (Macaca fascicularis)
+pdam_00015631 unknown function
+pdam_00006313 gap1: GTPase-activating protein (Schizosaccharomyces pombe (strain 972 / ATCC 24843))
+pdam_00021879 Hhipl2: HHIP-like protein 2 (Mus musculus)
+pdam_00021083 BMP7: Bone morphogenetic protein 7 (Homo sapiens)
+pdam_00018611 PAPPA: Pappalysin-1 (Homo sapiens)
+pdam_00016346 RHO: Rhodopsin (Loligo forbesi)
+pdam_00000157 unknown function
+pdam_00014063 unknown function
+pdam_00017325 unknown function
+pdam_00013140 HCRTR1: Orexin receptor type 1 (Bos taurus)
+pdam_00014224 CETN3: Centrin-3 (Homo sapiens)
+pdam_00001956 unknown function
+pdam_00008899 TCN1: Transcobalamin-1 (Homo sapiens)
+pdam_00005941 unknown function
+pdam_00010586 Oit3: Oncoprotein-induced transcript 3 protein (Rattus norvegicus)
+pdam_00006268 RERG: Ras-related and estrogen-regulated growth inhibitor (Homo sapiens)
+pdam_00019343 lamc1: Laminin subunit gamma-1 (Xenopus tropicalis)
+pdam_00005136 Gcc1: GRIP and coiled-coil domain-containing protein 1 (Mus musculus)
+pdam_00004426 unknown function
+pdam_00004431 unknown function
+pdam_00009226 ift43a: Intraflagellar transport protein 43 homolog A (Salmo salar)
+pdam_00019700 Serine protease inhibitor dipetalogastin (Fragment) (Dipetalogaster maximus)
+pdam_00010271 A.superbus venom factor 1 (Austrelaps superbus)
+pdam_00023260 GPX7: Glutathione peroxidase 7 (Bos taurus)
+pdam_00012124 SCARB2: Lysosome membrane protein 2 (Homo sapiens)
+pdam_00004638 Cp1: Cathepsin L (Drosophila melanogaster)
+pdam_00010339 wnt8a: Protein Wnt-8a (Danio rerio)
+pdam_00014962 CHKA: Choline kinase alpha (Homo sapiens)
+pdam_00014385 unknown function

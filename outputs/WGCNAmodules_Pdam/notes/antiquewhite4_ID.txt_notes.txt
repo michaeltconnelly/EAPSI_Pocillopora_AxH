@@ -1,0 +1,73 @@
+pdam_00014676 unknown function
+pdam_00017133 nphp3: Nephrocystin-3 (Danio rerio)
+pdam_00025172 unknown function
+pdam_00008108 unknown function
+pdam_00004851 BASS4: Probable sodium/metabolite cotransporter BASS4%2C chloroplastic (Oryza sativa subsp. japonica)
+pdam_00004852 BASS4: Probable sodium/metabolite cotransporter BASS4%2C chloroplastic (Oryza sativa subsp. japonica)
+pdam_00022274 Telokin (Meleagris gallopavo)
+pdam_00017278 unknown function
+pdam_00024817 unknown function
+pdam_00025939 unknown function
+pdam_00025748 mak5: ATP-dependent RNA helicase mak5 (Aspergillus oryzae (strain ATCC 42149 / RIB 40))
+pdam_00007754 unknown function
+pdam_00000358 ASXL3: Putative Polycomb group protein ASXL3 (Homo sapiens)
+pdam_00000477 XRN1: 5'-3' exoribonuclease 1 (Homo sapiens)
+pdam_00005772 unknown function
+pdam_00021111 traf6: TNF receptor-associated factor 6 (Danio rerio)
+pdam_00003339 unknown function
+pdam_00014905 unknown function
+pdam_00018165 Magi2: Membrane-associated guanylate kinase%2C WW and PDZ domain-containing protein 2 (Rattus norvegicus)
+pdam_00015005 bhmt: Betaine--homocysteine S-methyltransferase 1 (Danio rerio)
+pdam_00020817 drkD: Probable serine/threonine-protein kinase drkD (Dictyostelium discoideum)
+pdam_00012908 unknown function
+pdam_00018531 unknown function
+pdam_00000092 CTRL: Chymotrypsin-like protease CTRL-1 (Homo sapiens)
+pdam_00022425 mrpl15: 39S ribosomal protein L15%2C mitochondrial (Danio rerio)
+pdam_00025462 GPSM1: G-protein-signaling modulator 1 (Homo sapiens)
+pdam_00021203 unknown function
+pdam_00025783 unknown function
+pdam_00020333 unknown function
+pdam_00008886 CASP7: Caspase-7 (Homo sapiens)
+pdam_00023214 Traf4: TNF receptor-associated factor 4 (Mus musculus)
+pdam_00024113 unknown function
+pdam_00025684 unknown function
+pdam_00002227 unknown function
+pdam_00022243 TDP2: Tyrosyl-DNA phosphodiesterase 2 (Homo sapiens)
+pdam_00010512 ENPEP: Glutamyl aminopeptidase (Sus scrofa)
+pdam_00023697 unknown function
+pdam_00012494 unknown function
+pdam_00006222 mshA: D-inositol 3-phosphate glycosyltransferase (Arthrobacter sp. (strain FB24))
+pdam_00012220 ADAMTS9: A disintegrin and metalloproteinase with thrombospondin motifs 9 (Homo sapiens)
+pdam_00020832 unknown function
+pdam_00016073 unknown function
+pdam_00019638 unknown function
+pdam_00002481 Saci_1252: Uncharacterized protein Saci_1252 (Sulfolobus acidocaldarius (strain ATCC 33909 / DSM 639 / JCM 8929 / NBRC 15157 / NCIMB 11770))
+pdam_00002497 RNH1: Ribonuclease inhibitor (Sus scrofa)
+pdam_00023658 TNXB: Tenascin-X (Homo sapiens)
+pdam_00025488 unknown function
+pdam_00002442 Meltf: Melanotransferrin (Mus musculus)
+pdam_00020852 unknown function
+pdam_00024254 Cad96Ca: Tyrosine kinase receptor Cad96Ca (Drosophila melanogaster)
+pdam_00026045 unknown function
+pdam_00013799 Sel1l: Protein sel-1 homolog 1 (Mesocricetus auratus)
+pdam_00012995 ALS2CR11: Amyotrophic lateral sclerosis 2 chromosomal region candidate gene 11 protein (Homo sapiens)
+pdam_00012613 unknown function
+pdam_00018409 unknown function
+pdam_00022490 unknown function
+pdam_00011181 unknown function
+pdam_00024317 unknown function
+pdam_00018450 unknown function
+pdam_00016574 Ttc7b: Tetratricopeptide repeat protein 7B (Mus musculus)
+pdam_00021637 SLC16A2: Monocarboxylate transporter 8 (Rattus norvegicus)
+pdam_00021632 unknown function
+pdam_00025271 unknown function
+pdam_00018995 CASP3: Caspase-3 (Bos taurus)
+pdam_00005051 EXOC1: Exocyst complex component 1 (Homo sapiens)
+pdam_00010870 unknown function
+pdam_00009030 DIS3L: DIS3-like exonuclease 1 (Pongo abelii)
+pdam_00006845 unknown function
+pdam_00024360 ZNF862: Zinc finger protein 862 (Homo sapiens)
+pdam_00008635 trim71: E3 ubiquitin-protein ligase TRIM71 (Xenopus tropicalis)
+pdam_00008674 unknown function
+pdam_00004197 unknown function
+pdam_00004196 unknown function

@@ -1,0 +1,182 @@
+pdam_00022462 G-protein coupled receptor GRL101 (Lymnaea stagnalis)
+pdam_00020669 POMT2: Protein O-mannosyl-transferase 2 (Homo sapiens)
+pdam_00025890 unknown function
+pdam_00019845 mapkap1: Target of rapamycin complex 2 subunit MAPKAP1 (Xenopus tropicalis)
+pdam_00024214 IIV3-084L: Putative ubiquitin thioesterase 232R (Invertebrate iridescent virus 3)
+pdam_00013208 efr3b: Protein EFR3 homolog B (Danio rerio)
+pdam_00006622 NIPSNAP3A: Protein NipSnap homolog 3A (Pongo abelii)
+pdam_00015277 Usb1: U6 snRNA phosphodiesterase (Rattus norvegicus)
+pdam_00013434 RSPH10B2: Radial spoke head 10 homolog B2 (Homo sapiens)
+pdam_00015963 Ccdc85a: Coiled-coil domain-containing protein 85A (Mus musculus)
+pdam_00015843 unknown function
+pdam_00003684 usp30: Ubiquitin carboxyl-terminal hydrolase 30 (Xenopus tropicalis)
+pdam_00007656 unknown function
+pdam_00015550 B3GALT5: Beta-1%2C3-galactosyltransferase 5 (Fragment) (Pan paniscus)
+pdam_00024153 pats1: Probable serine/threonine-protein kinase pats1 (Dictyostelium discoideum)
+pdam_00000293 Tmem246: Transmembrane protein 246 (Rattus norvegicus)
+pdam_00000457 NOP2: Probable 28S rRNA (cytosine(4447)-C(5))-methyltransferase (Homo sapiens)
+pdam_00022805 unknown function
+pdam_00023857 ywrD: Putative gamma-glutamyltransferase YwrD (Bacillus subtilis (strain 168))
+pdam_00008420 Cyp3a2: Cytochrome P450 3A2 (Rattus norvegicus)
+pdam_00005793 Galnt11: Polypeptide N-acetylgalactosaminyltransferase 11 (Mus musculus)
+pdam_00016687 nlrc4: NLR family CARD domain-containing protein 4 (Xenopus tropicalis)
+pdam_00003396 Mb21d2: Protein MB21D2 (Mus musculus)
+pdam_00003404 P4HTM: Transmembrane prolyl 4-hydroxylase (Homo sapiens)
+pdam_00003352 Espn: Espin (Mus musculus)
+pdam_00021822 unknown function
+pdam_00021824 Nlrc5: Protein NLRC5 (Mus musculus)
+pdam_00012009 NRDE2: Protein NRDE2 homolog (Homo sapiens)
+pdam_00017329 unknown function
+pdam_00008366 NSNH: Inosine-uridine preferring nucleoside hydrolase (Leishmania major)
+pdam_00001506 GALNT1: Polypeptide N-acetylgalactosaminyltransferase 1 (Bos taurus)
+pdam_00001521 unknown function
+pdam_00011516 LACTBL1: Putative beta-lactamase-like 1 (Homo sapiens)
+pdam_00025362 unknown function
+pdam_00017850 klhl12: Kelch-like protein 12 (Danio rerio)
+pdam_00017843 Itpkb: Inositol-trisphosphate 3-kinase B (Rattus norvegicus)
+pdam_00023727 unknown function
+pdam_00000888 unknown function
+pdam_00000779 Dzip3: E3 ubiquitin-protein ligase DZIP3 (Mus musculus)
+pdam_00023627 unknown function
+pdam_00023628 unknown function
+pdam_00023895 unknown function
+pdam_00021874 unknown function
+pdam_00007890 LHX3: LIM/homeobox protein Lhx3 (Fragment) (Sus scrofa)
+pdam_00002139 unknown function
+pdam_00000544 unknown function
+pdam_00003797 USP34: Ubiquitin carboxyl-terminal hydrolase 34 (Homo sapiens)
+pdam_00021362 TTC28: Tetratricopeptide repeat protein 28 (Homo sapiens)
+pdam_00021880 Slc18b1: MFS-type transporter SLC18B1 (Mus musculus)
+pdam_00000001 unknown function
+pdam_00000033 TRIM2: Tripartite motif-containing protein 2 (Homo sapiens)
+pdam_00024658 unknown function
+pdam_00021579 Nwd1: NACHT domain- and WD repeat-containing protein 1 (Mus musculus)
+pdam_00011134 TRIM2: Tripartite motif-containing protein 2 (Bos taurus)
+pdam_00004770 CECR5: Cat eye syndrome critical region protein 5 (Homo sapiens)
+pdam_00024838 TTC28: Tetratricopeptide repeat protein 28 (Homo sapiens)
+pdam_00023890 unknown function
+pdam_00018683 RAB5A: Ras-related protein Rab-5A (Macaca fascicularis)
+pdam_00017465 Tor1aip2: Torsin-1A-interacting protein 2 (Mus musculus)
+pdam_00009136 CTRB1: Chymotrypsinogen 2 (Canis lupus familiaris)
+pdam_00023745 unknown function
+pdam_00021201 unknown function
+pdam_00025780 unknown function
+pdam_00006598 smpd4: Sphingomyelin phosphodiesterase 4 (Xenopus laevis)
+pdam_00011064 ZNF277: Zinc finger protein 277 (Homo sapiens)
+pdam_00025485 unknown function
+pdam_00005624 USH1C: Harmonin (Homo sapiens)
+pdam_00008211 FAM114A2: Protein FAM114A2 (Homo sapiens)
+pdam_00024797 Nod2: Nucleotide-binding oligomerization domain-containing protein 2 (Mus musculus)
+pdam_00024798 unknown function
+pdam_00024951 TDRD6: Tudor domain-containing protein 6 (Homo sapiens)
+pdam_00018565 Ripk1: Receptor-interacting serine/threonine-protein kinase 1 (Mus musculus)
+pdam_00019711 ALKBH1: Nucleic acid dioxygenase ALKBH1 (Homo sapiens)
+pdam_00025994 unknown function
+pdam_00013163 ssx2ip-b: Afadin- and alpha-actinin-binding protein B (Xenopus laevis)
+pdam_00022844 MTHFSD: Methenyltetrahydrofolate synthase domain-containing protein (Bos taurus)
+pdam_00025659 unknown function
+pdam_00024038 unknown function
+pdam_00024034 unknown function
+pdam_00024033 unknown function
+pdam_00021323 KMO: Kynurenine 3-monooxygenase (Homo sapiens)
+pdam_00001873 PDE3A: cGMP-inhibited 3'%2C5'-cyclic phosphodiesterase A (Homo sapiens)
+pdam_00007580 unknown function
+pdam_00022789 PIEZO1: Piezo-type mechanosensitive ion channel component 1 (Homo sapiens)
+pdam_00008860 unknown function
+pdam_00010581 unknown function
+pdam_00016308 chtf18: Chromosome transmission fidelity protein 18 homolog (Xenopus laevis)
+pdam_00006483 LCLAT1: Lysocardiolipin acyltransferase 1 (Homo sapiens)
+pdam_00002228 Plpp1: Phospholipid phosphatase 1 (Rattus norvegicus)
+pdam_00025451 unknown function
+pdam_00014293 lhfp: Lipoma HMGIC fusion partner homolog (Danio rerio)
+pdam_00004875 TUBG1: Tubulin gamma-1 chain (Bos taurus)
+pdam_00021931 unknown function
+pdam_00023601 unknown function
+pdam_00019679 fem1b: Protein fem-1 homolog B (Xenopus laevis)
+pdam_00017537 unknown function
+pdam_00017539 unknown function
+pdam_00022061 HNRNPUL1: Heterogeneous nuclear ribonucleoprotein U-like protein 1 (Homo sapiens)
+pdam_00008556 unknown function
+pdam_00009311 Smyd3: Histone-lysine N-methyltransferase SMYD3 (Mus musculus)
+pdam_00016790 nphp3: Nephrocystin-3 (Danio rerio)
+pdam_00002639 PARP14: Poly [ADP-ribose] polymerase 14 (Homo sapiens)
+pdam_00019886 unknown function
+pdam_00003093 rsg1: REM2- and Rab-like small GTPase 1 (Xenopus laevis)
+pdam_00022334 mshA: D-inositol 3-phosphate glycosyltransferase (Geodermatophilus obscurus (strain ATCC 25078 / DSM 43160 / JCM 3152 / G-20))
+pdam_00019329 TRIM56: E3 ubiquitin-protein ligase TRIM56 (Bos taurus)
+pdam_00017980 Bora: Protein aurora borealis (Rattus norvegicus)
+pdam_00019951 DOLPP1: Dolichyldiphosphatase 1 (Callithrix jacchus)
+pdam_00002973 unknown function
+pdam_00003023 Clec16a: Protein CLEC16A (Mus musculus)
+pdam_00026033 unknown function
+pdam_00020254 POLR3B: DNA-directed RNA polymerase III subunit RPC2 (Homo sapiens)
+pdam_00020831 Zfp26: Zinc finger protein 26 (Mus musculus)
+pdam_00020857 Jbts17: Protein JBTS17 (Mus musculus)
+pdam_00016070 Mfge8: Lactadherin (Mus musculus)
+pdam_00008578 CUB and peptidase domain-containing protein 1 (Fragment) (Acropora millepora)
+pdam_00021558 ANKRD50: Ankyrin repeat domain-containing protein 50 (Homo sapiens)
+pdam_00021407 unknown function
+pdam_00000896 roco4: Probable serine/threonine-protein kinase roco4 (Dictyostelium discoideum)
+pdam_00000934 Uvrag: UV radiation resistance associated protein (Mus musculus)
+pdam_00005578 unknown function
+pdam_00010854 unknown function
+pdam_00005176 unknown function
+pdam_00018260 KLC1: Kinesin light chain 1 (Pongo abelii)
+pdam_00005872 DNMT: DNA (cytosine-5)-methyltransferase PliMCI (Paracentrotus lividus)
+pdam_00002495 usp10: Ubiquitin carboxyl-terminal hydrolase 10 (Xenopus tropicalis)
+pdam_00023081 tll1: Tolloid-like protein 1 (Xenopus laevis)
+pdam_00004374 TTC28: Tetratricopeptide repeat protein 28 (Homo sapiens)
+pdam_00004394 unknown function
+pdam_00025104 PTPRM: Receptor-type tyrosine-protein phosphatase mu (Homo sapiens)
+pdam_00015422 ZFYVE26: Zinc finger FYVE domain-containing protein 26 (Bos taurus)
+pdam_00023076 unknown function
+pdam_00024855 unknown function
+pdam_00007000 GOLGA1: Golgin subfamily A member 1 (Homo sapiens)
+pdam_00009163 pats1: Probable serine/threonine-protein kinase pats1 (Dictyostelium discoideum)
+pdam_00024251 unknown function
+pdam_00001055 ANO5: Anoctamin-5 (Homo sapiens)
+pdam_00017871 SIRT5: NAD-dependent protein deacylase sirtuin-5%2C mitochondrial (Canis lupus familiaris)
+pdam_00021423 unknown function
+pdam_00013011 TMEM245: Transmembrane protein 245 (Bos taurus)
+pdam_00013010 FNTB: Protein farnesyltransferase subunit beta (Bos taurus)
+pdam_00025221 Znfx1: NFX1-type zinc finger-containing protein 1 (Mus musculus)
+pdam_00018151 N(4)-(Beta-N-acetylglucosaminyl)-L-asparaginase (Elizabethkingia miricola)
+pdam_00001643 ddx41: Probable ATP-dependent RNA helicase ddx41 (Dictyostelium discoideum)
+pdam_00001736 unknown function
+pdam_00018037 AP5M1: AP-5 complex subunit mu-1 (Homo sapiens)
+pdam_00001236 Fzd4: Frizzled-4 (Mus musculus)
+pdam_00001340 exd1: piRNA biogenesis protein EXD1 (Xenopus laevis)
+pdam_00001324 unknown function
+pdam_00020599 unknown function
+pdam_00012714 XPO6: Exportin-6 (Homo sapiens)
+pdam_00012718 v1g169424: Eukaryotic translation initiation factor 3 subunit L (Nematostella vectensis)
+pdam_00005824 Mfn2: Mitofusin-2 (Mus musculus)
+pdam_00018421 SLC16A3: Monocarboxylate transporter 4 (Gallus gallus)
+pdam_00019733 Atpalpha: Sodium/potassium-transporting ATPase subunit alpha (Drosophila melanogaster)
+pdam_00022078 unknown function
+pdam_00015763 unknown function
+pdam_00003257 Hey: Hairy/enhancer-of-split related with YRPW motif protein (Drosophila melanogaster)
+pdam_00020763 unknown function
+pdam_00006126 unknown function
+pdam_00018872 Ttd14: TRPL translocation defect protein 14 (Drosophila melanogaster)
+pdam_00016844 unknown function
+pdam_00006029 NUDT24: Nudix hydrolase 24%2C chloroplastic (Arabidopsis thaliana)
+pdam_00010726 unknown function
+pdam_00020173 unknown function
+pdam_00017174 HSPA12B: Heat shock 70 kDa protein 12B (Homo sapiens)
+pdam_00017745 adgra3: Adhesion G protein-coupled receptor A3 (Danio rerio)
+pdam_00009737 unknown function
+pdam_00009952 unknown function
+pdam_00009028 CC2D2A: Coiled-coil and C2 domain-containing protein 2A (Homo sapiens)
+pdam_00001821 Ugt2a2: UDP-glucuronosyltransferase 2A2 (Mus musculus)
+pdam_00002833 MAP3K7: Mitogen-activated protein kinase kinase kinase 7 (Homo sapiens)
+pdam_00002881 FERMT2: Fermitin family homolog 2 (Homo sapiens)
+pdam_00002896 RCC1: Regulator of chromosome condensation (Mesocricetus auratus)
+pdam_00023277 CG17065: N-acetylglucosamine-6-phosphate deacetylase (Drosophila melanogaster)
+pdam_00016549 hnmt: Histamine N-methyltransferase (Danio rerio)
+pdam_00022856 unknown function
+pdam_00009860 CG32809: Coiled-coil domain-containing protein CG32809 (Drosophila melanogaster)
+pdam_00022763 Mcm3ap: Germinal-center associated nuclear protein (Mus musculus)
+pdam_00016735 Dnaaf5: Dynein assembly factor 5%2C axonemal (Mus musculus)
+pdam_00016734 Klhdc10: Kelch domain-containing protein 10 (Rattus norvegicus)
+pdam_00007128 ABCG4: ATP-binding cassette sub-family G member 4 (Homo sapiens)

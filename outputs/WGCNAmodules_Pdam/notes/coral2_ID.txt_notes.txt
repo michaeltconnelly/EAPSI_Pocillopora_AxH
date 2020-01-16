@@ -1,0 +1,71 @@
+pdam_00008169 ITGA9: Integrin alpha-9 (Homo sapiens)
+pdam_00020297 NAA35: N-alpha-acetyltransferase 35%2C NatC auxiliary subunit (Gallus gallus)
+pdam_00023703 unknown function
+pdam_00018434 unknown function
+pdam_00019497 med16: Mediator of RNA polymerase II transcription subunit 16 (Xenopus laevis)
+pdam_00023791 RNF32: RING finger protein 32 (Macaca fascicularis)
+pdam_00011426 unknown function
+pdam_00018693 v1g162096: ATP-dependent (S)-NAD(P)H-hydrate dehydratase (Nematostella vectensis)
+pdam_00005748 unknown function
+pdam_00021240 unknown function
+pdam_00003407 MORN1: MORN repeat-containing protein 1 (Homo sapiens)
+pdam_00008403 Pot1: Protection of telomeres protein 1 (Mus musculus)
+pdam_00008373 Nf1: Neurofibromin (Rattus norvegicus)
+pdam_00003211 ubc12: NEDD8-conjugating enzyme ubc12 (Schizosaccharomyces pombe (strain 972 / ATCC 24843))
+pdam_00003175 ints12: Integrator complex subunit 12 (Xenopus laevis)
+pdam_00004321 ints9: Integrator complex subunit 9 homolog (Nematostella vectensis)
+pdam_00003619 Tsnaxip1: Translin-associated factor X-interacting protein 1 (Mus musculus)
+pdam_00021366 CCDC28B: Coiled-coil domain-containing protein 28B (Homo sapiens)
+pdam_00017221 OGFOD1: Prolyl 3-hydroxylase OGFOD1 (Homo sapiens)
+pdam_00000025 GTF2H2: General transcription factor IIH subunit 2 (Bos taurus)
+pdam_00005395 WBP11: WW domain-binding protein 11 (Homo sapiens)
+pdam_00005355 Tll2: Tolloid-like protein 2 (Mus musculus)
+pdam_00019036 Reep2: Receptor expression-enhancing protein 2 (Mus musculus)
+pdam_00004738 unknown function
+pdam_00023439 unknown function
+pdam_00014718 MELTF: Melanotransferrin (Oryctolagus cuniculus)
+pdam_00022700 FHIT: Bis(5'-adenosyl)-triphosphatase (Bos taurus)
+pdam_00006617 STX1B: Syntaxin-1B (Ovis aries)
+pdam_00005648 unknown function
+pdam_00005656 Ecd: Protein ecdysoneless homolog (Mus musculus)
+pdam_00004003 unknown function
+pdam_00009550 sap30l: Histone deacetylase complex subunit SAP30L (Danio rerio)
+pdam_00001972 ANXA7: Annexin A7 (Bos taurus)
+pdam_00011857 nudcd1: NudC domain-containing protein 1 (Danio rerio)
+pdam_00008911 RNF25: E3 ubiquitin-protein ligase RNF25 (Bos taurus)
+pdam_00005998 v1g211400: Cyclic GMP-AMP synthase (Nematostella vectensis)
+pdam_00024019 VNN1: Pantetheinase (Bos taurus)
+pdam_00012535 Uncharacterized protein C1orf228 homolog (Bos taurus)
+pdam_00017527 C21orf59: UPF0769 protein C21orf59 (Homo sapiens)
+pdam_00023694 aldh8a1: Aldehyde dehydrogenase family 8 member A1 (Danio rerio)
+pdam_00005721 Resact receptor (Arbacia punctulata)
+pdam_00007717 unknown function
+pdam_00014241 unknown function
+pdam_00023200 GTF2B: Transcription initiation factor IIB (Bos taurus)
+pdam_00005909 Jmjd7: JmjC domain-containing protein 7 (Mus musculus)
+pdam_00023575 unknown function
+pdam_00009479 COASY: Bifunctional coenzyme A synthase (Sus scrofa)
+pdam_00002403 Decr1: 2%2C4-dienoyl-CoA reductase%2C mitochondrial (Rattus norvegicus)
+pdam_00009228 ppp1r21: Protein phosphatase 1 regulatory subunit 21 (Xenopus laevis)
+pdam_00012893 unknown function
+pdam_00013802 unknown function
+pdam_00013803 unknown function
+pdam_00010797 Sptlc1: Serine palmitoyltransferase 1 (Mus musculus)
+pdam_00010789 Mat2a: S-adenosylmethionine synthase isoform type-2 (Mus musculus)
+pdam_00002701 Pawr: PRKC apoptosis WT1 regulator protein (Mus musculus)
+pdam_00002804 Flt1: Vascular endothelial growth factor receptor 1 (Mus musculus)
+pdam_00020367 hsd11b1l: Hydroxysteroid 11-beta-dehydrogenase 1-like protein (Xenopus tropicalis)
+pdam_00001755 NGFR: Tumor necrosis factor receptor superfamily member 16 (Gallus gallus)
+pdam_00004711 PIGT: GPI transamidase component PIG-T (Homo sapiens)
+pdam_00011591 PARN: Poly(A)-specific ribonuclease PARN (Homo sapiens)
+pdam_00018441 Morn4: MORN repeat-containing protein 4 (Rattus norvegicus)
+pdam_00012701 Gtpbp1: GTP-binding protein 1 (Rattus norvegicus)
+pdam_00009654 KLHL18: Kelch-like protein 18 (Homo sapiens)
+pdam_00003895 unknown function
+pdam_00020983 Gtpbp2: GTP-binding protein 2 (Mus musculus)
+pdam_00024440 AGAP002721: Tryptophan 2%2C3-dioxygenase (Anopheles gambiae)
+pdam_00016706 PTPN1: Tyrosine-protein phosphatase non-receptor type 1 (Homo sapiens)
+pdam_00006834 unknown function
+pdam_00002814 RDH13: Retinol dehydrogenase 13 (Homo sapiens)
+pdam_00021522 C05D11.1: Uncharacterized protein C05D11.1 (Caenorhabditis elegans)
+pdam_00009858 LEO1: RNA polymerase-associated protein LEO1 (Pongo abelii)

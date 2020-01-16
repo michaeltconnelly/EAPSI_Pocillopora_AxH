@@ -1,0 +1,48 @@
+pdam_00009278 Ptchd3: Patched domain-containing protein 3 (Mus musculus)
+pdam_00022748 Tnip1: TNFAIP3-interacting protein 1 (Mus musculus)
+pdam_00016082 Gabarap: Gamma-aminobutyric acid receptor-associated protein (Rattus norvegicus)
+pdam_00021755 unknown function
+pdam_00019293 USP8: Ubiquitin carboxyl-terminal hydrolase 8 (Homo sapiens)
+pdam_00007693 drkD: Probable serine/threonine-protein kinase drkD (Dictyostelium discoideum)
+pdam_00000258 Epb41l3: Band 4.1-like protein 3 (Mus musculus)
+pdam_00000286 TEKT1: Tektin-1 (Homo sapiens)
+pdam_00008447 NLRP12: NACHT%2C LRR and PYD domains-containing protein 12 (Homo sapiens)
+pdam_00010914 Grb2: Growth factor receptor-bound protein 2 (Rattus norvegicus)
+pdam_00017349 CUEDC1: CUE domain-containing protein 1 (Homo sapiens)
+pdam_00024667 DENND6A: Protein DENND6A (Gallus gallus)
+pdam_00017838 ANXA6: Annexin A6 (Bos taurus)
+pdam_00006317 Traf3: TNF receptor-associated factor 3 (Mus musculus)
+pdam_00022439 SMAD3: Mothers against decapentaplegic homolog 3 (Gallus gallus)
+pdam_00010146 CASR: Extracellular calcium-sensing receptor (Bos taurus)
+pdam_00005358 Rnf11: RING finger protein 11 (Mus musculus)
+pdam_00012869 Sdc: Syndecan (Drosophila melanogaster)
+pdam_00022562 PLEKHF2: Pleckstrin homology domain-containing family F member 2 (Gallus gallus)
+pdam_00011140 Fbxw7: F-box/WD repeat-containing protein 7 (Mus musculus)
+pdam_00011164 RAB39B: Ras-related protein Rab-39B (Bos taurus)
+pdam_00017295 Sned1: Sushi%2C nidogen and EGF-like domain-containing protein 1 (Mus musculus)
+pdam_00006409 VAMP713: Vesicle-associated membrane protein 713 (Arabidopsis thaliana)
+pdam_00018576 ANP2: Mitogen-activated protein kinase kinase kinase 2 (Arabidopsis thaliana)
+pdam_00021210 unknown function
+pdam_00003056 UBE2J2: Ubiquitin-conjugating enzyme E2 J2 (Homo sapiens)
+pdam_00005718 ndel1: Nuclear distribution protein nudE-like 1 (Xenopus tropicalis)
+pdam_00005732 TAB1: TGF-beta-activated kinase 1 and MAP3K7-binding protein 1 (Homo sapiens)
+pdam_00011047 NLRC3: Protein NLRC3 (Homo sapiens)
+pdam_00002963 chpt1: Cholinephosphotransferase 1 (Xenopus laevis)
+pdam_00018255 Adap2: Arf-GAP with dual PH domain-containing protein 2 (Rattus norvegicus)
+pdam_00015822 PRKD3: Serine/threonine-protein kinase D3 (Homo sapiens)
+pdam_00012822 v1g243165: UPF0518 protein v1g243165 (Nematostella vectensis)
+pdam_00009467 unknown function
+pdam_00017867 RBM12: RNA-binding protein 12 (Macaca mulatta)
+pdam_00017599 unknown function
+pdam_00013698 Ppp1r9a: Neurabin-1 (Rattus norvegicus)
+pdam_00009089 PIGN: GPI ethanolamine phosphate transferase 1 (Homo sapiens)
+pdam_00018121 med27: Mediator of RNA polymerase II transcription subunit 27 (Danio rerio)
+pdam_00016565 Qpct: Glutaminyl-peptide cyclotransferase (Mus musculus)
+pdam_00012546 unknown function
+pdam_00017957 Stk25: Serine/threonine-protein kinase 25 (Mus musculus)
+pdam_00014339 unknown function
+pdam_00008919 unknown function
+pdam_00009939 unknown function
+pdam_00009865 unknown function
+pdam_00016214 nphp3: Nephrocystin-3 (Xenopus laevis)
+pdam_00021383 unknown function

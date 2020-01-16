@@ -1,0 +1,55 @@
+pdam_00017137 EGF1: Fibropellin-1 (Strongylocentrotus purpuratus)
+pdam_00019225 unknown function
+pdam_00015288 IRF2: Interferon regulatory factor 2 (Homo sapiens)
+pdam_00023301 unknown function
+pdam_00018983 unknown function
+pdam_00007657 unknown function
+pdam_00019107 FGFR3: Fibroblast growth factor receptor 3 (Homo sapiens)
+pdam_00004583 unknown function
+pdam_00000349 PXDN: Peroxidasin homolog (Homo sapiens)
+pdam_00000347 unknown function
+pdam_00000348 pxdn: Peroxidasin (Xenopus tropicalis)
+pdam_00012657 Smarcd1: SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily D member 1 (Mus musculus)
+pdam_00011541 Hbp1: HMG box-containing protein 1 (Rattus norvegicus)
+pdam_00015305 unknown function
+pdam_00020187 unknown function
+pdam_00016137 ELF4: ETS-related transcription factor Elf-4 (Homo sapiens)
+pdam_00021364 Tnfaip3: Tumor necrosis factor alpha-induced protein 3 (Mus musculus)
+pdam_00012904 PPT1: Palmitoyl-protein thioesterase 1 (Bos taurus)
+pdam_00000142 unknown function
+pdam_00011465 dcmA: Dichloromethane dehalogenase (Methylophilus leisingeri (strain DSM 6813 / VKM B-2013 / DM11))
+pdam_00011440 unknown function
+pdam_00016945 PRSS16: Thymus-specific serine protease (Homo sapiens)
+pdam_00009563 unknown function
+pdam_00001896 Oard1: O-acetyl-ADP-ribose deacetylase 1 (Mus musculus)
+pdam_00001974 unknown function
+pdam_00016307 unknown function
+pdam_00012509 unknown function
+pdam_00018373 unknown function
+pdam_00016803 Capn7: Calpain-7 (Mus musculus)
+pdam_00013354 ZC3H12B: Probable ribonuclease ZC3H12B (Homo sapiens)
+pdam_00006426 PIK3AP1: Phosphoinositide 3-kinase adapter protein 1 (Gallus gallus)
+pdam_00003058 cyp17a1: Steroid 17-alpha-hydroxylase/17%2C20 lyase (Ictalurus punctatus)
+pdam_00003081 unknown function
+pdam_00016068 NAPEPLD: N-acyl-phosphatidylethanolamine-hydrolyzing phospholipase D (Homo sapiens)
+pdam_00022634 unknown function
+pdam_00005234 unknown function
+pdam_00020245 unknown function
+pdam_00022723 unknown function
+pdam_00018381 unknown function
+pdam_00018380 unknown function
+pdam_00018383 unknown function
+pdam_00003551 ZNFX1: NFX1-type zinc finger-containing protein 1 (Homo sapiens)
+pdam_00021428 unknown function
+pdam_00010292 MALT1: Mucosa-associated lymphoid tissue lymphoma translocation protein 1 (Homo sapiens)
+pdam_00012426 ZC3H12B: Probable ribonuclease ZC3H12B (Homo sapiens)
+pdam_00001260 unknown function
+pdam_00018134 unknown function
+pdam_00015264 Tshr: Thyrotropin receptor (Rattus norvegicus)
+pdam_00009646 unknown function
+pdam_00025131 unknown function
+pdam_00003296 Elk1: ETS domain-containing protein Elk-1 (Mus musculus)
+pdam_00009606 unknown function
+pdam_00024439 unknown function
+pdam_00002935 KLHL28: Kelch-like protein 28 (Homo sapiens)
+pdam_00018273 unknown function

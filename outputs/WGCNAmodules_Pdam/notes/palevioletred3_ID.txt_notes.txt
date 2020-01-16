@@ -1,0 +1,98 @@
+pdam_00017127 unknown function
+pdam_00017132 unknown function
+pdam_00025012 unknown function
+pdam_00018218 unknown function
+pdam_00015273 SPATA2: Spermatogenesis-associated protein 2 (Homo sapiens)
+pdam_00013416 Slc7a9: b(0%2C+)-type amino acid transporter 1 (Mus musculus)
+pdam_00008117 FBXO22: F-box only protein 22 (Pongo abelii)
+pdam_00008085 Inpp5k: Inositol polyphosphate 5-phosphatase K (Mus musculus)
+pdam_00019499 unknown function
+pdam_00017270 DSTYK: Dual serine/threonine and tyrosine protein kinase (Bos taurus)
+pdam_00014598 Pxylp1: 2-phosphoxylose phosphatase 1 (Mus musculus)
+pdam_00008967 Dlish: SH3 domain-containing protein Dlish (Drosophila melanogaster)
+pdam_00015547 wsb1: WD repeat and SOCS box-containing protein 1 (Danio rerio)
+pdam_00023969 unknown function
+pdam_00022450 Fbxw8: F-box/WD repeat-containing protein 8 (Mus musculus)
+pdam_00018691 unknown function
+pdam_00018690 UNC5D: Netrin receptor UNC5D (Homo sapiens)
+pdam_00016431 BECN1: Beclin-1 (Sus scrofa)
+pdam_00000834 Smg5: Protein SMG5 (Mus musculus)
+pdam_00002164 YPTM2: GTP-binding protein YPTM2 (Zea mays)
+pdam_00024384 PXDN: Peroxidasin homolog (Homo sapiens)
+pdam_00000655 cmtr1: Cap-specific mRNA (nucleoside-2'-O-)-methyltransferase 1 (Danio rerio)
+pdam_00000597 KLHL5: Kelch-like protein 5 (Homo sapiens)
+pdam_00005432 dxo: Decapping and exoribonuclease protein (Xenopus laevis)
+pdam_00005351 HMGXB4: HMG domain-containing protein 4 (Homo sapiens)
+pdam_00007359 PSD3: PH and SEC7 domain-containing protein 3 (Homo sapiens)
+pdam_00011095 TM_0508: Uncharacterized protein TM_0508 (Thermotoga maritima (strain ATCC 43589 / MSB8 / DSM 3109 / JCM 10099))
+pdam_00020072 EXOC5: Exocyst complex component 5 (Homo sapiens)
+pdam_00016044 trim71: E3 ubiquitin-protein ligase TRIM71 (Xenopus tropicalis)
+pdam_00014023 TBK1: Serine/threonine-protein kinase TBK1 (Homo sapiens)
+pdam_00014003 RDR1: Probable RNA-dependent RNA polymerase 1 (Oryza sativa subsp. japonica)
+pdam_00005663 adcA: Arrestin domain-containing protein A (Dictyostelium discoideum)
+pdam_00010183 MTMR10: Myotubularin-related protein 10 (Homo sapiens)
+pdam_00003976 HECA: Headcase protein homolog (Homo sapiens)
+pdam_00009559 YIPF5: Protein YIPF5 (Macaca fascicularis)
+pdam_00018938 CDADC1: Cytidine and dCMP deaminase domain-containing protein 1 (Macaca fascicularis)
+pdam_00001900 trim13: Tripartite motif containing 13 (Xenopus tropicalis)
+pdam_00001932 HRH2: Histamine H2 receptor (Pongo pygmaeus)
+pdam_00025142 TTC28: Tetratricopeptide repeat protein 28 (Homo sapiens)
+pdam_00019140 SVEP1: Sushi%2C von Willebrand factor type A%2C EGF and pentraxin domain-containing protein 1 (Homo sapiens)
+pdam_00008258 MAP3K19: Mitogen-activated protein kinase kinase kinase 19 (Homo sapiens)
+pdam_00025480 NGFR: Tumor necrosis factor receptor superfamily member 16 (Gallus gallus)
+pdam_00016311 unknown function
+pdam_00006480 LCLAT1: Lysocardiolipin acyltransferase 1 (Homo sapiens)
+pdam_00010540 RDR1: Probable RNA-dependent RNA polymerase 1 (Oryza sativa subsp. japonica)
+pdam_00022233 HMCN1: Hemicentin-1 (Homo sapiens)
+pdam_00011261 unknown function
+pdam_00012582 Os9: Protein OS-9 (Mus musculus)
+pdam_00018367 Map3k10: Mitogen-activated protein kinase kinase kinase 10 (Mus musculus)
+pdam_00011742 unknown function
+pdam_00006436 unknown function
+pdam_00002598 Mb21d2: Protein MB21D2 (Mus musculus)
+pdam_00002617 mpp5a: MAGUK p55 subfamily member 5-A (Danio rerio)
+pdam_00003102 ctdnep1a: CTD nuclear envelope phosphatase 1A (Danio rerio)
+pdam_00023987 kinX: Probable serine/threonine-protein kinase kinX (Dictyostelium discoideum)
+pdam_00020551 pats1: Probable serine/threonine-protein kinase pats1 (Dictyostelium discoideum)
+pdam_00016076 unknown function
+pdam_00008598 B4GALNT4: N-acetyl-beta-glucosaminyl-glycoprotein 4-beta-N-acetylgalactosaminyltransferase 1 (Homo sapiens)
+pdam_00004168 unknown function
+pdam_00018203 unknown function
+pdam_00010598 unknown function
+pdam_00007307 WASF3: Wiskott-Aldrich syndrome protein family member 3 (Homo sapiens)
+pdam_00023061 Ncam2: Neural cell adhesion molecule 2 (Mus musculus)
+pdam_00006733 Capn15: Calpain-15 (Mus musculus)
+pdam_00007836 unknown function
+pdam_00007808 unknown function
+pdam_00007837 unknown function
+pdam_00011708 unknown function
+pdam_00009241 FKRP: Fukutin-related protein (Homo sapiens)
+pdam_00015452 PPP2R5C: Serine/threonine-protein phosphatase 2A 56 kDa regulatory subunit gamma isoform (Homo sapiens)
+pdam_00013819 KIF16B: Kinesin-like protein KIF16B (Homo sapiens)
+pdam_00017597 BCHE: Cholinesterase (Bos taurus)
+pdam_00024071 CYLD: Ubiquitin carboxyl-terminal hydrolase CYLD (Bos taurus)
+pdam_00025756 TTC28: Tetratricopeptide repeat protein 28 (Homo sapiens)
+pdam_00021309 mshA: D-inositol 3-phosphate glycosyltransferase (Nakamurella multipartita (strain ATCC 700099 / DSM 44233 / CIP 104796 / JCM 9543 / NBRC 105858 / Y-104))
+pdam_00021312 unknown function
+pdam_00001189 unknown function
+pdam_00018125 unknown function
+pdam_00014552 unknown function
+pdam_00019735 unknown function
+pdam_00025594 Gpsm1: G-protein-signaling modulator 1 (Rattus norvegicus)
+pdam_00009608 SHL2: Probable RNA-dependent RNA polymerase SHL2 (Oryza sativa subsp. japonica)
+pdam_00009604 RDR1: Probable RNA-dependent RNA polymerase 1 (Oryza sativa subsp. japonica)
+pdam_00023739 unknown function
+pdam_00014345 unknown function
+pdam_00019002 CDK6: Cyclin-dependent kinase 6 (Homo sapiens)
+pdam_00016838 unknown function
+pdam_00010710 KEAP1: Kelch-like ECH-associated protein 1 (Pongo abelii)
+pdam_00020993 kiz: Centrosomal protein kizuna (Danio rerio)
+pdam_00009394 Gpatch3: G patch domain-containing protein 3 (Mus musculus)
+pdam_00015239 fgfr1a: Fibroblast growth factor receptor 1-A (Danio rerio)
+pdam_00015235 FGFR3: Fibroblast growth factor receptor 3 (Homo sapiens)
+pdam_00016725 SSR1: Translocon-associated protein subunit alpha (Homo sapiens)
+pdam_00009955 unknown function
+pdam_00009914 prtgb: Protogenin B (Fragment) (Danio rerio)
+pdam_00006827 MIB2: E3 ubiquitin-protein ligase MIB2 (Gallus gallus)
+pdam_00018751 unknown function
+pdam_00019506 Shf: SH2 domain-containing adapter protein F (Mus musculus)

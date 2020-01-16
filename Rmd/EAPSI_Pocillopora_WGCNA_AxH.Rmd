@@ -23,13 +23,13 @@ allowWGCNAThreads(nThreads = 4)
 ```
 ## Import sample and trait metadata
 ```{r, echo=FALSE}
-stable_samples <- read.table("EAPSIsamples_stable_meta.txt", header = TRUE)
-rownames(stable_samples) <- stable_samples$sample
-stable_samples$sample <- NULL
+samples <- read.table("./data/EAPSI_samples_AxH_meta.txt", header = TRUE)
+rownames(samples) <- samples$SampleID
+samples$SampleID <- NULL
 ```
 ## Import counts data 
 ```{r}
-countdata_vst <- read.delim("alltreatments_stable.norm.vst.counts.csv", sep = ",", comment.char="#")
+countdata_vst <- read.delim("./outputs/STARcounts_Pdam/AxH_Pdam.vst.counts", sep = ",", comment.char="#")
 row.names(countdata_vst) <- countdata_vst$X
 countdata_vst <- select(countdata_vst, -X)
 #To select which treatments to use in network construction
@@ -37,7 +37,7 @@ countdata_vst <- select(countdata_vst, -X)
 ```
 ### Make expression matrix sample names match metadata
 ```{r}
-colnames(countdata_vst) <- stable_samples$sample
+colnames(countdata_vst) <- samples$sample
 ```
 ## Convert to matrix and transpose
 ```{r}
@@ -48,10 +48,10 @@ datExpr <- t(countdata_vst)
 datExpr <- datExpr[,apply(datExpr,2,mean)>4]
 ```
 ```{r}
-rownames(datExpr) <- rownames(stable_samples)
+rownames(datExpr) <- rownames(samples)
 ncol(datExpr)
 ```
-This returns 17387 genes for network analysis
+This returns 18173 genes for network analysis
  
 ## Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
 ```{r}
@@ -114,7 +114,7 @@ moduleLabels <- net$colors
 ```
 ```{r}
 MEs <- net$MEs
-rownames(MEs) <- rownames(stable_samples)
+rownames(MEs) <- rownames(samples)
 ```
 ```{r}
 MEs <- orderMEs(MEs, greyLast = TRUE)
@@ -122,7 +122,7 @@ MEs <- orderMEs(MEs, greyLast = TRUE)
 ## Recalculate ME with color labels
 ```{r}
 MEs1 <- moduleEigengenes(expr = datExpr, colors = moduleColors, softPower = sft$powerEstimate)$eigengenes
-rownames(MEs1) <- rownames(stable_samples)
+rownames(MEs1) <- rownames(samples)
 ```
 ```{r}
 MEs1 <- orderMEs(MEs1, greyLast = TRUE)
@@ -139,7 +139,6 @@ uniqModules
 
 ## Output interesting module gene lists for GO enrichment tests
 ```{r}
-setwd("./WGCNAmodules_Pdam/lists")
 for (module in uniqModules)
 {
 # Select module probes
@@ -147,30 +146,30 @@ inModule <- (moduleColors==module)
 # Get their entrez ID codes
 modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
 # Write them into a file
-fileName = paste(module, "_ID", ".txt", sep="");
+fileName = paste("./outputs/WGCNAmodules_Pdam/lists/", module, "_ID", ".txt", sep="");
 write.table(as.data.frame(modGeneIDs), file = fileName,
 row.names = FALSE, col.names = FALSE)
 }
 ```
 ## Remove quotations from list gene IDs and search for gene notes 
 ```{bash}
-sed -i -e 's/"//g' ./WGCNAmodules_Pdam/lists/*_ID.txt
-rm ./WGCNAmodules_Pdam/lists/*_ID.txt-e
+sed -i -e 's/"//g' ./outputs/WGCNAmodules_Pdam/lists/*_ID.txt
+rm ./outputs/WGCNAmodules_Pdam/lists/*_ID.txt-e
 ```
 ## Search module gene notes from ID lists
 ```{bash}
-MODULES=./WGCNAmodules_Pdam/lists/*_ID.txt
+MODULES=./outputs/WGCNAmodules_Pdam/lists/*_ID.txt
 for module in $MODULES
 do
-  grep -f $module ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ${module}_notes.txt
+  grep -f $module ./data/pdam_genome_IDInfo.gff > ${module}_notes.txt
+  mv ${module}*_notes.txt ./outputs/WGCNAmodules_Pdam/notes/
 done
-mv ./WGCNAmodules_Pdam/lists/*_notes.txt ./WGCNAmodules_Pdam/notes
 ```
 ## Choose top hub gene in each module
 ```{r}
 hubs <- chooseTopHubInEachModule(datExpr = datExpr, colorh = moduleColors, power = sft$powerEstimate, type = "signed")
 hubs <- as.data.frame(hubs)
-write.csv(hubs, file = "./WGCNAmodules_Pdam/hubgenes/hubs.csv")
+write.csv(hubs, file = "./outputs/WGCNAmodules_Pdam/hubs.csv")
 ```
 ## Search module gene notes from ID lists
 ```{bash}
@@ -240,9 +239,9 @@ TOMplot(dissim = plotTOM, dendro = geneTree, Colors = moduleColors, setLayout = 
 
 ## Quantify module-trait associations
 ```{r}
-datTraits <- select(stable_samples, -treatment, -genotype) 
+datTraits <- select(samples, -Reef, -Colony, -Environment, -Treatment, -Batch) 
 #-allheat, -allanti, -alllps, -W1, -W2)
-rownames(datTraits) <- rownames(stable_samples)
+rownames(datTraits) <- rownames(samples)
 #Define numbers of genes and samples
 nGenes <- ncol(datExpr);
 nSamples <- nrow(datExpr);
@@ -255,8 +254,7 @@ moduleCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
 ```
 ## Create ME-trait heatmap
 ```{r}
-setwd("./WGCNAmodules_Pdam_ctrl-LPS")
-pdf("ModuleCorrelations_ctrl-LPS", width = 11, height = 16)
+pdf("./outputs/WGCNAmodules_Pdam/ModuleCorrelations.pdf", width = 8.5, height = 11)
 # Will display correlations and their p-values
 textMatrix = paste(signif(moduleTraitCor, 2), "\n(",
 signif(moduleTraitPvalue, 2), ")", sep = "");
@@ -277,7 +275,6 @@ plotLegend = FALSE,
 cex.text = 0.5,
 zlim = c(-1,1),
 main = paste("Module-treatment correlations"))
-dev.off()
 ```
 ## Create ME-trait heatmaps for interesting modules only
 ```{r}

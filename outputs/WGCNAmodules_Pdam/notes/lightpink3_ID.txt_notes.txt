@@ -1,0 +1,37 @@
+pdam_00012114 unknown function
+pdam_00021252 unknown function
+pdam_00025883 unknown function
+pdam_00003660 yfkN: Trifunctional nucleotide phosphoesterase protein YfkN (Bacillus subtilis (strain 168))
+pdam_00018169 Lrp5: Low-density lipoprotein receptor-related protein 5 (Mus musculus)
+pdam_00002138 KLKB1: Plasma kallikrein (Homo sapiens)
+pdam_00000680 unknown function
+pdam_00022422 unknown function
+pdam_00018724 MB21D2: Protein MB21D2 (Homo sapiens)
+pdam_00010215 NRXN3: Neurexin-3 (Homo sapiens)
+pdam_00024176 unknown function
+pdam_00008764 Npffr1: Neuropeptide FF receptor 1 (Rattus norvegicus)
+pdam_00013167 Mfge8: Lactadherin (Rattus norvegicus)
+pdam_00019590 unknown function
+pdam_00025555 unknown function
+pdam_00009530 unknown function
+pdam_00006247 THAP12: 52 kDa repressor of the inhibitor of the protein kinase (Homo sapiens)
+pdam_00024497 unknown function
+pdam_00002463 ADAMTS16: A disintegrin and metalloproteinase with thrombospondin motifs 16 (Homo sapiens)
+pdam_00002464 unknown function
+pdam_00004359 MIM1: Myeloid protein 1 (Gallus gallus)
+pdam_00021343 LGALS3BP: Galectin-3-binding protein (Pongo abelii)
+pdam_00003570 Bbox1: Gamma-butyrobetaine dioxygenase (Rattus norvegicus)
+pdam_00007916 unknown function
+pdam_00007974 unknown function
+pdam_00018584 unknown function
+pdam_00012132 HOP2: Hsp70-Hsp90 organizing protein 2 (Arabidopsis thaliana)
+pdam_00024642 unknown function
+pdam_00016863 POGK: Pogo transposable element with KRAB domain (Homo sapiens)
+pdam_00015682 ACAN: Aggrecan core protein (Bos taurus)
+pdam_00015686 unknown function
+pdam_00008512 unknown function
+pdam_00022355 traf6: TNF receptor-associated factor 6 (Xenopus tropicalis)
+pdam_00013046 SLC9A9: Sodium/hydrogen exchanger 9 (Homo sapiens)
+pdam_00021563 unknown function
+pdam_00013969 unknown function
+pdam_00009986 unknown function
