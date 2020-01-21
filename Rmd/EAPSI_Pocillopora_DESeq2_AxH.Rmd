@@ -2600,7 +2600,7 @@ plot3d(anti_heat_doubledf$LFC_Anti, anti_heat_doubledf$LFC_Heat, anti_heat_doubl
 # topGO Enrichment Tests
 ## Input required *P. damicornis* GO annotation data and construct Gene-to-GO object for custom annotation mapping
 ```{r, warning=FALSE}
-geneID_GO <- readMappings(file = "pdam_genome_genesGO.txt")
+geneID_GO <- readMappings(file = "./data/pdam_emapper_genesGO.txt")
 str(head(geneID_GO))
 ```
 ## Construct GO-to-Gene object for GO term searches of interesting genes
@@ -2627,9 +2627,10 @@ Anti+Heat+LPS_Control (Up/Down)
 ## Construct topGOdata object using *P. damicornis* gene models, differentially expressed gene lists and gene ontology annotations
 ## Perform Fisher's exact test to identify enriched gene ontology terms
 ## Perform Kolmogorov-Smirnov test to identify enriched gene ontology terms
-## Analyse highly-significant GO terms and corresponding p-values, then produce a table of results
+## Analyse highly-significant MF GO terms and corresponding p-values, then produce a table of results
+Remember to use DESeq_geneID.sh to generate gene ID lists
 ```{r}
-DElists <- list.files(path = "./DESeqresults_Pdam/lists", pattern = "_ID.txt", full.names = TRUE)
+DElists <- list.files(path = "./outputs/DESeq-results/lists", pattern = "_ID.txt", full.names = TRUE)
 ```
 ```{r}
 topGOanalyzeDE <- function(filename) {
@@ -2641,7 +2642,7 @@ names(geneList) <- geneNames
 #node size is used to prune the GO hierarchy from the terms which have less than that many annotated genes 
 Pdam_GOdata <- new("topGOdata",
               description = DElist,
-              ontology = "BP",
+              ontology = "MF",
               allGenes = geneList,
               nodeSize = 10,
               annot = annFUN.gene2GO,
@@ -2680,7 +2681,6 @@ mv ~/computing/scripts/EAPSI_AntiXHeat-master/DESEqresults_Pdam/topGO/*.txt ~/co
 sed -i -e 's/"//g' ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/REVIGO/*.txt
 rm  ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/REVIGO/*.txt-e
 ```
-
 
 ```{r}
 genes <- read.csv("./DESeqresults_Pdam/lists/res_anti.heat_ctrl_up_ID.txt", header = FALSE, stringsAsFactors = FALSE)
@@ -2779,6 +2779,11 @@ mv ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt ~/comput
 ```{bash}
 sed -i -e 's/"//g' ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt
 rm  ~/computing/scripts/EAPSI.HW-WT-master/DESEqresults_Pdam/topGO/*.txt-e
+```
+
+# GO_MWU Enrichment Test
+```{r}
+
 ```
 
 # REVIGO plots

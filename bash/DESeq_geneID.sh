@@ -1,17 +1,38 @@
 #!/bin/bash
 dir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 
-awk -F "," '{print $1}' ${dir}/outputs/DESeq-results/tables/overall/res_AxH_ctrl.csv > ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_ID.txt
-sed -i '' 1d ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_ID.txt
-sed -i -e 's/"//g' ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_ID.txt
-rm ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_ID.txt-e
+for file in ${dir}/outputs/DESeq-results/tables/all/*
+do
+awk -F "," '{print $1}' ${file} > ${file}_ID.txt
+sed -i '' 1d ${file}_ID.txt
+sed -i -e 's/"//g' ${file}_ID.txt
+rm ${file}_ID.txt-e
+done
+mv ${dir}/outputs/DEseq-results/tables/all/*.txt ${dir}/outputs/DEseq-results/lists/
 
-awk -F "," '{print $1}' ${dir}/outputs/DESeq-results/tables/up/res_AxH_ctrl_up.csv > ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_up_ID.txt
-sed -i '' 1d ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_up_ID.txt
-sed -i -e 's/"//g' ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_up_ID.txt
-rm ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_up_ID.txt-e
+for file in ${dir}/outputs/DESeq-results/tables/up/*
+do
+awk -F "," '{print $1}' ${file} > ${file}_ID.txt
+sed -i '' 1d ${file}_ID.txt
+sed -i -e 's/"//g' ${file}_ID.txt
+rm ${file}_ID.txt-e
+done
+mv ${dir}/outputs/DEseq-results/tables/up/*.txt ${dir}/outputs/DEseq-results/lists/
 
-awk -F "," '{print $1}' ${dir}/outputs/DESeq-results/tables/down/res_AxH_ctrl_dn.csv > ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_dn_ID.txt
-sed -i '' 1d ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_dn_ID.txt
-sed -i -e 's/"//g' ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_dn_ID.txt
-rm ${dir}/outputs/DESeq-results/lists/res_AxH_ctrl_dn_ID.txt-e
+for file in ${dir}/outputs/DESeq-results/tables/down/*
+do
+awk -F "," '{print $1}' ${file} > ${file}_ID.txt
+sed -i '' 1d ${file}_ID.txt
+sed -i -e 's/"//g' ${file}_ID.txt
+rm ${file}_ID.txt-e
+done
+mv ${dir}/outputs/DEseq-results/tables/down/*.txt ${dir}/outputs/DEseq-results/lists/
+
+for file in ${dir}/outputs/DESeq-results/tables/overall/*
+do
+awk -F "," '{print $1}' ${file} > ${file}_ID.txt
+sed -i '' 1d ${file}_ID.txt
+sed -i -e 's/"//g' ${file}_ID.txt
+rm ${file}_ID.txt-e
+done
+mv ${dir}/outputs/DEseq-results/tables/overall/*.txt ${dir}/outputs/DEseq-results/lists/
