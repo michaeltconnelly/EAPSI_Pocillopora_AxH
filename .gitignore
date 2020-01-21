@@ -2,6 +2,7 @@
 .Rproj.user
 *.Rproj
 data/zippedreads/
+data/go.obo
 outputs/logfiles/
 outputs/errorfiles/
 outputs/fastcs/

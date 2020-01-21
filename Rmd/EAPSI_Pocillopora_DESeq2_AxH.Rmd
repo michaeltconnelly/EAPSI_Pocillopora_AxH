@@ -2683,8 +2683,11 @@ rm  ./outputs/DESeq-results/REVIGO/*.txt-e
 ```
 
 # GO_MWU Enrichment Test
+Generate gene ID and measure (signed log10 p-values) tables from DESeq2 lists
 ```{r}
-
+ID_measure <- data.frame(row.names(res_anti), res_anti$log2FoldChange, res_anti$pvalue)
+ID_measure$logP <- ifelse(ID_measure$res_anti.log2FoldChange > 0, 1*round(-log10(ID_measure$res_anti.pvalue), 3), -1*round(-log10(ID_measure$res_anti.pvalue), 3))
+#generate function for this and do for all comparisons!
 ```
 
 # REVIGO plots
