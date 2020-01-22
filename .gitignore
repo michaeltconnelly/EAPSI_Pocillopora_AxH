@@ -13,6 +13,7 @@ outputs/phylotrans_Pdam/
 bash/jobs/
 .Rhistory
 .RData
+.RDataTmp
 Rmd/*.html
 core*
 hs*

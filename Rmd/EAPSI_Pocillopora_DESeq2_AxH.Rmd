@@ -2685,9 +2685,20 @@ rm  ./outputs/DESeq-results/REVIGO/*.txt-e
 # GO_MWU Enrichment Test
 Generate gene ID and measure (signed log10 p-values) tables from DESeq2 lists
 ```{r}
-ID_measure <- data.frame(row.names(res_anti), res_anti$log2FoldChange, res_anti$pvalue)
-ID_measure$logP <- ifelse(ID_measure$res_anti.log2FoldChange > 0, 1*round(-log10(ID_measure$res_anti.pvalue), 3), -1*round(-log10(ID_measure$res_anti.pvalue), 3))
-#generate function for this and do for all comparisons!
+measure.frame <- function(res) {
+  measure.table <- data.frame(row.names(res), ifelse(res$log2FoldChange > 0, 1*round(-log10(res$pvalue), 2), -1*round(-log10(res$pvalue), 2)))
+  colnames(measure.table) <- c('gene', 'logP')
+  measure.table <- measure.table %>% arrange(desc(logP))
+  return(measure.table)
+}
+measure.heat <- measure.frame(res_heat)
+measure.anti <- measure.frame(res_anti)
+measure.anti.heat <- measure.frame(res_anti.heat)
+#write.table(measure.heat, file = "/Users/mikeconnelly/computing/programs/GO_MWU/heat_measure.csv", sep = ",", row.names = FALSE)
+write_csv(measure.anti.heat, path = "/Users/mikeconnelly/computing/programs/GO_MWU/anti.heat_measure.csv", col_names = TRUE)
+for (res in res_anti) {
+  measure.frame(res)
+}
 ```
 
 # REVIGO plots
