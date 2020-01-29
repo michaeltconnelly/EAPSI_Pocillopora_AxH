@@ -3,6 +3,7 @@
 *.Rproj
 data/zippedreads/
 data/go.obo
+data/classifiers/
 outputs/logfiles/
 outputs/errorfiles/
 outputs/fastcs/
