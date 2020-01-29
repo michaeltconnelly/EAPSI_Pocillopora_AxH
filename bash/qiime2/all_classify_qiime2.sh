@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: Classify ASVs using qiime2 feature-classifier trained for 16S V4 region
-#source activate qiime2-2019.1
+#source activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"

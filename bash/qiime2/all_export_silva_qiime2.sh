@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: Export rooted tree, classfied representative sequences and feature table of ASVs classified against SILVA database
-#source activate qiime2-2019.1
+#source activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"

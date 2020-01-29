@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: import demultiplexed 16S sequence reads, summarize read depth and quality scores
-#source activate qiime2-2019.1
+#source activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"

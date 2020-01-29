@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: Calculate core diversity metrics and generate rarefaction statistics on ASVs classified against Greengenes database
-#source activate qiime2-2019.1
+#source activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"

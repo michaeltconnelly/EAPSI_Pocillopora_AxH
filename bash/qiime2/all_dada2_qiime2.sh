@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: Use DADA2 to dereplicate and merge paired-end reads and create feature table of ASVs
-#source activate qiime2-2019.1
+#source activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"
