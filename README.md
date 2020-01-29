@@ -4,9 +4,9 @@ This repository contains scripts for analyzing RNA-seq and 16S rRNA gene amplico
 
 Unix bash scripts for analysis of coral RNAseq data on the University of Miami's Pegasus computing cluster are contained within the directory bash/rnaseq/.
 
-'verbatim code chunk for RNAseq'
+`verbatim code chunk for RNAseq`
 
 Scripts for analysis of bacteria 16S sequences using QIIME2 on a local machine are contained within bash/qiime2.
 
-'source activate qiime2-2019.10
-bash ./bash/qiime2/all_start_qiime2.sh'
+`source activate qiime2-2019.10
+bash ./bash/qiime2/all_start_qiime2.sh`
