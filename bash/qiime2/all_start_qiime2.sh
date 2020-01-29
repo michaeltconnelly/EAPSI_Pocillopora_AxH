@@ -1,6 +1,6 @@
 #!/bin/bash
 #purpose: create directory structure, copy program binaries and reference sequences on local computer
-#source activate qiime2-2019.10
+#conda activate qiime2-2019.10
 
 prodir="/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH"
 exp="AxH"
