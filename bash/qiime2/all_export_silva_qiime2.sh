@@ -43,8 +43,8 @@ biom convert \
 ### Modify formatting of .tsv taxonomy tables
 awk -F "\t" '{print $1"\t"$2}' ${prodir}/outputs/qiime2/export_silva/taxonomy.tsv > ${prodir}/outputs/qiime2/export_silva/taxonomy2.tsv
 #need to insert literal tab
-#sed 's/;/(ctrl + v + tab)/g' ${prodir}/outputs/qiime2/export/taxonomy2.tsv > ${prodir}/outputs/qiime2/export/taxonomy3.tsv
-#grep -v "Feature" ${prodir}/outputs/qiime2/export/taxonomy3.tsv > ${prodir}/outputs/qiime2/export/taxonomy4.tsv
+#sed 's/;/(ctrl + v + tab)/g' ${prodir}/outputs/qiime2/export_silva/taxonomy2.tsv > ${prodir}/outputs/qiime2/export_silva/taxonomy3.tsv
+#grep -v "Feature" ${prodir}/outputs/qiime2/export_silva/taxonomy3.tsv > ${prodir}/outputs/qiime2/export_silva/taxonomy4.tsv
 #need to open taxonomy4.tsv in Excel and save as tab-deliminted text
 
 ### Modify formatting of .tsv feature tables (rareified and unrareified)
