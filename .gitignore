@@ -11,6 +11,9 @@ outputs/trimqcs/
 outputs/trimmomaticreads/
 outputs/STARalign_Pdam/
 outputs/phylotrans_Pdam/
+outputs/DESeq-results/
+outputs/phylo/
+outputs/qiime2/
 bash/jobs/
 .Rhistory
 .RData
@@ -18,5 +21,3 @@ bash/jobs/
 Rmd/*.html
 core*
 hs*
-outputs/DESeq-results/
-outputs/phylo/
