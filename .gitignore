@@ -14,6 +14,7 @@ outputs/phylotrans_Pdam/
 outputs/DESeq-results/
 outputs/phylo/
 outputs/qiime2/
+outputs/phyloseq-results/*
 bash/jobs/
 .Rhistory
 .RData

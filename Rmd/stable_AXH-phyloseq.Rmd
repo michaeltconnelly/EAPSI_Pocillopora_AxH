@@ -4,53 +4,39 @@ output: html
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI-bacteria/all_wd/")
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH")
 ```
 ## Setup packages and working directories
-```{r, message=FALSE}
-library(tidyverse)
-library(ggplot2)
-library(phyloseq)
-library(vegan)
-library(ape)
-library(DESeq2)
-library(edgeR)
-library(microbiome)
-library(RColorBrewer)
-library(ggpubr)
-library(grid)
-library(plyr)
-library(data.table)
-library(DT)
-library(ranacapa)
+```{r packages, include=FALSE}
+packages <- c("tidyverse", "phyloseq", "vegan", "ape", "microbiome", "DESeq2", "edgeR", "pheatmap", "ggpubr", "ggrepel","RColorBrewer", "grid", "plyr", "data.table", "DT", "ranacapa")
+lapply(packages, library, character.only = TRUE)
 ```
 
 Set theme, colors and shapes for ggplot2 plotting
 ```{r, warning=FALSE, message=FALSE}
 theme_set(theme_bw())
-#Treatment color and fill scheme
-condcolors <- c("#0000FF", "#00CCCC", "#FF6600", "#FFCC33", "#CC0033", "#FF66FF")
-condcolors_anti <- c("#00CCCC", "#0000FF")
-condcolors_heat <- c("#0000FF", "#FF6600")
-condcolors_anti.heat <- c("#FFCC33", "#0000FF")
-condcolors_antixheat <- c("#0000FF", "#FF6600", "#00CCCC", "#FFCC33")
+condcolors_AxH <- c("blue", "cyan", "darkorange", "gold")
+condcolors_anti <- c(condcolors_AxH[1:2])
+condcolors_heat <- c(condcolors_AxH[1], condcolors_AxH[3])
+condcolors_anti.heat <- c(condcolors_AxH[1], condcolors_AxH[4])
 ###
-condfillcolors_antixheat <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
+condfillcolors_AxH <- c("#99CCFF", "#99FFFF", "#FFCC99", "#FFFF66")
+colshapes <- c(16, 17, 15, 18)
+colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
 ###
-#Colony shape, color and fill scheme
-colshapes <- c(18, 9, 16, 10, 15, 12, 17, 2)
-colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#99CCFF", "#FFCCFF", "#FF99FF", "#CCCCFF", "#CC99FF")
+condcolors_null <- c(rep("black", 4))
+colshapes_null <- c(rep(20, 8))
 ```
-```{r}
+```{r taxa colors, include=FALSE}
 ### Bacteria taxa
 ## Phyla
-phyla_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/phyla_colors.csv", col_names = c("phylum", "color"))
+phyla_colors <- read_csv("./Rmd/taxa_colors/phyla_colors.csv", col_names = c("phylum", "color"))
 ## Classes
-classes_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/classes_colors.csv", col_names = c("phylum", "class", "color"))
+classes_colors <- read_csv("./Rmd/taxa_colors/classes_colors.csv", col_names = c("phylum", "class", "color"))
 ## Orders
-orders_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/orders_colors.csv", col_names = c("phylum", "class", "order", "color"))
+orders_colors <- read_csv("./Rmd/taxa_colors/orders_colors.csv", col_names = c("phylum", "class", "order", "color"))
 ## Families
-families_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_colors/families_colors3.csv", col_names = c("phylum", "class", "order", "family", "color"))
+families_colors <- read_csv("./Rmd/taxa_colors/families_colors3.csv", col_names = c("phylum", "class", "order", "family", "color"))
 ## Genera
 #genera_colors <- 
 ## Specices
@@ -60,30 +46,30 @@ families_colors <- read_csv("~/computing/scripts/EAPSI_AntiXHeat-master/taxa_col
 ## Make phyloseq object
 Read in unrareified 99% OTU (ASV) table
 ```{r}
-ASV <- read.table("./export_silva/all_silva_feature-table.tsv", row.names = 1, header = TRUE)
+ASV <- read.table("./outputs/qiime2/export_silva/all_silva_feature-table.tsv", row.names = 1, header = TRUE)
 ASV <- t(ASV)
 ```
 Read in rareified 99% OTU (ASV) table
 ```{r}
-ASV2600 <- read.table("./export_silva/all_silva_rarefied_feature-table.tsv", row.names = 1, header = TRUE)
+ASV2600 <- read.table("./outputs/qiime2/export_silva/all_silva_rarefied_feature-table.tsv", row.names = 1, header = TRUE)
 ASV2600 <- t(ASV2600)
 ```
 Read in taxononomic classification information
 ```{r}
-taxonomy <- as.matrix(read.table("./export_silva/taxonomy4.txt", sep = "\t", row.names = 1, header = FALSE, fill = TRUE))
+taxonomy <- as.matrix(read.table("./outputs/qiime2/export_silva/taxonomy4.txt", sep = "\t", row.names = 1, header = FALSE, fill = TRUE))
 colnames(taxonomy) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 taxonomy[taxonomy==""] <- NA
 taxdf <- as.data.frame(taxonomy)
 ```
 Read in phylogenetic tree, sample metadata and set factor orders
 ```{r}
-tree <- read_tree("./export_silva/tree.nwk")
-map <- read.table("./metadata/metadata_all.tsv", sep ="\t", row.names = 1, header = FALSE)
+tree <- read_tree("./outputs/qiime2/export_silva/tree.nwk")
+map <- read.table("./data/qiime2_metadata.tsv", sep ="\t", row.names = 1, header = FALSE)
 colnames(map) <- c ("Reef",	"Colony",	"Environment",	"Treatment")
 map$SampleID <- rownames(map)
-map$Reef <- factor(map$Reef, levels = c("Houwan", "Wanglitung", "Outlet", "Houbihu", "controls"), ordered = TRUE)
-map$Colony <- factor(map$Colony, levels = c("HW1", "HW2", "WT1", "WT2", "OT1", "OT2", "HB1", "HB2", "controls"), ordered = TRUE)
-map$Treatment <- factor(map$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "Antibiotics.Heat.LPS", "LPS", "positive", "negative"), ordered = TRUE)
+map$Reef <- factor(map$Reef, levels = c("Houwan", "Wanglitung", "controls"), ordered = TRUE)
+map$Colony <- factor(map$Colony, levels = c("HW1", "HW2", "WT1", "WT2", "controls"), ordered = TRUE)
+map$Treatment <- factor(map$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
 ```
 Create phyloseq objects
 ```{r}
@@ -96,7 +82,7 @@ summarize_phyloseq(ps)
 ```
 Read in read depth information
 ```{r}
-readdepth <- read_csv("./QC/per-sample-fastq-counts.csv")
+readdepth <- read_csv("./outputs/qiime2/QC/per-sample-fastq-counts.csv")
 colnames(readdepth) <- c("SampleID", "Count")
 readdepth <- merge.data.frame(map, readdepth, by = "SampleID")
 ```
@@ -155,7 +141,7 @@ ps.stable.control.clr <- microbiome::transform(ps.stable.control, "clr")
 
 ### Read depth QC plot
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/readdepth_AXH.pdf", height = 5, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/readdepth_AXH.pdf", height = 5, width = 8.5)
 readdepthAXH <- dplyr::filter(readdepth, Treatment == "control" | Treatment == "Heat" | Treatment == "Antibiotics" | Treatment == "Antibiotics.Heat" | Treatment == "positive" | Treatment == "negative") %>% dplyr::filter(Reef == "Houwan" | Reef == "Wanglitung" | Reef == "controls")
 ###
 readdepthAXH$SampleID <- gsub("\\.6", "_control_", readdepthAXH$SampleID)
@@ -163,7 +149,7 @@ readdepthAXH$SampleID <- gsub("\\.5", "_anti_", readdepthAXH$SampleID)
 readdepthAXH$SampleID <- gsub("\\.4", "_heat_", readdepthAXH$SampleID)
 readdepthAXH$SampleID <- gsub("\\.1", "_anti+heat_", readdepthAXH$SampleID)
 ###
-readdepthAXH$Treatment <- factor(readdepthAXH$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
+readdepthAXH$Treatment <- factor(readdepthAXH$Treatment, levels = c("control", "Antibiotics", "Heat", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
 readdepthAXH <- dplyr::arrange(readdepthAXH, Treatment, Colony)
 readdepthAXH$SampleID <- factor(readdepthAXH$SampleID, levels = readdepthAXH$SampleID, ordered = TRUE)
 ###
@@ -171,8 +157,8 @@ ggdepth <- ggplot(readdepthAXH, aes(SampleID, Count))
 ggdepth +
   geom_bar(stat = "identity", aes(color = Treatment, fill = Treatment)) +
   #scale_y_continuous(trans = 'log10') +
-  scale_color_manual(values = c(condcolors_antixheat, "black", "black")) +
-  scale_fill_manual(values = c(condfillcolors_antixheat, "dark gray", "light gray")) +
+  scale_color_manual(values = c(condcolors_AxH, "black", "black")) +
+  scale_fill_manual(values = c(condfillcolors_AxH, "dark gray", "light gray")) +
   ylab("16S Read Count") +
   theme(axis.text.x = element_text(angle = 90)) +
   ggtitle("Total number of 16S reads per sample")
@@ -192,11 +178,11 @@ Prune phyloseq object to include samples and sequencing controls
 
 ### Rarefaction curve
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/rarefaction_AXH.pdf", height = 4, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/rarefaction_AXH.pdf", height = 4, width = 8.5)
 grare <- ggrare(ps.stable.AXH, step = 10, color = "Treatment", label = "Colony", plot = FALSE, se = TRUE)
 grare + 
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condfillcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condfillcolors_AxH) +
   #facet_wrap(~Treatment) +
   ggtitle("Rarefaction curve of 16S amplicon sequence variants")
 ```
@@ -222,7 +208,7 @@ ps.stable.AXH_phylum$Sample<- gsub("\\.1", ".anti+heat.", ps.stable.AXH_phylum$S
 ps.stable.AXH_phylum$Sample <- factor(ps.stable.AXH_phylum$Sample, levels = c("Hw1.control.a", "Hw1.control.b", "Hw1.control.c", "Hw2.control.a", "Hw2.control.b", "Hw2.control.c", "Wt1.control.a", "Wt1.control.b", "Wt1.control.c", "Wt2.control.a", "Wt2.control.b", "Wt2.control.c", "Hw1.heat.a", "Hw1.heat.b", "Hw1.heat.c", "Hw2.heat.a", "Hw2.heat.b", "Hw2.heat.c", "Wt1.heat.a", "Wt1.heat.b", "Wt1.heat.c", "Wt2.heat.a", "Wt2.heat.b", "Hw1.anti.a", "Hw1.anti.b", "Hw1.anti.c", "Hw2.anti.a", "Hw2.anti.b", "Hw2.anti.c", "Wt1.anti.a", "Wt1.anti.b", "Wt1.anti.c", "Wt2.anti.a", "Wt2.anti.b", "Wt2.anti.c", "Hw1.anti+heat.a", "Hw1.anti+heat.b", "Hw1.anti+heat.c", "Hw2.anti+heat.a", "Hw2.anti+heat.b", "Hw2.anti+heat.c", "Wt1.anti+heat.a", "Wt1.anti+heat.b", "Wt1.anti+heat.c", "Wt2.anti+heat.a", "Wt2.anti+heat.b", "Wt2.anti+heat.c"), ordered = TRUE)
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/barplot_phylum_AXH.pdf", height = 8, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/barplot_phylum_AXH.pdf", height = 8, width = 8.5)
 ### all samples
 p_phylum1 <- ggplot(data = ps.stable.AXH_phylum, aes(x = Sample, y = Abundance, fill = Phylum))
 p_phylum1 <- p_phylum1 +
@@ -315,7 +301,7 @@ ps.stable.AXH_class$Sample<- gsub("\\.1", ".anti+heat.", ps.stable.AXH_class$Sam
 ps.stable.AXH_class$Sample <- factor(ps.stable.AXH_class$Sample, levels = c("Hw1.control.a", "Hw1.control.b", "Hw1.control.c", "Hw2.control.a", "Hw2.control.b", "Hw2.control.c", "Wt1.control.a", "Wt1.control.b", "Wt1.control.c", "Wt2.control.a", "Wt2.control.b", "Wt2.control.c", "Hw1.heat.a", "Hw1.heat.b", "Hw1.heat.c", "Hw2.heat.a", "Hw2.heat.b", "Hw2.heat.c", "Wt1.heat.a", "Wt1.heat.b", "Wt1.heat.c", "Wt2.heat.a", "Wt2.heat.b", "Hw1.anti.a", "Hw1.anti.b", "Hw1.anti.c", "Hw2.anti.a", "Hw2.anti.b", "Hw2.anti.c", "Wt1.anti.a", "Wt1.anti.b", "Wt1.anti.c", "Wt2.anti.a", "Wt2.anti.b", "Wt2.anti.c", "Hw1.anti+heat.a", "Hw1.anti+heat.b", "Hw1.anti+heat.c", "Hw2.anti+heat.a", "Hw2.anti+heat.b", "Hw2.anti+heat.c", "Wt1.anti+heat.a", "Wt1.anti+heat.b", "Wt1.anti+heat.c", "Wt2.anti+heat.a", "Wt2.anti+heat.b", "Wt2.anti+heat.c"), ordered = TRUE)
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/barplot_class_AXH.pdf", height = 8, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/barplot_class_AXH.pdf", height = 8, width = 8.5)
 ### all samples
 p_class1 <- ggplot(data = ps.stable.AXH_class, aes(x = Sample, y = Abundance, fill = Class))
 p_class1 <- p_class1 +
@@ -418,7 +404,7 @@ ps.stable.AXH_order$Sample <- factor(ps.stable.AXH_order$Sample, levels = c("Hw1
 ## Corrections needed
 
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/barplot_order_AXH.pdf", height = 8.5, width = 11)
+pdf(file = "./outputs/phyloseq-results/figures/barplot_order_AXH.pdf", height = 8.5, width = 11)
 length(unique(ps.stable.AXH_order$Order))
 
 ### all samples
@@ -497,7 +483,7 @@ ps.stable.AXH_family$Sample<- gsub("\\.1", ".anti+heat.", ps.stable.AXH_family$S
 ps.stable.AXH_family$Sample <- factor(ps.stable.AXH_family$Sample, levels = c("Hw1.control.a", "Hw1.control.b", "Hw1.control.c", "Hw2.control.a", "Hw2.control.b", "Hw2.control.c", "Wt1.control.a", "Wt1.control.b", "Wt1.control.c", "Wt2.control.a", "Wt2.control.b", "Wt2.control.c", "Hw1.heat.a", "Hw1.heat.b", "Hw1.heat.c", "Hw2.heat.a", "Hw2.heat.b", "Hw2.heat.c", "Wt1.heat.a", "Wt1.heat.b", "Wt1.heat.c", "Wt2.heat.a", "Wt2.heat.b", "Hw1.anti.a", "Hw1.anti.b", "Hw1.anti.c", "Hw2.anti.a", "Hw2.anti.b", "Hw2.anti.c", "Wt1.anti.a", "Wt1.anti.b", "Wt1.anti.c", "Wt2.anti.a", "Wt2.anti.b", "Wt2.anti.c", "Hw1.anti+heat.a", "Hw1.anti+heat.b", "Hw1.anti+heat.c", "Hw2.anti+heat.a", "Hw2.anti+heat.b", "Hw2.anti+heat.c", "Wt1.anti+heat.a", "Wt1.anti+heat.b", "Wt1.anti+heat.c", "Wt2.anti+heat.a", "Wt2.anti+heat.b", "Wt2.anti+heat.c"), ordered = TRUE)
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/barplot_family_AXH.pdf", height = 8.5, width = 11)
+pdf(file = "./outputs/phyloseq-results/figures/barplot_family_AXH.pdf", height = 8.5, width = 11)
 
 length(unique(ps.stable.AXH_family$Family))
 
@@ -570,7 +556,7 @@ getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
 ```
 ```{r}
 ### all samples
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/barplot_genus_AXH.pdf", height = 8.5, width = 11)
+pdf(file = "./outputs/phyloseq-results/figures/barplot_genus_AXH.pdf", height = 8.5, width = 11)
 p_genus <- ggplot(data = ps.stable.AXH_genus, aes(x = Sample, y = Abundance, fill = Genus))
 p_genus <- p_genus +
   geom_bar(aes(), stat = "identity", position = "fill") +
@@ -638,7 +624,7 @@ p_species <- p_species +
 p_species
 ```
 
-
+¬
 ```{r}
 taxdf <- as.data.frame(taxonomy)
 length(unique(taxdf$Family))
@@ -660,15 +646,15 @@ plot_richness(ps.stable.AXH, x="Treatment", color="Treatment", measures = alpham
   #facet_grid(~Colony) +
   geom_boxplot() +
   geom_point(size = 3, aes(shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes)
 ```
 ```{r}
-#pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/richness_ctrl.LPS.pdf", height = 2.95, width = 4.5)
+#pdf(file = "./outputs/phyloseq-results/figures/richness_ctrl.LPS.pdf", height = 2.95, width = 4.5)
 plot_richness(ps.stable.AXH, x="Treatment", measures=c("Chao1", "Simpson", "Shannon")) +
   geom_boxplot(aes(fill = Treatment)) +
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condfillcolors_antixheat) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   ylim(c(0,100)) +
@@ -681,11 +667,11 @@ plot_richness(ps.stable.AXH, x="Treatment", measures=c("Chao1", "Simpson", "Shan
         strip.text = element_blank())
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/richness_chao1_AXH.pdf", height = 3, width = 2.8)
+pdf(file = "./outputs/phyloseq-results/figures/richness_chao1_AXH.pdf", height = 3, width = 2.8)
 plot_richness(ps.stable.AXH, x="Treatment", measures=c("Chao1")) +
   geom_boxplot(aes(fill = Treatment)) +
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condfillcolors_antixheat) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
@@ -699,11 +685,11 @@ plot_richness(ps.stable.AXH, x="Treatment", measures=c("Chao1")) +
         strip.text = element_blank())
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/richness_shannon_AXH.pdf", height = 3, width = 2.8)
+pdf(file = "./outputs/phyloseq-results/figures/richness_shannon_AXH.pdf", height = 3, width = 2.8)
 plot_richness(ps.stable.AXH, x="Treatment", measures=c("Shannon")) +
   geom_boxplot(aes(fill = Treatment)) +
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condfillcolors_antixheat) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
@@ -717,11 +703,11 @@ plot_richness(ps.stable.AXH, x="Treatment", measures=c("Shannon")) +
         strip.text = element_blank())
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/richness_simpson_AXH.pdf", height = 3, width = 2.8)
+pdf(file = "./outputs/phyloseq-results/figures/richness_simpson_AXH.pdf", height = 3, width = 2.8)
 plot_richness(ps.stable.AXH, x="Treatment", measures=c("Simpson")) +
   geom_boxplot(aes(fill = Treatment)) +
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condfillcolors_antixheat) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
@@ -754,7 +740,7 @@ alpha_geno <- function(ps = ps.stable.AXH, alphameasure) {
 alphabox <- plot_richness(ps, x = "Colony", color = "Treatment", measures = alphameasure) +
   geom_boxplot(aes(fill = Colony)) +
   geom_point(size = 3, aes(shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = colcolors) +
   scale_shape_manual(values = colshapes)
 print(alphabox)
@@ -817,8 +803,8 @@ ps_euc <- ordinate(ps.stable.AXH.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.stable.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   stat_ellipse(aes(fill = Treatment), geom = "polygon", type = "norm", alpha = 0.1) + 
   geom_point(size = 3) +
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   ggtitle("PCA of control and LPS samples beta diversity")
 print(p1)
@@ -852,8 +838,8 @@ names(pdataframe)[1] = "method"
 
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
   geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_antixheat) + 
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
   facet_wrap(~method, scales="free")
 p
@@ -862,7 +848,7 @@ p
 plist[[6]] + 
   geom_point(size = 3, aes(color = Treatment, shape = Colony)) + 
   geom_polygon(aes(fill = Colony), alpha = 0.5) +
-  scale_color_manual(values = condcolors_antixheat) + 
+  scale_color_manual(values = condcolors_AxH) + 
   scale_fill_manual(values = colcolors) +
   scale_shape_manual(values = colshapes) +
   coord_fixed(1) 
@@ -891,12 +877,12 @@ ps.stable.control.ord.PCoA.brayP <- ordinate(ps.stable.control.rel, method="PCoA
 #### Specific ordination plots for AXH paper/MBE702 
 PCoAs
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures_MBE702/PCoAs.ellipses.brayP.AXH.pdf", height = 5.25, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures_MBE702/PCoAs.ellipses.brayP.AXH.pdf", height = 5.25, width = 8.5)
 p1 <- plot_ordination(ps.stable.AXH.rel, ps.stable.AXH.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
   stat_ellipse(aes(color = Treatment, fill = Treatment), geom = "polygon", type = "norm", alpha = 0.0) + 
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat, name = "Treatment") +
-  scale_fill_manual(values = condcolors_antixheat, name = "Treatment") +
+  scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+  scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
   scale_shape_manual(values = colshapes, name = "Colony") + 
   #coord_fixed(17.8/23.5) +
   ggtitle("") +
@@ -908,11 +894,11 @@ p1 <- plot_ordination(ps.stable.AXH.rel, ps.stable.AXH.ord.PCoA.brayP, type = "s
 print(p1)
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/PCoAs.ellipses.brayP.AXH_colony.pdf", height = 5.5, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/PCoAs.ellipses.brayP.AXH_colony.pdf", height = 5.5, width = 8.5)
 p1 <- plot_ordination(ps.stable.AXH, ps.stable.AXH.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
   stat_ellipse(aes(fill = Colony), geom = "polygon", type = "norm", alpha = 0.6) + 
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat, name="Treatment") +
+  scale_color_manual(values = condcolors_AxH, name="Treatment") +
   scale_fill_manual(values = colcolors, name = "Colony") +
   scale_shape_manual(values = colshapes, name="Colony") + 
   coord_fixed(1) +
@@ -928,7 +914,7 @@ print(p1)
 p1 <- plot_ordination(ps.stable.control.rel, ps.stable.control.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
   geom_polygon(aes(fill = Colony), alpha = 0.9) +
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat[1], name = "Treatment") +
+  scale_color_manual(values = condcolors_AxH[1], name = "Treatment") +
   scale_fill_manual(values = colcolors, name = "Colony") +
   scale_shape_manual(values = colshapes, name = "Colony") + 
   #coord_fixed(17.8/23.5) +
@@ -944,12 +930,12 @@ print(p1)
 
 NMDS
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/NMDS.ellipses.brayP.AXH_trmt.pdf", height = 5.5, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/NMDS.ellipses.brayP.AXH_trmt.pdf", height = 5.5, width = 8.5)
 p1 <- plot_ordination(ps.stable.AXH.rel, ps.stable.AXH.ord.NMDS.brayP, type = "sample", axes = c(1,2)) +
   stat_ellipse(aes(fill = Treatment), geom = "polygon", type = "norm", alpha = 0.15) + 
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat, name = "Treatment") +
-  scale_fill_manual(values = condcolors_antixheat, name = "Treatment") +
+  scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+  scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
   scale_shape_manual(values = colshapes, name = "Colony") + 
   coord_fixed(1) +
   ggtitle("Bacteria Community NMDS") +
@@ -961,11 +947,11 @@ p1 <- plot_ordination(ps.stable.AXH.rel, ps.stable.AXH.ord.NMDS.brayP, type = "s
 print(p1)
 ```
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/phyloseq_results/figures/NMDS.ellipses.brayP.AXH_colony.pdf", height = 5.5, width = 8.5)
+pdf(file = "./outputs/phyloseq-results/figures/NMDS.ellipses.brayP.AXH_colony.pdf", height = 5.5, width = 8.5)
 p1 <- plot_ordination(ps.stable.AXH, ps.stable.AXH.ord.NMDS.brayP, type = "sample", axes = c(1,2)) +
   stat_ellipse(aes(fill = Colony), geom = "polygon", type = "norm", alpha = 0.6) + 
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_antixheat, name="Treatment") +
+  scale_color_manual(values = condcolors_AxH, name="Treatment") +
   scale_fill_manual(values = colcolors, name = "Colony") +
   scale_shape_manual(values = colshapes, name="Colony") + 
   coord_fixed(1) +
@@ -1123,8 +1109,8 @@ ps.stable.AXH.HW1.rel <- transform_sample_counts(ps.stable.AXH.HW1, function(x) 
 ps_euc <- ordinate(ps.stable.AXH.HW1.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.stable.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   geom_point(size = 3) +
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   ggtitle("PCA of control and LPS samples beta diversity")
 print(p1)
@@ -1149,8 +1135,8 @@ names(pdataframe)[1] = "method"
 
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
   geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_antixheat) + 
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
   facet_wrap(~method, scales="free")
 p
@@ -1196,8 +1182,8 @@ ps.stable.AXH.HW2.rel <- transform_sample_counts(ps.stable.AXH.HW2, function(x) 
 ps_euc <- ordinate(ps.stable.AXH.HW2.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.stable.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   geom_point(size = 3) +
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   ggtitle("PCA of control and LPS samples beta diversity")
 print(p1)
@@ -1222,8 +1208,8 @@ names(pdataframe)[1] = "method"
 
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
   geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_antixheat) + 
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
   facet_wrap(~method, scales="free")
 p
@@ -1269,8 +1255,8 @@ ps.stable.AXH.WT1.rel <- transform_sample_counts(ps.stable.AXH.WT1, function(x) 
 ps_euc <- ordinate(ps.stable.AXH.WT1.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.stable.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   geom_point(size = 3) +
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   ggtitle("PCA of control and LPS samples beta diversity")
 print(p1)
@@ -1295,8 +1281,8 @@ names(pdataframe)[1] = "method"
 
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
   geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_antixheat) + 
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
   facet_wrap(~method, scales="free")
 p
@@ -1342,8 +1328,8 @@ ps.stable.AXH.WT2.rel <- transform_sample_counts(ps.stable.AXH.WT2, function(x) 
 ps_euc <- ordinate(ps.stable.AXH.WT2.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.stable.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   geom_point(size = 3) +
-  scale_color_manual(values = condcolors_antixheat) +
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   ggtitle("PCA of control and LPS samples beta diversity")
 print(p1)
@@ -1368,8 +1354,8 @@ names(pdataframe)[1] = "method"
 
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
   geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_antixheat) + 
-  scale_fill_manual(values = condcolors_antixheat) +
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
   facet_wrap(~method, scales="free")
 p
