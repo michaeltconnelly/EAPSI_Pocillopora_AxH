@@ -8,5 +8,7 @@ Unix bash scripts for analysis of coral RNAseq data on the University of Miami's
 
 Scripts for analysis of bacteria 16S sequences using QIIME2 on a local machine are contained within bash/qiime2.
 
+Change absolute paths to sequence read files in ./data/qiime2_manifest.tsv file
+
 `source activate qiime2-2019.10
 bash ./bash/qiime2/all_start_qiime2.sh`
