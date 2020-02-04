@@ -173,12 +173,12 @@ write.csv(hubs, file = "./outputs/WGCNAmodules_Pdam/hubs.csv")
 ```
 ## Search module gene notes from ID lists
 ```{bash}
-awk -F "," '{print $2}' ./WGCNAmodules_Pdam/hubgenes/hubs.csv > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt
-sed -i -e 's/"//g' ./WGCNAmodules_Pdam/hubgenes/*.txt
-grep -f ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.txt ~/computing/sequences/genomes/coral/pocillopora/pdam_genome_IDs.notes.gff > ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt
-sed -i -e 's/ID=//g' ./WGCNAmodules_Pdam/hubgenes/*notes.txt
-awk -F " Note=" '{print $1"\t"$2}' ./WGCNAmodules_Pdam/hubgenes/hubs_IDs.notes.txt > ./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt
-rm ./WGCNAmodules_Pdam/hubgenes/*txt-e
+awk -F "," '{print $2}' ./outputs/WGCNAmodules_Pdam/hubs.csv > ./outputs/WGCNAmodules_Pdam/hubs_IDs.txt
+sed -i -e 's/"//g' ./outputs/WGCNAmodules_Pdam/hubs*.txt
+grep -f ./outputs/WGCNAmodules_Pdam/hubs_IDs.txt ./data/pdam_genome_IDInfo.gff > ./outputs/WGCNAmodules_Pdam/hubs_IDs.notes.txt
+sed -i -e 's/ID=//g' ./outputs/WGCNAmodules_Pdam/*notes.txt
+awk -F " Note=" '{print $1"\t"$2}' ./outputs/WGCNAmodules_Pdam/hubs_IDs.notes.txt > ./outputs/WGCNAmodules_Pdam/hubs_IDsnotes.txt
+rm ./outputs/WGCNAmodules_Pdam/*txt-e
 ```
 ```{r}
 hubs_IDsnotes <- read.delim("./WGCNAmodules_Pdam/hubgenes/hubs_IDsnotes.txt", header=FALSE)
@@ -307,7 +307,7 @@ main = paste(which.module, "Module-trait relationships"))
 }
 ```
 
-## Quantify module-taxa associations
+## Quantify module-phyla associations
 ```{r}
 glom_phylum <- tax_glom(ps.stable.AXH.rel, taxrank = "Phylum")
 ps.stable.AXH_phylum <- psmelt(glom_phylum)
@@ -325,13 +325,13 @@ rownames(datPhyla) <- gsub('.', '-', datPhyla$Sample, fixed = TRUE)
 datPhyla <- datPhyla[-1]
 row.names(datPhyla) <- rownames(datTraits)
 ```
-## Correlate module eigengene-taxa associations
+## Correlate module eigengene-phyla associations
 ```{r}
 modulePhylaCor <- cor(MEs1, datPhyla, use = "p")
 modulePhylaPvalue <- corPvalueStudent(modulePhylaCor, nSamples)
 modulePhylaCors <- as.data.frame(modulePhylaCor, modulePhylaPvalue)
 ```
-## Create ME-trait heatmap
+## Create ME-phyla heatmap
 ```{r}
 pdf("./outputs/WGCNAmodules_Pdam/ModuleCorrelations_Phyla.pdf", width = 8.5, height = 11)
 # Will display correlations and their p-values
@@ -354,6 +354,57 @@ plotLegend = FALSE,
 cex.text = 0.5,
 zlim = c(-1,1),
 main = paste("Module-taxa correlations"))
+```
+
+## Quantify module-class associations
+```{r}
+glom_class <- tax_glom(ps.stable.AXH.rel, taxrank = "Class")
+ps.stable.AXH_class <- psmelt(glom_class)
+#ps.stable.AXH_class <- filter(ps.stable.AXH_class, Abundance > 0)
+ps.stable.AXH_class$Class <- as.character(ps.stable.AXH_class$Class)
+ps.stable.AXH_class$Kingdom <- gsub("D_0__", "", ps.stable.AXH_class$Kingdom)
+ps.stable.AXH_class$Phylum <- gsub("D_1__", "", ps.stable.AXH_class$Phylum)
+ps.stable.AXH_class$Class <- gsub("D_2__", "", ps.stable.AXH_class$Class)
+#ps.stable.AXH_class$Phylum[ps.stable.AXH_class$Abundance < 0.01] <- "<1% abundance"
+#ps.stable.AXH_class$Class[ps.stable.AXH_class$Abundance < 0.01] <- "<1% abundance"
+### create properly formatted table
+datClass <- ps.stable.AXH_class %>% select(Class, Sample, Abundance) %>%
+  tidyr::pivot_wider(names_from = Class, values_from = Abundance) %>% 
+  arrange(Sample) %>%
+  filter(Sample!='Hw2.6a')
+rownames(datClass) <- gsub('.', '-', datClass$Sample, fixed = TRUE)
+datClass <- datClass[-1]
+row.names(datClass) <- rownames(datTraits)
+```
+## Correlate module eigengene-class associations
+```{r}
+moduleClassCor <- cor(MEs1, datClass, use = "p")
+moduleClassPvalue <- corPvalueStudent(moduleClassCor, nSamples)
+moduleClassCors <- as.data.frame(moduleClassCor, moduleClassPvalue)
+```
+## Create ME-phyla heatmap
+```{r}
+pdf("./outputs/WGCNAmodules_Pdam/ModuleCorrelations_Class.pdf", width = 8.5, height = 11)
+# Will display correlations and their p-values
+textMatrix = paste(signif(moduleClassCor, 2), "\n(",
+signif(moduleClassPvalue, 2), ")", sep = "");
+dim(textMatrix) = dim(moduleClassCor)
+par(mar = c(6, 8.5, 3, 3));
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = moduleClassCor,
+xLabels = names(datClass),
+yLabels = names(MEs1),
+yLabelsPosition = "left",
+ySymbols = names(MEs1),
+yColorWidth = 0.005,
+colorLabels = FALSE,
+colors = blueWhiteRed(50),
+textMatrix = textMatrix,
+setStdMargins = FALSE,
+plotLegend = FALSE,
+cex.text = 0.5,
+zlim = c(-1,1),
+main = paste("Module-class correlations"))
 ```
 
 ## Barplots of interesting module eigengene expression
@@ -405,4 +456,258 @@ ME <- MEs1[, paste("ME", which.module, sep="")]
 par(mfrow = c(1,1), mar = c(1,2,4,1))
 plotMat(t(scale(datExpr[,moduleColors==which.module ]) ), nrgcols = 30, rlabels = T, clabels = rownames(WTsamples), rcols = which.module, title = which.module)
 }
+```
+# kME statistics *** MUST BE EDITED***
+## Output gene trait significance and module interconnectivity scatterplots
+```{r}
+ datKME <- signedKME(datExpr, MEs)
+GS <- as.numeric(cor(datExpr, datTraits$lps, use = "p"))
+  GScolor <- numbers2colors(GS, signed = T)
+  numberOfColumn <- substring(names(datKME), 2)
+```
+```{r}
+pdf(file = "~/computing/scripts/EAPSI_LPS-master/WGCNAmodules_Pdam_ctrl-LPS/figures/ModuleKmEScatters_LPS_neg.pdf", width = 4.5, height = 4.5)
+ for (module in negModules) {
+  which.module <- (gsub("ME", "", module))
+  column <- match(module, numberOfColumn)     
+  restModule <- moduleNumbers == which.module
+  verboseScatterplot(datKME[restModule, column], GS[restModule], 
+                     ylim = c(-1,1),
+                     xlim = c(-0.5,1),
+                     abline = TRUE,
+                     col = "black",
+                     abline.color = "blue",
+                     xlab = paste("Intra-modular connectivity (kME)", sep = ""), 
+                     ylab = paste("LPS Gene Significance"),
+                     main = NULL) 
+  }
+```
+
+```{r}
+ for (module in posModules[5]) {
+  which.module <- (gsub("ME", "", module))
+  column <- match(module, colorOfColumn)     
+  restModule <- moduleColors == which.module
+  
+datKME.GS <- data.frame(cbind(datKME[restModule, column], GS[restModule]))
+colnames(datKME.GS) <- c("kME", "GS.LPS")
+datKME.GS$GeneID <- Genes[restModule]
+hikME <- datKME.GS %>% arrange(desc(GS.LPS)) #%>% filter(kME > 0.68 & GS.LPS > 0.5)
+genematch <- match(hikME$GeneID, genefeatures$ID)
+hikME$GeneInfo <- genefeatures$GeneInfo[genematch]
+
+g <- ggplot(hikME, aes(GS.LPS, kME)) + geom_point(color = which.module) + 
+  xlab(paste("Module membership ", which.module, "module")) + 
+  ylab(paste("Gene Significance", "LPS")) +
+  ggtitle(paste("kME.", which.module, "vs. GS")) + 
+  xlim(-0.5, 1) +
+  ylim(-0,1.5) +
+  theme_bw() +
+  geom_text_repel(data = hikME[1:5, ], aes(label = hikME[1:5, ]$GeneInfo), color = "black", size = 2.5, box.padding = unit(0.35, "lines"))
+print (g)
+}
+```
+```{r}
+write.csv(hikME[1:21, 2:4], file = "~/computing/scripts/EAPSI_LPS-master/WGCNAmodules_Pdam_ctrl-LPS/modules_kME-GS_tables/black_top20.csv")
+```
+
+
+## Module eigengene and gene-scaled profile plots
+```{r}
+#gather what we know about the genes
+geneInfo<-data.frame(row.names = colnames(datExpr), module = moduleNumbers, membership = NA)
+for(gene in rownames(geneInfo)){
+	currentmod <- geneInfo[gene, 'module']
+	geneInfo[gene, 'membership'] <- geneModuleMembership[gene, paste('ME', currentmod, sep='')]
+}
+geneInfo <- geneInfo[order(geneInfo$module, geneInfo$membership, decreasing=T), ]
+genematch <- match(rownames(geneInfo), genefeatures$ID)
+geneInfo$Info <- genefeatures$GeneInfo[genematch]
+```
+```{r}
+#plot eigengenes along with highly correlated individual genes
+pdf(file = "~/computing/scripts/EAPSI_LPS-master/WGCNAmodules_Pdam_ctrl-LPS/figures/ModuleProfiles_LPS_4.25_pos.pdf", width = 4.5, height = 3.5)
+
+#initialize plot with eigengene -- we scale the expression value to mean=0 sd=1 so we can compare profiles of genes with different absolute expression levels
+for (posmodule in posModules){
+MEagg <- aggregate(scale(MEs[,posmodule])~Treatment+Colony, FUN = mean, data = stable_samples) %>% arrange(Treatment)
+MEagg$TC <- paste(MEagg$Colony, MEagg$Treatment, sep=".")
+
+plot(MEagg$V1, ylim = c(-2,2), type = "l", lwd = 3, col = "black", ylab = "Scaled Expression", xlab = NULL, main = gsub("ME","M",posmodule))
+abline(h = 0, lty = 2, lwd = 0.1)
+#plot each individual gene with high membership on top of the eigengene
+for(gene in rownames(geneInfo)[geneInfo$module==(gsub("ME", "", posmodule)) & geneInfo$membership > 0.8]){
+	agg <- aggregate(scale(datExpr[,gene])~Treatment+Colony, FUN = mean, data = stable_samples) %>% arrange(Treatment)
+	lines(agg$V1, type = "l", lwd = 0.1, col="black")
+}
+#replot eigengenes on top of the individual gene expression profiles
+lines(MEagg$V1, type = "l", lwd=5,col="red")
+}
+```
+
+## Output interesting module VisANT edge file
+```{r}
+#need to save/generate TOM
+TOM <- TOMsimilarityFromExpr(datExpr, power = 8)
+#setwd("~/computing/scripts/EAPSI-Wanglitung/WGCNAmodules/visANT")
+
+# Select modules (only interested in one for now)
+visANTModules <- sigModules
+# Select module probes
+Genes <- colnames(datExpr)
+```
+
+## Import gene name annotation information
+```{r}
+genenames <- read.delim(file = "/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome_ID_Names.gff", header = F)
+colnames(genenames) <- c("ID", "GeneName")
+genenames <- genenames %>% filter(genenames$ID %in% genefeatures$ID)
+rownames(genenames) <- genenames$ID
+```
+
+```{r}
+for (visANTmod in visANTModules)
+{
+inModule <- (moduleNumbers == gsub("ME", "", visANTmod))
+# Select the genes within each module and extract gene info
+modGeneIDs <- Genes[inModule]
+# Select the highly connected genes 
+#conmodGeneIDs <- rownames(geneInfo)[geneInfo$module==(gsub("ME", "", visANTmod)) & geneInfo$membership > 0.8]
+modGeneNames <- genenames$GeneName[match(modGeneIDs, rownames(genenames))]
+# Select the corresponding Topological Overlap
+modTOM = TOM[inModule, inModule]
+dimnames(modTOM) = list(modGeneIDs, modGeneIDs)
+# Export the network into an edge list file VisANT can read
+vis = exportNetworkToVisANT(modTOM,
+file = paste("~/computing/scripts/EAPSI_LPS-master", "VisANTInput-", gsub("E", "", visANTmod), ".txt", sep=""),
+weighted = TRUE,
+threshold = 0,
+probeToGene = data.frame(modGeneIDs, modGeneNames))
+}
+```
+```{r}
+# Restrict the network to the genes with connectivity (kME) greater than 0.8
+
+for (visANTmod in visANTModules)
+{
+inModule <- (moduleNumbers == gsub("ME", "", visANTmod))
+# Select the genes within each module and extract gene info
+modGeneIDs <- Genes[inModule]
+# Select the highly connected genes 
+conmodGeneIDs <- rownames(geneInfo)[geneInfo$module==(gsub("ME", "", visANTmod)) & geneInfo$membership > 0.8]
+modGeneNames <- genenames$GeneName[match(modGeneIDs, rownames(genenames))]
+conmodGeneNames <- genenames$GeneName[match(conmodGeneIDs, rownames(genenames))]
+# Select the corresponding Topological Overlap
+modTOM = TOM[inModule, inModule]
+dimnames(modTOM) = list(modGeneIDs, modGeneIDs)
+# Export the network into an edge list file VisANT can read
+vis = exportNetworkToVisANT(modTOM[conmodGeneIDs,conmodGeneIDs],
+file = paste("~/computing/scripts/EAPSI_LPS-master/WGCNAmodules_Pdam_ctrl-LPS/visANT/", "VisANTInput-", gsub("E", "", visANTmod), ".txt", sep=""),
+weighted = TRUE,
+threshold = 0,
+probeToGene = data.frame(conmodGeneIDs, conmodGeneNames))
+}
+```
+
+# topGO Enrichment Tests
+## Input required *P. damicornis* GO annotation data and construct Gene-to-GO object for custom annotation mapping
+```{r, warning=FALSE}
+geneID_GO <- readMappings(file = "./data/pdam_emapper_genesGO.txt")
+str(head(geneID_GO))
+```
+## Construct GO-to-Gene object for GO term searches of interesting genes
+```{r}
+GO_geneID <- inverseList(geneID_GO)
+str(head(GO_geneID))
+```
+## Generate gene universe and GO universe from Gene-to-GO and GO-to-Gene objects
+```{r}
+geneNames <- names(geneID_GO)
+str(head(geneNames))
+```
+```{r}
+GONames <- names(GO_geneID)
+str(head(GONames))
+```
+
+## Input lists of positively and negatively differentially expressed genes after DESeq2 analysis
+Anti_Control (Up/Down)
+LPS_Control (Up/Down)
+Heat_Control (Up/Down)
+Anti+Heat_Control (Up/Down)
+Anti+Heat+LPS_Control (Up/Down)
+## Construct topGOdata object using *P. damicornis* gene models, differentially expressed gene lists and gene ontology annotations
+## Perform Fisher's exact test to identify enriched gene ontology terms
+## Perform Kolmogorov-Smirnov test to identify enriched gene ontology terms
+## Analyse highly-significant MF GO terms and corresponding p-values, then produce a table of results
+Remember to use DESeq_geneID.sh to generate gene ID lists
+```{r}
+modulelists <- list.files(path = "./outputs/WGCNAmodules_Pdam/lists", pattern = "_ID.txt", full.names = TRUE)
+```
+```{r}
+topGOanalyzeWGCNA <- function(filename) {
+### Custom function for full topGO analysis and results table generation
+modgenes <- read.delim(filename, header = FALSE, stringsAsFactors = FALSE)
+modgenes <- as.data.frame(modgenes)
+geneList <- factor(as.integer(geneNames %in% modgenes$V1))
+names(geneList) <- geneNames
+Pdam_GOdata <- new("topGOdata",
+              description = DElist,
+              ontology = "BP",
+              allGenes = geneList,
+              nodeSize = 10,
+              annot = annFUN.gene2GO,
+              gene2GO = geneID_GO)
+resultFisher01 <- runTest(Pdam_GOdata, algorithm = "weight01", statistic = "fisher")
+resultFisher <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "fisher")
+resultKS <- runTest(Pdam_GOdata, algorithm = "classic", statistic = "ks")
+resultKSelim <- runTest(Pdam_GOdata, algorithm = "elim", statistic = "ks")
+allRes <- GenTable(Pdam_GOdata, 
+                   elimKS = resultKSelim,
+                   classicKS = resultKS,
+                   classicFisher = resultFisher,
+                   weight01Fisher = resultFisher01,
+                   orderBy = "weight01Fisher", 
+                   ranksOf = "weight01Fisher", 
+                   topNodes = 50)
+print(allRes)
+resultfile <- paste(filename, "_topGO.csv", sep = "")
+write.csv(allRes, file = resultfile)
+}
+```
+```{r}
+for (modulelist in modulelists)
+{
+  print(modulelist)
+  topGOanalyzeWGCNA(modulelist)
+}
+```
+```{bash}
+mv ./outputs/WGCNAmodules_Pdam/lists/*.csv ./outputs/WGCNAmodules_Pdam/topGO
+```
+
+```{bash}
+bash ./bash/awk_REVIGO.sh
+mv ./outputs/WGCNAmodules_Pdam/topGO/*.txt ./outputs/WGCNAmodules_Pdam/REVIGO
+sed -i -e 's/"//g' ./outputs/DESeq-results/REVIGO/*.txt
+rm  ./outputs/DESeq-results/REVIGO/*.txt-e
+```
+
+# GO_MWU Enrichment Test
+Generate gene ID and measure (kME) tables from WGNCA results
+```{r}
+#measure.frame <- function(res) {
+#  measure.table <- data.frame(row.names(res), ifelse(res$log2FoldChange > 0, 1*round(-log10(res$pvalue), 2), -1*round(-log10(res$pvalue), 2)))
+#  colnames(measure.table) <- c('gene', 'logP')
+#  measure.table <- measure.table %>% arrange(desc(logP))
+#  return(measure.table)
+#}
+#measure.heat <- measure.frame(res_heat)
+#measure.anti <- measure.frame(res_anti)
+#measure.anti.heat <- measure.frame(res_anti.heat)
+#write.table(measure.heat, file = "/Users/mikeconnelly/computing/programs/GO_MWU/heat_measure.csv", sep = ",", row.names = FALSE)
+#write_csv(measure.anti.heat, path = "/Users/mikeconnelly/computing/programs/GO_MWU/anti.heat_measure.csv", col_names = TRUE)
+#for (res in res_anti) {
+#  measure.frame(res)
+#}
 ```
