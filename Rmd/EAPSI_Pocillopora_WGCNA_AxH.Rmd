@@ -91,8 +91,8 @@ net <- blockwiseModules(datExpr,
                           maxBlockSize = 20000,
                           deepSplit = 2,
                           detectCutHeight = 0.99,
-                          minModuleSize = min(20, ncol(datExpr)/2 ),
-                          mergeCutHeight = 0.15,
+                          minModuleSize = min(50, ncol(datExpr)/2 ),
+                          mergeCutHeight = 0.2,
                           TOMType = "signed",
                           saveTOMs = FALSE,
                           saveTOMFileBase = "EAPSI_TOM",
@@ -197,7 +197,7 @@ plotDendroAndColors(dendro = net$dendrograms[[1]], colors = moduleColors[net$blo
 "Module Colors",
 dendroLabels = FALSE, hang = 0.03,
 addGuide = TRUE, guideHang = 0.15,
-abHeight = c(0.95))
+abHeight = c(0.99))
 ```
 ## Visualize eigengene network
 ```{r}
@@ -306,6 +306,21 @@ zlim = c(-1,1),
 main = paste(which.module, "Module-trait relationships"))
 }
 ```
+
+## Quantify module-taxa associations
+```{r}
+glom_phylum <- tax_glom(ps.stable.AXH.rel, taxrank = "Phylum")
+ps.stable.AXH_phylum <- psmelt(glom_phylum)
+#ps.stable.AXH_phylum <- filter(ps.stable.AXH_phylum, Abundance > 0)
+ps.stable.AXH_phylum$Phylum <- as.character(ps.stable.AXH_phylum$Phylum)
+ps.stable.AXH_phylum$Kingdom <- gsub("D_0__", "", ps.stable.AXH_phylum$Kingdom)
+ps.stable.AXH_phylum$Phylum <- gsub("D_1__", "", ps.stable.AXH_phylum$Phylum)
+ps.stable.AXH_phylum$Phylum[ps.stable.AXH_phylum$Abundance < 0.01] <- "<1% abundance"
+
+datTaxa <- ps.stable.AXH_phylum %>% select(OTU, Sample, Abundance, Phylum)
+datTaxa1 <- datTaxa %>% tidyr::pivot_wider(id_cols = OTU, names_from = Sample, values_from = Abundance)
+```
+
 ## Barplots of interesting module eigengene expression
 ### Set treatment colors
 ```{r}
