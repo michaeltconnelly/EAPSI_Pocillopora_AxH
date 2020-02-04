@@ -91,8 +91,8 @@ net <- blockwiseModules(datExpr,
                           maxBlockSize = 20000,
                           deepSplit = 2,
                           detectCutHeight = 0.99,
-                          minModuleSize = min(50, ncol(datExpr)/2 ),
-                          mergeCutHeight = 0.2,
+                          minModuleSize = min(100, ncol(datExpr)/2 ),
+                          mergeCutHeight = 0.3,
                           TOMType = "signed",
                           saveTOMs = FALSE,
                           saveTOMFileBase = "EAPSI_TOM",
@@ -315,10 +315,45 @@ ps.stable.AXH_phylum <- psmelt(glom_phylum)
 ps.stable.AXH_phylum$Phylum <- as.character(ps.stable.AXH_phylum$Phylum)
 ps.stable.AXH_phylum$Kingdom <- gsub("D_0__", "", ps.stable.AXH_phylum$Kingdom)
 ps.stable.AXH_phylum$Phylum <- gsub("D_1__", "", ps.stable.AXH_phylum$Phylum)
-ps.stable.AXH_phylum$Phylum[ps.stable.AXH_phylum$Abundance < 0.01] <- "<1% abundance"
-
-datTaxa <- ps.stable.AXH_phylum %>% select(OTU, Sample, Abundance, Phylum)
-datTaxa1 <- datTaxa %>% tidyr::pivot_wider(id_cols = OTU, names_from = Sample, values_from = Abundance)
+#ps.stable.AXH_phylum$Phylum[ps.stable.AXH_phylum$Abundance < 0.01] <- "<1% abundance"
+### create properly formatted table
+datPhyla <- ps.stable.AXH_phylum %>% select(Phylum, Sample, Abundance) %>%
+  tidyr::pivot_wider(names_from = Phylum, values_from = Abundance) %>% 
+  arrange(Sample) %>%
+  filter(Sample!='Hw2.6a')
+rownames(datPhyla) <- gsub('.', '-', datPhyla$Sample, fixed = TRUE)
+datPhyla <- datPhyla[-1]
+row.names(datPhyla) <- rownames(datTraits)
+```
+## Correlate module eigengene-taxa associations
+```{r}
+modulePhylaCor <- cor(MEs1, datPhyla, use = "p")
+modulePhylaPvalue <- corPvalueStudent(modulePhylaCor, nSamples)
+modulePhylaCors <- as.data.frame(modulePhylaCor, modulePhylaPvalue)
+```
+## Create ME-trait heatmap
+```{r}
+pdf("./outputs/WGCNAmodules_Pdam/ModuleCorrelations_Phyla.pdf", width = 8.5, height = 11)
+# Will display correlations and their p-values
+textMatrix = paste(signif(modulePhylaCor, 2), "\n(",
+signif(modulePhylaPvalue, 2), ")", sep = "");
+dim(textMatrix) = dim(modulePhylaCor)
+par(mar = c(6, 8.5, 3, 3));
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = modulePhylaCor,
+xLabels = names(datPhyla),
+yLabels = names(MEs1),
+yLabelsPosition = "left",
+ySymbols = names(MEs1),
+yColorWidth = 0.005,
+colorLabels = FALSE,
+colors = blueWhiteRed(50),
+textMatrix = textMatrix,
+setStdMargins = FALSE,
+plotLegend = FALSE,
+cex.text = 0.5,
+zlim = c(-1,1),
+main = paste("Module-taxa correlations"))
 ```
 
 ## Barplots of interesting module eigengene expression
