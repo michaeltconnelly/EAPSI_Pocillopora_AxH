@@ -1,0 +1,68 @@
+---
+title: "stable_AXH-aldex2"
+author: "Mike Connelly"
+date: "10/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH")
+```
+## Setup packages and working directories
+```{r, message=FALSE}
+library(ALDEx2)
+```
+
+Setup sample metadata for ALDEx2 testing
+```{r}
+map <- read.table("./data/qiime2_metadata.tsv", sep ="\t", row.names = 1, header = FALSE)
+colnames(map) <- c ("Reef",	"Colony",	"Environment",	"Treatment")
+map$SampleID <- rownames(map)
+map$Reef <- factor(map$Reef, levels = c("Houwan", "Wanglitung", "controls"), ordered = TRUE)
+map$Colony <- factor(map$Colony, levels = c("HW1", "HW2", "WT1", "WT2", "controls"), ordered = TRUE)
+map$Treatment <- factor(map$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
+```
+
+Check that phyloseq object exists
+```{r}
+ps.stable.AXH
+summarize_phyloseq(ps.stable.AXH)
+```
+
+Treatment sample subsets of phyloseq objects
+```{r}
+nsamples(ps_assigned)
+samples <- sample_names(ps_assigned)
+samples.AxC <- grep("[HW][wt][1-2].[16][abc]", samples, value = TRUE)
+ps.AxC <- prune_samples(samples.AxC, ps_assigned)
+ps.AxC
+summarize_phyloseq(ps.AxC)
+```
+
+Read out ASV tables from phyloseq objects
+```{r}
+aldex.asv <- as.data.frame(t(otu_table(ps.AxC)))
+```
+```{r}
+conds <- as.character(sample_data(ps.AxC)$Treatment)
+conds
+```
+
+
+
+## ALDEx2 tests
+```{r}
+x.ps <- aldex(reads = aldex.asv, conditions = conds, mc.samples = 128, test = "t", effect = TRUE, include.sample.summary = FALSE, denom = "all", verbose = TRUE)
+```
+```{r}
+par(mfrow=c(1,2))
+aldex.plot(x.ps, type = "MA", test = "welch", xlab = "Log-ratio abundance", ylab = "Difference")
+aldex.plot(x.ps, type="MW", test="welch", xlab="Dispersion", ylab="Difference")
+```
+```{r}
+?aldex.clr
+?aldex.plot
+?aldex.effect
+```
+
