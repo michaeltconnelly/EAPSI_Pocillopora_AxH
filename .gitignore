@@ -23,3 +23,5 @@ Rmd/*.html
 core*
 hs*
 outputs/WGCNAmodules_Pdam/
+outputs/aldex2/
+outputs/20*

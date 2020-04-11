@@ -1,7 +1,7 @@
 ---
 title: "AXH_DESeq-contrasts_Pdam"
 author: "Mike Connelly"
-date: "12/9/2019"
+date: "3/26/2020"
 output: html_document
 ---
 
@@ -22,8 +22,15 @@ resultsNames(dds_antixheat)
 ### Antibiotics vs. Control
 ```{r}
 res_anti_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Antibiotics", "control"))
-res_anti_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
-res_anti_ctrl$IDGeneInfo <- as.character(res_anti_ctrl$IDGeneInfo)
+###
+res_anti_ctrl$ID <- mcols(dds_anti)$ID
+res_anti_ctrl$GeneInfo <- mcols(dds_anti)$GeneInfo
+res_anti_ctrl$KO_terms <- mcols(dds_anti)$KO_terms
+res_anti_ctrl$Pfam_domains <- mcols(dds_anti)$Pfam_domains
+res_anti_ctrl$ID <- as.character(res_anti_ctrl$ID)
+res_anti_ctrl$GeneInfo <- as.character(res_anti_ctrl$GeneInfo)
+res_anti_ctrl$KO_terms <- as.character(res_anti_ctrl$KO_terms)
+res_anti_ctrl$Pfam_domains <- as.character(res_anti_ctrl$Pfam_domains)
 ###
 write.csv(as.data.frame(res_anti_ctrl[order(res_anti_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti_ctrl.csv")
 ressig_anti_ctrl <- subset(res_anti_ctrl, padj<0.01)
@@ -39,8 +46,15 @@ summary(res_anti_ctrl)
 ### Heat vs. Control
 ```{r}
 res_heat_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Heat", "control"))
-res_heat_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
-res_heat_ctrl$IDGeneInfo <- as.character(res_heat_ctrl$IDGeneInfo)
+###
+res_heat_ctrl$ID <- mcols(dds_heat)$ID
+res_heat_ctrl$GeneInfo <- mcols(dds_heat)$GeneInfo
+res_heat_ctrl$KO_terms <- mcols(dds_heat)$KO_terms
+res_heat_ctrl$Pfam_domains <- mcols(dds_heat)$Pfam_domains
+res_heat_ctrl$ID <- as.character(res_heat_ctrl$ID)
+res_heat_ctrl$GeneInfo <- as.character(res_heat_ctrl$GeneInfo)
+res_heat_ctrl$KO_terms <- as.character(res_heat_ctrl$KO_terms)
+res_heat_ctrl$Pfam_domains <- as.character(res_heat_ctrl$Pfam_domains)
 ###
 write.csv(as.data.frame(res_heat_ctrl[order(res_heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_heat_ctrl.csv")
 ressig_heat_ctrl <- subset(res_heat_ctrl, padj<0.01)
@@ -56,8 +70,15 @@ summary(res_heat_ctrl)
 ### Antibiotics.Heat vs. Control
 ```{r}
 res_anti.heat_ctrl <- results(dds_antixheat, contrast = c("Treatment", "Antibiotics.Heat", "control"))
-res_anti.heat_ctrl$IDGeneInfo <- mcols(dds_antixheat)$IDGeneInfo
-res_anti.heat_ctrl$IDGeneInfo <- as.character(res_anti.heat_ctrl$IDGeneInfo)
+###
+res_anti.heat_ctrl$ID <- mcols(dds_anti.heat)$ID
+res_anti.heat_ctrl$GeneInfo <- mcols(dds_anti.heat)$GeneInfo
+res_anti.heat_ctrl$KO_terms <- mcols(dds_anti.heat)$KO_terms
+res_anti.heat_ctrl$Pfam_domains <- mcols(dds_anti.heat)$Pfam_domains
+res_anti.heat_ctrl$ID <- as.character(res_anti.heat_ctrl$ID)
+res_anti.heat_ctrl$GeneInfo <- as.character(res_anti.heat_ctrl$GeneInfo)
+res_anti.heat_ctrl$KO_terms <- as.character(res_anti.heat_ctrl$KO_terms)
+res_anti.heat_ctrl$Pfam_domains <- as.character(res_anti.heat_ctrl$Pfam_domains)
 ###
 write.csv(as.data.frame(res_anti.heat_ctrl[order(res_anti.heat_ctrl$padj, decreasing = FALSE),]), file = "./outputs/DESeq-results/tables/all/res_anti.heat_ctrl.csv")
 ressig_anti.heat_ctrl <- subset(res_anti.heat_ctrl, padj<0.01)

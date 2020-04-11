@@ -8,7 +8,7 @@ output: html_document
 RMarkdown document containing scripts for DESeq2 modelling of differential gene expression between fragments of four *Pocillopora* coral genotypes collected at Wanglitung and Houwan reefs and placed in three experimental treatment groups and once control group during EAPSI Taiwan, summer 2017.
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 ## Setup packages and working directories
@@ -18,13 +18,9 @@ library("tidyverse")
 library("DESeq2")
 library("ggpubr")
 library("apeglm")
-library("VennDiagram")
-library("ggrepel")
-library("RColorBrewer")
-library("calibrate")
 ```
 
-## Set overall theme, colors, and shapes for DESeq2 visualizations
+### Set overall theme, colors, and shapes for DESeq2 visualizations
 ```{r}
 theme_set(theme_bw())
 condcolors_anti <- c("#00CCCC", "#0000FF")
@@ -34,13 +30,12 @@ condcolors_antixheat <- c("#0000FF", "#FF6600", "#00CCCC", "#FFCC33")
 ###
 condfillcolors <- c("#99FFFF", "#FFFF66", "#FF6666", "#99CCFF", "#FFCC99", "#FFCCFF")
 condfillcolors_antixheat <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
-colshapes <- c(18, 9, 16, 10)
-colcolors <- c("#CCFFCC", "#99FFCC", "#CCFFFF", "#99CCFF")
+colshapes <- c(16, 17, 15, 18)
+colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
 ```
-
 ## Import sample metadata and counts data
 ```{r, echo=TRUE}
-stable_samples <- read.table("./data/EAPSIsamples_stable.txt", header = TRUE)
+stable_samples <- read.table("./data/EAPSI_samples_AxH.txt", header = TRUE)
 #stable_samples$treatment <- as.factor(stable_samples$treatment)
 #stable_samples$genotype <- as.factor(stable_samples$genotype)
 countdata <- read.delim("./outputs/STARcounts_Pdam/AxH_Pdam.counts", comment.char="#")
@@ -57,28 +52,308 @@ countdata <- countdata[ ,7:ncol(countdata)]
   colnames(countdata) <- gsub("X.", "", colnames(countdata))
   colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.projects.EAPSI_Pocillopora_AxH.outputs.STARalign_Pdam.", "", colnames(countdata))
   colnames(countdata) <- gsub("_PdamAligned.out.bam$", "", colnames(countdata))
+# Sort countdata by P. damicornis gene ID
+countdata.sorted <- as.data.frame(countdata[order(rownames(countdata)),])
 ```
-## Import gene feature annotation information
+## Import gene feature annotation information: ID, Info, KO terms, Pfam domains...
 ```{r}
-genefeatures <- read.delim(file = "./data/pdam_genome_IDInfo.gff", header = F)
-colnames(genefeatures) <- c("IDGeneInfo")
-rownames(genefeatures) <- rownames(countdata)
+genefeatures <-  read.delim(file = "./data/pdam_genome_excel_annotations.tsv", header = F)
+colnames(genefeatures) <- c("ID", "GeneInfo", "KO_terms", "Pfam_domains")
+rownames(genefeatures) <- genefeatures$ID
 ```
 ## Check gene feature annotation and countdata rowname order coherence
 ```{r}
-all(rownames(countdata) == rownames(genefeatures))
+all(rownames(countdata.sorted) == genefeatures$ID)
+all(rownames(countdata.sorted) ==  rownames(genefeatures))
 ```
+## Create DESeqDataSet
+```{r subset_dds}
+# Create full DESeqDataSet
+dds <- DESeqDataSetFromMatrix(countData = countdata.sorted,
+                              colData = stable_samples,
+                              design = ~ Colony)
+# Subset DESeqDataSet
+### Remove genes counted zero times in subset
+dds <- dds[ rowSums(counts(dds)) > 0, ]
+```
+## Visualize global gene expression
+```{r}
+# Normalize expression data for visualization purposes using VST tranformation
+vsd <- vst(dds, blind = TRUE)
+```
+### Principal Coordinate Analysis (PCoA)
+```{r pcoa, eval = TRUE}
+## Calculate distances among samples
+sampleDists <- dist(t(assay(vsd)), method = "manhattan")
+sampleDistMatrix <- as.matrix(sampleDists)
+
+## Calculate MDS
+mds <- as.data.frame(colData(vsd)) %>% 
+  cbind(cmdscale(sampleDistMatrix))
+
+# Calculate group centroids for plotting
+mds <- mds %>%
+  group_by(Colony) %>%
+  dplyr::summarise(c1 = mean(`1`), c2 = mean(`2`)) %>%    
+  full_join(mds)
+
+#set factor orders 
+mds$Treatment <- factor(mds$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+
+# Plot with spiders
+pcoa <- ggplot(mds, aes(color = Treatment, shape = Colony)) +
+  geom_segment(mapping = aes(x = `1`, y = `2`, xend = c1, yend = c2),
+               lwd = 0.25, col = "grey") +
+  geom_point(size = 5, aes(x = c1, y = c2), color = "dark grey") +
+  geom_point(size = 3, aes(x = `1`, y = `2`, fill = Treatment, show.legend = F)) +
+  geom_point(size = 3, aes(x = `1`, y = `2`), fill = "white", show.legend = F) +
+  scale_color_manual(values = condcolors_antixheat) +
+  scale_shape_manual(values = colshapes) +
+  scale_alpha_manual(values = c(1, 0), name = "temp", labels = c("control", "heated")) +
+  guides(shape = guide_legend(order = 2, override.aes = list(fill = "black"))) +
+  guides(alpha = guide_legend(override.aes = list(shape = 21, alpha = 1, fill = c("black", "white")))) +
+  labs(x = "PC1", y = "PC2") +
+  #theme_custom() +
+  theme(legend.spacing.y = unit(0, "cm"))
+pcoa
+
+ggsave(filename = "./outputs/DESeq-results/figures/pcoa.png", pcoa, width = 6, height = 4, units = "in")
+```
+## Variance partitioning
+
+Partition total transcriptome variance among explanatory factors (symbiont, heating, and their interaction) for each colony. Based on the PCoA above, it appears that symbiont type should explain the most variance in colony 26, and very little variance in colony 22. Heating should explain more variance in colony 22.
+```{r varpart_col, eval = TRUE, results = 'hide'}
+# Get sample data for heat stress experiment into tibble
+coldata <- stable_samples %>%
+  as_tibble() %>%
+  select(SampleID, Colony, Treatment)
+coldata$SampleID <- gsub('-','.', coldata$SampleID)
+coldata <- coldata %>% mutate(group = paste(Colony, Treatment, sep = "_"))
+# Gather raw counts into tibble
+colcounts <- countdata.sorted %>%
+  rownames_to_column("gene") %>%
+  as_tibble() %>%
+  gather(key = "SampleID", value = "count", -gene)
+# Join count data with sample data, and nest vs count data by colony
+all <- left_join(coldata, colcounts) %>%
+  nest(-Colony) 
+
+# Create DESeqDataSet for each colony, filter genes mean count > 1 within each colony, and vst transform
+all <- all %>%
+  mutate(sdat = map(data, ~ data.frame(column_to_rownames(distinct(., SampleID, Colony, Treatment, group), "SampleID"))),
+         counts = map(data, ~ spread(select(., SampleID, gene, count), SampleID, count)),
+         counts = map(counts, ~ as.matrix(column_to_rownames(., "gene"))),
+         dds = map2(counts, sdat, ~ DESeqDataSetFromMatrix(countData = .x, colData = .y, design = ~ group)),
+         ddsf = map(dds, function(x) x[rowMedians(counts(x)) > 1, ]),  # Filter DESeqDataSet
+         vsd = map(ddsf, ~ vst(., blind = FALSE)))  # Variance Stabilizing Transformation
+
+# Run variance partition analysis for each colony
+cl <- makeCluster(8); registerDoParallel(cl)
+all <- all %>%
+  mutate(vp = map2(vsd, sdat, ~ fitExtractVarPartModel(
+    exprObj = assay(.x), data = .y, formula = ~ (1|sym) + (1|trt2) + (1|sym:trt2)
+    )))
+stopCluster(cl)
+
+# Calculate sum of variance explained by each source across all genes for each colony
+allsumm <- all %>% mutate(vpsum = map(vp, ~ summarise_all(., sum)))
+
+all$vp[[3]] %>%
+  as.data.frame(.) %>%
+  summarise_all(., median)
+
+plotVarPart(all$vp[[3]])
+rowSums(assay(all$vsd[[3]]))
+mean(all$vp[[3]]$sym)
+weighted.mean(all$vp[[3]]$sym, w = rowSums(assay(all$vsd[[3]])))
+```
+Plot sources of variance for each colony
+```{r plot_varpart, eval = TRUE}
+varpartfig <- allsumm %>% 
+  unnest(vpsum, .drop = T) %>%
+  gather(source, value, -colony) %>%
+  group_by(colony) %>%
+  mutate(relvar = value / sum(value)) %>%   # TOTAL VARIANCE NOT SAME FOR EACH COLONY -- NORMALIZE WITHIN COLONY
+  filter(source != "Residuals") %>%
+  mutate(source = recode(source, trt2 = "temp", `sym:trt2` = "sym:temp")) %>%
+  ggplot(aes(x = source, y = relvar*100, fill = colony)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ colony, labeller = global_labeller) +
+  labs(x = "", y = "% variance explained") +
+  theme_custom() +
+  theme(legend.position = "none",
+        strip.text.x = element_text(size = 6))
+
+varpartfig
+
+save(varpartfig, file = "output/varpartfig.RData")
+
+ggsave(filename = "output/varpart.png", plot = varpartfig, width = 69, height = 84.5, units = "mm")
+
+fig2 <- cowplot::plot_grid(pcoa, varpartfig, rel_widths = c(2, 1), labels = "AUTO")
+ggsave(filename = "figures/fig2.png", fig2, width = 169, height = 84.5, units = "mm")
+
+
+allsumm %>% 
+  unnest(vpsum, .drop = T) %>%
+  gather(source, value, -colony) %>%
+  group_by(colony) %>%
+  mutate(relvar = value / sum(value)) %>%   # TOTAL VARIANCE NOT SAME FOR EACH COLONY -- NORMALIZE WITHIN COLONY
+  filter(source != "Residuals") %>%
+  summarise(total_explained = sum(relvar))
+```
+### Discriminant analysis of principal components (DAPC)
+```{r DAPC}
+# Discriminant function including all genes
+vsd2 <- limma::removeBatchEffect(assay(vsd), vsd$colony)
+# use batch-colony-removed vst counts
+dat <- data.frame(vsd2) 
+# use regular vst counts
+#dat <- data.frame(assay(vsd))
+
+# How many PCs should be kept?
+# dapc2 <- dapc(t(dat), colData(hs.dds)$group, n.da=4, n.pca=35)
+# temp <- optim.a.score(dapc2, n.sim = 5)
+# my.dapc <- function(n.pca) dapc(t(dat), colData(hs.dds)$group, n.pca = n.pca, n.da = 4)
+
+# library(furrr)
+# plan(multiprocess)
+# my.dapc.res <- tibble(n.pca = 5:20) %>%
+#   mutate(dapc = map(n.pca, my.dapc),
+#          a.score = furrr::future_map(dapc, a.score, n.sim = 1000),
+#          mean = map_dbl(a.score, ~ .$mean),
+#          cumvar = map_dbl(dapc, ~ .$var))
+# 
+# my.dapc.res %>%
+#   arrange(-mean) %>%
+#   head()
+
+# Retaining 6 PC's gives highest a-score (25%), but only utilizes 44% of variance. Retaining 15 PC's reduces a-score to 17%, but retains 72% of variance. Therefore, let's use 15 PC's for the DA. 
+
+dp1 <- dapc(t(dat), colData(dds)$Colony,
+            n.pca = 15, n.da = 2)   # Retain 15 PCs and 2 discriminant functions
+#scatter(dp1,bg="white",scree.da=TRUE,scree.pca=TRUE,legend=TRUE,solid=.4) 
+
+# Axis one represents general heat stress response, and effect of D under control moving toward this transcriptional state.  Axis two represents the *different/unique* heat stress responses of C vs. D corals.
+
+#scatter(dp1, bg = "white", legend = TRUE, scree.da = FALSE)
+
+dapc <- tibble(sample = rownames(dp1$ind.coord),
+               grp = dp1$grp,
+               LD1 = dp1$ind.coord[,1],
+               LD2 = dp1$ind.coord[,2])
+dapc <- dapc %>%
+  group_by(grp) %>%
+  summarize(c1 = mean(LD1),
+            c2 = mean(LD2)) %>%
+  full_join(dapc)
+
+# Plot with spiders
+dapc.fig <- 
+  ggplot(dapc, aes(shape = factor(grepl("^D", grp)), 
+                             fill = factor(grepl("h", grp)))) +
+  geom_segment(mapping = aes(x = LD1, y = LD2, xend = c1, yend = c2), lwd = 0.25, col = "grey") +
+  geom_point(aes(x = c1, y = c2), size = 2) +
+  geom_point(aes(x = LD1, y = LD2), size = 0.7, show.legend = FALSE) +
+  scale_shape_manual(name = "sym", labels = c("C", "D"), values = c(21, 24)) +
+  scale_fill_manual(name = "temp", labels = c("control", "heated"), values = c("black", "white")) +
+  guides(fill = guide_legend(override.aes = list(shape = 21, size = 2))) +
+  guides(shape = guide_legend(override.aes = list(fill = "black", size = 2))) +
+  labs(x = "LD1", y = "LD2") +
+  #theme_custom() +
+  #theme(legend.position = c(0.25, 0.15)) +
+  theme(plot.margin = margin(t = 0, r = 0.9, unit = "cm")) +
+  #theme(legend.spacing.y = unit(0, "cm"),
+  #      legend.spacing.x = unit(0, "cm")) +
+  #theme(legend.box = "horizontal") +
+  theme(legend.position = "none") +
+  annotate(geom = "text", x = -1.5, y = -1.6, adj = 1, label = "sym / temp", size = 3.5) +
+  annotate(geom = "text", x = -1.5, y = -2.825, adj = 1, size = 2.5,
+           label = "C / control\nC / heated\nD / control\nD / heated") +
+  annotate(geom = "point", x = -3.2, y = seq(from = -2.15, by = -0.45, length.out = 4), 
+           size = 2, shape = c(21, 21, 24, 24), fill = c("black", "white", "black", "white"))
+
+xplot <- 
+  ggdensity(dapc, x = "LD1", fill = "grp", lwd = 0.25,
+            palette = c("black", "white", "black", "white")) +
+  annotate(geom = "point", x = c(-3,-0.75, 1.2, 2.5), y = c(0.37,0.48,0.6,0.35), 
+           pch = c(21, 24, 24, 21), fill = c("black", "black", "white", "white")) +
+  clean_theme() + rremove("legend") + 
+  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"))
+  
+#ggplot(dapc, aes(x = LD1, fill = grp)) + geom_density(alpha = 0.5, adjust = 1)
+
+fig3 <- plot_grid(xplot, NULL, dapc.fig, ncol = 1, align = "hv", rel_heights = c(0.7, -0.28, 2))
+fig3
+
+ggsave(filename = "figures/fig3.png", plot = fig3, width = 80, height = 80, units = "mm")
+```
+
+The DAPC shows that despite the significant variability among colonies, the four treatment groups can be discriminated well based on gene expression data. The first discriminant function (x-axis) represents the effect of heat stress in general, with control temperature corals to the left and heated corals to the right. Along this axis, D-control corals are intermediate between C-control corals and heated corals, showing that the presence of D shifts the transcriptional state toward the heat-stressed state. The second discriminant function (y-axis) separates the distinct responses to heat stress that occur in C vs. D corals.
+
+```{r, include = FALSE, eval = FALSE}
+# DAPC - axis of heat stress in C corals (Ccontrol vs. Cheat), then see where D's fall along it (sensu Kenkel and Matz)
+
+# use batch-colony-removed vst counts
+vsd2 <- vsd
+#assay(vsd2) <- limma::removeBatchEffect(assay(vsd), vsd$colony)
+## Subset C-control and C-heat corals
+CcCh <- vsd2[, colData(vsd2)$group %in% c("Cc", "Ch")]
+dat <- data.frame(assay(CcCh))
+
+# Fit DAPC axis
+dp1 <- dapc(t(dat), colData(CcCh)$group, n.pca = 12, n.da = 1)
+scatter(dp1, scree.pca = T)
+
+# Calculate values along this axis
+## Subset D-control and D-heat corals
+DcDh <- vsd2[, colData(vsd2)$group %in% c("Dc", "Dh")]
+dat2 <- data.frame(assay(DcDh))
+## Get scores for these samples along the Cc-Ch DAPC axis
+pred.sup <- predict.dapc(dp1, newdata=(t(dat2)))
+
+# Create dapc object to plot new scores
+newdp <- dp1
+newdp$ind.coord<-pred.sup$ind.scores
+newdp$posterior<-pred.sup$posterior
+newdp$assign<-pred.sup$assign
+newdp$grp <- colData(DcDh)$group
+scatter(newdp)
+
+# Get scores for all groups
+dpc <- tibble(group = c(as.character(dp1$grp), as.character(newdp$grp)),
+              core = c(rownames(dp1$ind.coord), rownames(newdp$ind.coord)),
+              colony = str_sub(core, 3, 4),
+              score = c(dp1$ind.coord, newdp$ind.coord))
+ggplot(dpc, aes(x = score, fill = group)) + geom_density(adjust = 1, alpha = 0.5)
+ggplot(dpc, aes(x = group, y = score, shape = colony, color = colony)) + geom_point()
+
+# Test for differences between groups
+mod <- lm(score ~ group, data = dpc)
+anova(mod)
+lsm <- lsmeans(mod, specs = "group")
+contrast(lsm, "pairwise")
+
+# Ccontrol -- -1.94
+# Cheat ---    1.94    (diff = 3.89)
+# Dcontrol -- -0.16
+
+
+# I deemed this approach inappropriate because we shouldn't necessarily constrain the responses of D corals to occur along an axis of heat stress for C corals... they could respond in an entirely different way along an entirely different axis. Therefore, the DAPC with all four groups is more appropriate. LD1 still ends up corresponding very strongly to the axis of heat stress for C corals, and we still C that shuffling to D moves corals toward the heat stress end of the axis. We can still do a statistical test on LD1 values for different groups. 
+```
+
+
 ## Select which treatments to use in DESeq object construction
 anti: Control-Antibiotics
 heat: Control-Heat
 anti.heat: Control-Antibiotics.Heat
 antixheat: Control-Antibiotics-Heat-Antibiotics.Heat
 ```{r}
-countdata_anti <- dplyr::select(countdata, matches("[HW][wt][12].[56]."))
-countdata_heat <- dplyr::select(countdata, matches("[HW][wt][12].[46]."))
-countdata_anti.heat <- dplyr::select(countdata, matches("[HW][wt][12].[16]."))
+countdata_anti <- dplyr::select(countdata.sorted, matches("[HW][wt][12].[56]."))
+countdata_heat <- dplyr::select(countdata.sorted, matches("[HW][wt][12].[46]."))
+countdata_anti.heat <- dplyr::select(countdata.sorted, matches("[HW][wt][12].[16]."))
 ###
-countdata_antixheat <- dplyr::select(countdata, matches("[HW][wt][12].[1456]."))
+countdata_antixheat <- dplyr::select(countdata.sorted, matches("[HW][wt][12].[1456]."))
 ```
 ```{r}
 countdata_HW1 <- dplyr::select(countdata_antixheat, matches("Hw1.*"))
@@ -115,7 +390,10 @@ stable_samples_WT2 <- filter(stable_samples_antixheat, Colony == "WT2")# %>% sel
       countdata_WT2 <- as.matrix(countdata_WT2)
 ```
 
+
+
 ## Create DESeq data objects
+### DESeq2 treatment model objects
 ```{r, message=FALSE}
       dds_anti <- DESeqDataSetFromMatrix(countData=countdata_anti, colData=stable_samples_anti, design= ~Batch + Colony + Treatment)
       dds_anti$Treatment <- factor(dds_anti$Treatment, levels=c("control", "Antibiotics"))
@@ -136,7 +414,7 @@ relevel(dds_anti.heat$Treatment, ref = "control")
       dds_antixheat$Treatment <- factor(dds_antixheat$Treatment, levels=c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
 relevel(dds_antixheat$Treatment, ref = "control")
 ```
-
+### DESeq2 genotype model objects
 ```{r, message=FALSE}
       dds_HW1 <- DESeqDataSetFromMatrix(countData=countdata_HW1, colData=stable_samples_HW1, design= ~Treatment)
 ### Batch effect encompasses Treatment
@@ -248,9 +526,11 @@ plotMA(res_anti, ylim = c(-20, 20))
 resultsNames(dds_heat)
 summary(res_heat)
 ```
+
 ```{r}
-res_heat$IDGeneInfo <- mcols(dds_heat)$IDGeneInfo
-res_heat$IDGeneInfo <- as.character(res_heat$IDGeneInfo)
+res_heat$ID <- mcols(dds_heat)$ID
+
+res_heat$ID <- as.character(res_heat$ID)
 ```
 ```{r}
 plotDispEsts(dds_heat)
