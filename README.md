@@ -12,3 +12,5 @@ Change absolute paths to sequence read files in ./data/qiime2_manifest.tsv file
 
 `source activate qiime2-2019.10
 bash ./bash/qiime2/all_start_qiime2.sh`
+
+![](./figures/AxH_Treatments.png)

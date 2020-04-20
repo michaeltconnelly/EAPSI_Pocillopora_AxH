@@ -38,7 +38,7 @@ Treatment sample subsets of phyloseq objects
 ```{r}
 nsamples(ps_assigned)
 samples <- sample_names(ps_assigned)
-samples.AxC <- grep("[HW][wt][1-2].[46][abc]", samples, value = TRUE)
+samples.AxC <- grep("[HW][wt][1-2].[16][abc]", samples, value = TRUE)
 ps.AxC <- prune_samples(samples.AxC, ps_assigned)
 ps.AxC
 summarize_phyloseq(ps.AxC)
@@ -137,11 +137,11 @@ aldex1 <- aldex.plot_gg(x.ps, type = "MW", test = "welch")
 aldex1 <- aldex1 + ggtitle(subtitle = "Heat vs. Control Treatment", "Bacteria ASV ALDeX2 Differential Abundance MW/MA Plots") 
 
 aldex2 <- aldex.plot_gg(x.ps, type = "MA", test = "welch")
-#aldex2 + ggtitle(subtitle = "Heat vs. Control Treatment", "Bacteria ASV ALDeX2 Differential Abundance MA Plot") 
+#aldex2 + ggtitle(subtitle = "Antibiotics + Heat vs. Control Treatment", "Bacteria ASV ALDeX2 Differential Abundance MA Plot") 
  
 aldexplots <- (aldex1 / aldex2) 
 aldexplots
-ggsave(aldexplots, filename = "./outputs/aldex2/heat-asv-aldex2.pdf", device = "pdf")
+ggsave(aldexplots, filename = "./outputs/aldex2/anti.heat-asv-aldex2.png", device = "png")
 ```
 ```{r}
 cutoff <- 0.1

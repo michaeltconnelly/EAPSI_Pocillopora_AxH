@@ -18,6 +18,7 @@ library("tidyverse")
 library("DESeq2")
 library("ggpubr")
 library("apeglm")
+library("variancePartition")
 ```
 
 ### Set overall theme, colors, and shapes for DESeq2 visualizations
@@ -135,8 +136,8 @@ colcounts <- countdata.sorted %>%
   as_tibble() %>%
   gather(key = "SampleID", value = "count", -gene)
 # Join count data with sample data, and nest vs count data by colony
-all <- left_join(coldata, colcounts) %>%
-  nest(-Colony) 
+all <- left_join(coldata, colcounts) 
+all <- all %>% nest(-Colony) 
 
 # Create DESeqDataSet for each colony, filter genes mean count > 1 within each colony, and vst transform
 all <- all %>%
