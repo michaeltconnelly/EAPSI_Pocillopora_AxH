@@ -1,0 +1,140 @@
+---
+title: "Pocillopora_AXH_SNPRelate"
+author: "Mike Connelly"
+date: "5/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH/")
+```
+```{r}
+library("tidyverse")
+#library("vcfR")
+library("SNPRelate") #BiocManager::install("SNPRelate")
+library("phangorn")
+library("poppr")
+library("vegan")
+library("ape")
+library("adegenet")
+library("dendextend")
+library("scales")
+```
+
+## SNPrelate
+Read in vcf files 
+```{r}
+#need to complete SNP variant calling pipeline for all 47 samples, 10 more samples needed
+vcfs <- list.files("./outputs/phylotrans_Pdam/", pattern=".vcf$")
+vcf_samples <- gsub(".filtered.vcf", "", vcfs)
+vcfs.list <- list()
+for (i in 1:length(vcfs)) {
+ vcfs.list[[i]] <- snpgdsVCF2GDS(vcf.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], sep = ''), out.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], '.gds', sep = ''), method = "biallelic.only")
+}
+names(vcfs.list) <- vcf_samples
+```
+```{r}
+gdss <- list.files("./outputs/phylotrans_Pdam/", pattern=".gds$")
+gdsss <- gsub('^', './outputs/phylotrans_Pdam/', gdss)
+gdsfile <- snpgdsCombineGeno(gds.fn = gdsss, out.fn ='./outputs/phylo/genofile.gds', method = "position", verbose = TRUE)
+```
+```{r}
+snpgdsSummary("./outputs/phylo/genofile.gds")
+```
+```{r}
+genofile <- snpgdsOpen('./outputs/phylo/genofile.gds', allow.duplicate = TRUE)
+snpgdsClose(genofile)
+samp_id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+```
+```{r}
+# Try different LD thresholds for sensitivity analysis
+snpset <- snpgdsLDpruning(genofile, ld.threshold=0.2)
+```
+```{r}
+# Run PCA
+pca <- snpgdsPCA(genofile, num.thread=2)
+# snp.id=snpset.id,
+# variance proportion (%)
+pc.percent <- pca$varprop*100
+head(round(pc.percent, 2))
+# make a data.frame
+tab <- data.frame(sample.id = pca$sample.id,
+    EV1 = pca$eigenvect[,1],    # the first eigenvector
+    EV2 = pca$eigenvect[,2],    # the second eigenvector
+    stringsAsFactors = FALSE)
+head(tab)
+# Draw
+plot(tab$EV2, tab$EV1, xlab="eigenvector 2", ylab="eigenvector 1")
+```
+```{r}
+#pca
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+pop_code <- read.gdsn(index.gdsn(genofile, "sample.id"))
+genotype <- gsub("-[0-9][abc]", "", pop_code)
+
+pca <- snpgdsPCA(genofile)
+
+tab <- data.frame(sample.id = pca$sample.id,
+                  Colony = factor(genotype)[match(pca$sample.id, sample.id)],
+                  Treatment = stable_samples$Treatment[match(sample.id, stable_samples$SampleID)], 
+                  EV1 = pca$eigenvect[,1],
+                  EV2 = pca$eigenvect[,2],
+                  stringsAsFactors = FALSE)
+```
+```{r}
+snp_pca <- tab %>% ggplot(aes(EV1, EV2, fill = Treatment)) +
+  geom_point(aes(shape = Colony, color = Colony, fill = Treatment), color = "black", stroke = 0.5, size = 3) + 
+  scale_color_manual(values = colcolors) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes) +
+  guides(fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5))) +
+  labs(x = "PC1", y = "PC2")
+snp_pcatitle <- expression(paste("PCA of ", italic("Pocillopora"), " spp. single nucleotide polymorphisms"))
+snp_pca <- snp_pca + ggtitle(snp_pcatitle)
+ggsave(snp_pca, filename = "./manuscript_figures/Fig2A_SNP_PCA.png", width = 6, height = 4, units = "in")
+```
+```{r}
+ibs.hc<-snpgdsHCluster(snpgdsIBS(genofile,num.thread=2, autosome.only=FALSE))
+```
+```{r}
+rv <- snpgdsCutTree(ibs.hc)
+```
+```{r}
+dend <- rv$dendrogram
+```
+
+```{r}
+pdf("./outputs/phylotrans_Pdam/EAPSI_SNP_tree.pdf", width = 11, height = 8.5)
+plot(dend,
+     horiz = TRUE,
+     main = "Taiwan Pocillopora AxH samples SNP clustering tree")
+```
+
+```{r}
+#LD based SNP pruning
+set.seed(1000)
+snpset <- snpgdsLDpruning(genofile, ld.threshold = 0.8)
+snp.id <- unlist(snpset)
+
+# distance matrix - use IBS
+dissMatrix  =  snpgdsIBS(genofile,
+                         sample.id=NULL,
+                         snp.id=snp.id,
+                         autosome.only=TRUE, 
+    remove.monosnp=TRUE,  maf=NaN, missing.rate=NaN, num.thread=2, verbose=TRUE)
+snpgdsClose(genofile)
+
+snpHCluster =  snpgdsHCluster(dissMatrix, sample.id=NULL, need.mat=TRUE, hang=0.01)
+
+cutTree = snpgdsCutTree(snpHCluster, z.threshold=15, outlier.n=5, n.perm = 5000, samp.group=NULL, 
+    col.outlier="red", col.list=NULL, pch.outlier=4, pch.list=NULL,label.H=FALSE, label.Z=TRUE, 
+    verbose=TRUE)
+
+treetitle <- expression(paste(italic("Pocillopora"), " spp. SNP phylotranscriptomic tree"))
+png(filename = "./manuscript_figures/Fig2B_SNP_tree.png", width = 8, height = 6, units = "in", res = 300)
+snpgdsDrawTree(cutTree,
+               main = treetitle,
+               edgePar=list(col=rgb(0.5,0.5,0.5,0.75), t.col="black"),y.label.kinship=T,leaflab="perpendicular")
+dev.off()
+```

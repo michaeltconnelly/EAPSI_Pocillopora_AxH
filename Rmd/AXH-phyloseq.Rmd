@@ -1,6 +1,10 @@
 ---
-title: "stable_AXH-phyloseq"
-output: html
+title: "Pocillopora_AXH_microbiome_analysis"
+author: "Mike Connelly"
+date: "4/29/2020"
+output: 
+  html_document:
+      code_folding: hide
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

@@ -69,7 +69,7 @@ color.bar(geneexpcolors2, -1, 1)
 ```
 ### Create heatmap annotation data frame
 ```{r}
-anno_col <- as.data.frame(colData(rld_antixheat)[, c("Treatment","Colony")])
+anno_col <- as.data.frame(colData(rld_AxH)[, c("Treatment","Colony")])
 ```
 
 ## Sample Clustering Heatmap
@@ -221,3 +221,34 @@ pheatmap(mat_ressig_anti_ctrl_up, col=geneexpcolors2,
          treeheight_col = 60,
          treeheight_row = 120)
 ```
+
+```{r}
+TRAFs <- scan("./data/pdam_TRAFs.txt", what = "character")
+```
+```{r}
+mat_TRAF <- assay(rld_AxH)[row.names(rld_AxH) %in% TRAFs, ]
+range(mat_TRAF)
+mat_TRAF <- mat_TRAF - rowMeans(mat_TRAF)
+range(mat_TRAF)
+```
+```{r}
+pdf(file = "./figures/Heatmap_TRAFs.pdf", width = 8, height = 6)
+pheatmap(mat_TRAF, col=geneexpcolors,
+         annotation_col = anno_col[,c("Colony", "Treatment")],
+         #annotation_row = anno_row,
+         show_rownames = TRUE,
+         show_colnames = FALSE,
+         fontsize_row = 6,
+         annotation_colors = anno_colors,
+         annotation_legend = TRUE,
+         annotation_names_col = FALSE,
+         annotation_names_row = FALSE,
+         legend = TRUE,
+         treeheight_col = 30,
+         treeheight_row = 60,
+         #breaks = seq(-5, 5, by = 0.025),
+         cutree_rows = 1,
+         cutree_cols = 1)
+```
+
+

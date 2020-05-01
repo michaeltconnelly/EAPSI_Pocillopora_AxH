@@ -10,13 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 ```{r}
-library(tidyverse)
-library(vcfR)
-library(SNPRelate)
-library(phangorn)
-library(poppr)
-library(ape)
-library(dendextend)
+library("tidyverse")
+library("vcfR")
+library("SNPRelate")
+library("phangorn")
+library("poppr")
+library("ape")
+library("dendextend")
 ```
 ```{r}
 colshapes <- c(16, 17, 15, 18)
