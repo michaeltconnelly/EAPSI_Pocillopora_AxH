@@ -9,24 +9,25 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
-
-### Create colony and condition annotation colors
 ```{r}
+library("RColorBrewer")
+```
+
+
+```{r}
+### Create colony and condition annotation colors
 anno_colors <- list(
   Colony = c(HW1=colcolors[1], HW2=colcolors[2], WT1=colcolors[3], WT2=colcolors[4]),
-  Treatment = c(control=condcolors_antixheat[1],  Heat=condcolors_antixheat[3], Antibiotics=condcolors_antixheat[2], Antibiotics.Heat=condcolors_antixheat[4]),
+  Treatment = c(control=condcolors_AxH[1],  Heat=condcolors_AxH[3], Antibiotics=condcolors_AxH[2], Antibiotics.Heat=condcolors_AxH[4]),
   DEG = c(Upregulated="red", Downregulated="blue"))
-```
+
 ### Create sample heatmap cell color
-```{r}
 colonyclustercol <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-```
+
 ### Create gene expression cell color
-```{r}
 geneexpcolors <- colorRampPalette( rev(brewer.pal(9, "Spectral")) )(300)
-```
+
 ### Create gene expression cell color
-```{r}
 # Function to plot color bar
 color.bar <- function(lut, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), title='') {
     scale = (length(lut)-1)/(max-min)
@@ -39,8 +40,7 @@ color.bar <- function(lut, min, max=-min, nticks=11, ticks=seq(min, max, len=nti
     	rect(0,y,10,y+1/scale, col=lut[i], border=NA)
     }	
 }
-```
-```{r}
+
 geneexpcolors <- colorRampPalette( rev(brewer.pal(9, "RdYlBu")) )(300)
 
 geneexpcolors1 <- colorRampPalette(colors()[c(26,1,553)])(300)
@@ -79,7 +79,7 @@ sampleDistMatrix <- as.matrix( sampleDists )
 ```
 
 ```{r}
-pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Heatmap_AXH_samples.pdf", width = 8.5, height = 7.5)
+pdf(file = "~/computing/scripts/EAPSI_AntiXHeat-master/DESeqresults_Pdam/figures/Heatmap_AXH_samples_1.pdf", width = 8.5, height = 7.5)
 pheatmap(sampleDistMatrix,
          clustering_distance_rows = sampleDists,
          clustering_distance_cols = sampleDists,

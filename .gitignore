@@ -25,3 +25,6 @@ hs*
 outputs/WGCNAmodules_Pdam/
 outputs/aldex2/
 outputs/20*
+data/goslim_generic.obo
+R/GO_MWU/
+data/pdam_gene2kogClass.tab
