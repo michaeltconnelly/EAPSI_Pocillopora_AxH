@@ -1,0 +1,45 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/data/pdam_annotations/")
+```
+```{r}
+library("tidyverse")
+```
+```{r}
+pdam_info <- read.delim(file = "pdam_genome_ID_Info.tab", header = F, col.names = c("ID", "Gene_Info"))
+ips_go <- read.delim(file = "pdam_ips_gene2go.tab", header = F, col.names = c("ID", "GO_Terms_IPS"))
+kaas_ko <- read.delim(file = "pdam_kaas_ko.tab", header = F, col.names = c("ID", "KO_Terms_KAAS"))
+pdam_pfam <- read.delim(file = "pdam_pfam.tab", header = F, col.names = c("ID", "Pfam_Domains"))
+```
+```{r}
+emapper <- read.delim(file = "pdam_genome_protein.fasta.emapper.annotations.tab", header = F)
+emapper <- emapper %>% 
+  select(V1, V5, V6, V7)
+colnames(emapper) <- c("ID","Gene_Name", "GO_Terms_EM", "KO_Terms_EM")
+```
+```{r}
+kog <- read.delim(file = "pdam_gene2kogClass.tab", header = F, col.names = c("ID", "KOG_Class"))
+koga <- read.delim(file = "pdam_gene2kogClass1.tab", header = F, col.names = c("ID", "KOG_Class_A"))
+kog <- full_join(kog, koga, by = "ID")
+```
+Concatenate gene IDs, gene names, GO terms, KO terms, KOG classes, and Pfam domains into single annotations source.
+```{r}
+gene_annotation <- full_join(pdam_info, emapper, by = "ID")
+gene_annotation <- full_join(gene_annotation, ips_go, by = "ID")
+gene_annotation <- full_join(gene_annotation, kaas_ko, by = "ID")
+gene_annotation <- full_join(gene_annotation, kog, by = "ID")
+gene_annotation <- full_join(gene_annotation, pdam_pfam, by = "ID")
+```
+```{r}
+gene_annotation <- gene_annotation %>%
+  select("ID", "Gene_Name", "Gene_Info", "GO_Terms_IPS", "GO_Terms_EM", "KO_Terms_KAAS", "KO_Terms_EM", "KOG_Class_A", "KOG_Class", "Pfam_Domains")
+is.na(gene_annotation) <- gene_annotation == ''
+```
+```{r}
+write_tsv(gene_annotation, path = "../pdam_genome_annotations.tab")
+```
+

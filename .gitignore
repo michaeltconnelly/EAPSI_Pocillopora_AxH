@@ -28,3 +28,5 @@ outputs/20*
 data/goslim_generic.obo
 R/GO_MWU/
 data/pdam_gene2kogClass.tab
+data/pdam_annotations*
+data/pdam_genome_annotations*

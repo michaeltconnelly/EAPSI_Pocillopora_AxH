@@ -32,7 +32,7 @@ library("stringr")
 library("RColorBrewer")
 library("wesanderson")
 
-### Set overall theme, colors, and shapes for ggplot2
+# Set overall theme, colors, and shapes for ggplot2
 theme_set(theme_bw())
 ###
 varcolors <- c(wes_palette(n=4, name="Zissou1"), "grey85")
@@ -50,32 +50,32 @@ colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
 condcolors_null <- c(rep("black", 4))
 colshapes_null <- c(rep(20, 8))
 ```
-
 ## Import sample metadata, counts data, and gene annotation
 ```{r data, echo=TRUE}
 samples <- read.table("./data/EAPSI_samples_AxH.txt", header = TRUE)
 samples$SampleID <- gsub('-','.', samples$SampleID)
-#Import and tidy counts data
+# Import and tidy counts data
 countdata <- read.delim("./outputs/STARcounts_Pdam/AxH_Pdam.counts", comment.char="#")
-#Set Gene ID's as row names
+# Set Gene ID's as row names
 row.names(countdata) <- countdata$Geneid
-#Remove first six columns (Geneid, chr, start, end, strand, length)
+# Remove first six columns (Geneid, chr, start, end, strand, length)
 countdata <- countdata[ ,7:ncol(countdata)]
 #countdata <- countdata[ ,6:ncol(countdata)]
-#Remove file prefixes and suffixes
+# Remove file prefixes and suffixes
   colnames(countdata) <- gsub("X.", "", colnames(countdata))
   colnames(countdata) <- gsub("scratch.projects.transcriptomics.mikeconnelly.projects.EAPSI_Pocillopora_AxH.outputs.STARalign_Pdam.", "", colnames(countdata))
   colnames(countdata) <- gsub("_PdamAligned.out.bam$", "", colnames(countdata))
-#Sort countdata by P. damicornis gene ID
+# Sort countdata by P. damicornis gene ID
 countdata.sorted <- as.data.frame(countdata[order(rownames(countdata)),])
 ```
 ```{r gene data}
-genefeatures <-  read.delim(file = "./data/pdam_genome_excel_annotations.tsv", header = F)
-colnames(genefeatures) <- c("ID", "GeneInfo", "KO_terms", "Pfam_domains")
-rownames(genefeatures) <- genefeatures$ID
-#Check gene feature annotation and countdata rowname order coherence
-all(rownames(countdata.sorted) == genefeatures$ID)
-all(rownames(countdata.sorted) ==  rownames(genefeatures))
+gene_annotation <- read.delim(file = "./data/pdam_genome_annotations.tab", header = T) %>% arrange(ID)
+rownames(gene_annotation) <- gene_annotation$ID
+# Check gene feature annotation and countdata rowname order coherence
+all(rownames(countdata.sorted) == gene_annotation$ID)
+all(rownames(countdata.sorted) ==  rownames(gene_annotation))
+# Obtain KOG annotations for P. damicornis genome
+gene2kog <- gene_annotation %>% select(ID, KOG_Class) %>% filter(KOG_Class != "")
 ```
 ```{r coldata}
 # Get sample data into tibble
@@ -101,9 +101,9 @@ dds <- DESeqDataSetFromMatrix(countData = countdata.sorted,
                               colData = coldata,
                               design = ~ Colony)
 # Check annotation and dds object rowname order coherence
-all(rownames(dds) == rownames(genefeatures))
+all(rownames(dds) == rownames(gene_annotation))
 # Add gene feature annotation to DESeqDataSets
-mcols(dds) <- cbind(mcols(dds), genefeatures)
+mcols(dds) <- cbind(mcols(dds), gene_annotation)
 # Subset DESeqDataSet
 ### Remove genes counted less than 10 times in subset
 dds <- dds[ rowSums(counts(dds)) > 10, ]
@@ -444,7 +444,7 @@ resultsNames(dsr1)
 # Define contrasts
 contrasts <- tibble(num = c("Heat", "Antibiotics", "Antibiotics.Heat", rep("Antibiotics.Heat", 2)), 
                     den = c(rep("control", 3), "Heat", "Antibiotics"))
-# Get DESeq results for all treatment contrasts for each colony
+# Create tibble with DESeq results for all treatment contrasts for each colony
 DE <- crossing(Colony = c("HW1", "HW2", "WT1", "WT2"), contrasts) %>%
    mutate(dsr = pmap(list(Colony, num, den), function(x, y, z) {
    results(dsr1, contrast = c("Colony.Treatment", paste0(x, ".", c(y, z))))}))
@@ -465,11 +465,15 @@ DE <- crossing(Colony = "all", contrasts) %>%
 ```
 ```{r DEG table}
 DE <- DE %>%
-  mutate(sig = map(dsr, ~ rownames_to_column(data.frame(.[which(.$padj < 0.05), ]), "gene")),
+  mutate(df = map(dsr, ~ rownames_to_column(data.frame(.), "ID")),
+         df = map(df, ~ left_join(., gene_annotation, by = "ID")))
+# Filter out significant up and down-regulated genes
+DE <- DE %>%
+  mutate(sig = map(df, ~ filter(., padj < 0.05)),
           up = map(sig, ~ filter(., log2FoldChange > 0)),
         down = map(sig, ~ filter(., log2FoldChange < 0))) 
 
-# Generate logP values for all differential expression contrasts
+# Generate signed logP values for all differential expression contrasts
 DE <- DE %>% mutate(logP = map(dsr, ~ data.frame(
   gene = rownames(data.frame(.)),
   logP = -log10(data.frame(.)$pvalue) * sign(data.frame(.)$log2FoldChange))))
@@ -487,6 +491,27 @@ DE_table <- DEtab %>% filter(den == "control") %>%
   knitr::kable(format = "markdown", caption = "Number of differentially expressed genes within individual colonies and across all colonies for each specified contrast. DEGs identified using DESeq with an adjusted p-value < 0.05. In brackets are the numbers of significantly up- and down-regulated genes.")
 DE_table
 ```
+
+The next chunk writes out the results tables as comma-separated files for all the differential expression results contrasts, with gene ID and annotation information for preparation as a supplemental table similar to the one with the LPS paper.
+
+```{r sig_tables}
+# Write significant DEG results tables to csv files
+DE %>%
+  filter(den == "control") %>%
+  mutate(sig_file_out = paste0(num, "_", den, "_", Colony, "_", "sig", ".csv"),
+         sig_file_out_path = file.path("./outputs/DESeq-results/tables/sig/", sig_file_out),
+         data = walk2(sig, sig_file_out_path, write_csv))
+# Write ALL DEG results tables to csv files
+DE %>%
+  filter(den == "control") %>%
+  mutate(file_out = paste0(num, "_", den, "_", Colony, "_", "all", ".csv"),
+         file_out_path = file.path("./outputs/DESeq-results/tables/all/", file_out),
+         data = walk2(df, file_out_path, write_csv))
+```
+
+
+Why are there only 14 differentially expressed genes between the heat and control samples? --> Missing samples
+
 ### Assess similarity of responses across colonies
 ```{r DEgenes_colony_comparison}
 shared_DEGs_colonies <- DE %>%
@@ -508,6 +533,13 @@ shared_DEGs_colonies <- DE %>%
 ## DESeq results visualizations
 ### Volcano plots
 
+For each of these plot styles, create data handling and plotting functions to process essential inputs into the plot
+```{r}
+
+```
+```{r}
+volcanoplot(DE$dsr[[1]])
+```
 
 
 ### Gene expression heatmaps
@@ -528,9 +560,9 @@ paletteLength <- 400
 # Red --> Blue gradient
 geneexpcolors <- colorRampPalette(rev(c("red", "yellow", "white", "cyan", "blue")))(paletteLength)
 # Orange --> Cyan gradient
-geneexpcolors2 <- colorRampPalette(rev(c("chocolate1","#FEE090","grey10", "cyan3","cyan")))(paletteLength)
+geneexpcolors1 <- colorRampPalette(rev(c("chocolate1","#FEE090","grey10", "cyan3","cyan")))(paletteLength)
 # Red --> Blue dark gradient
-geneexpcolors3 <- colorRampPalette(rev(c("red", "yellow", "grey10", "cyan", "blue")))(paletteLength)
+geneexpcolors2 <- colorRampPalette(rev(c("red", "yellow", "grey10", "cyan", "blue")))(paletteLength)
 ### Color bars to preview
 color.bar(geneexpcolors, -1, 1)
 color.bar(geneexpcolors1, -1, 1)
@@ -587,8 +619,31 @@ pheatmap(matvar,
          cutree_rows = 1,
          main="Heatmap of Top Most Variable Gene Expression")
 ```
-
-
+```{r deg_heatmaps}
+### Create differentially expressed gene matrix 
+#Create heatmap matrix and annotation groupings
+mat_genes  <- assay(vsd)[DE$up[[1]]$gene, ]
+row.names(mat_genes) <- DE$up[[1]]$gene#[1:95]
+mat_genes <- mat_genes - rowMeans(mat_genes)
+pheatmap(mat_genes, 
+         col = geneexpcolors2,
+         #breaks = seq(-3, 3, by = 0.015),
+         legend = TRUE,
+         annotation_col = anno_col,
+         annotation_colors = anno_colors,
+         annotation_legend = FALSE,
+         annotation_names_col = FALSE,
+         annotation_names_row = FALSE,
+         show_rownames = TRUE,
+         fontsize_row = 10,
+         show_colnames = FALSE,
+         fontsize_col = 10,
+         treeheight_col = 50,
+         cutree_cols = 1,
+         treeheight_row = 40,
+         cutree_rows = 1,
+         main="Heatmap of Differential Gene Expression")
+```
 
 ### Gene counts boxplots
 
@@ -751,16 +806,13 @@ write_csv(allGO, path = "./outputs/DESeq-results/GO_MWU/allGO.csv")
 Using the signed log(p-values) from the differential expression analysis, we can analyze which KOG classifications are up- or down-regulated within each colony, and across all four colonies together.
 
 ```{r KOG, results = 'hide'}
-# Import KOG annotations for P. damicornis genome
-gene2kog <- read.table("./data/pdam_gene2kogClass.tab", sep = "\t") %>% 
-   filter(!V2 == "")
-
+# Ensure gene KOG annotation is present
+head(gene2kog)
 # Run KOG.MWU analysis on all contrasts
 KOG <- DE %>%
   mutate(KOG = map(logP, ~ kog.mwu(., gene2kog)),
          # If a KOG term has <10 genes associated with it, set delta rank to zero
          KOG = map(KOG, ~ mutate(., delta.rank = ifelse(nseqs < 10, 0, delta.rank))))
-
 # Generate all KOG delta rank tables
 kogtables <- KOG %>%
   unnest(KOG) %>%
@@ -919,30 +971,30 @@ relevel(dds_WT2$Treatment, ref = "control")
 ```
 ### Check annotation and dds object rowname order coherence
 ```{r}
-all(rownames(dds_anti) == rownames(genefeatures))
-all(rownames(dds_heat) == rownames(genefeatures))
-all(rownames(dds_anti.heat) == rownames(genefeatures))
-all(rownames(dds_antixheat) == rownames(genefeatures))
+all(rownames(dds_anti) == rownames(gene_annotation))
+all(rownames(dds_heat) == rownames(gene_annotation))
+all(rownames(dds_anti.heat) == rownames(gene_annotation))
+all(rownames(dds_antixheat) == rownames(gene_annotation))
 ```
 ```{r}
-all(rownames(dds_HW1) == rownames(genefeatures))
-all(rownames(dds_HW2) == rownames(genefeatures))
-all(rownames(dds_WT1) == rownames(genefeatures))
-all(rownames(dds_WT2) == rownames(genefeatures))
+all(rownames(dds_HW1) == rownames(gene_annotation))
+all(rownames(dds_HW2) == rownames(gene_annotation))
+all(rownames(dds_WT1) == rownames(gene_annotation))
+all(rownames(dds_WT2) == rownames(gene_annotation))
 ```
 
 ### Add gene feature annotation to DESeqDataSets
 ```{r}
-mcols(dds_anti) <- cbind(mcols(dds_anti), genefeatures)
-mcols(dds_heat) <- cbind(mcols(dds_heat), genefeatures)
-mcols(dds_anti.heat) <- cbind(mcols(dds_anti.heat), genefeatures)
-mcols(dds_antixheat) <- cbind(mcols(dds_antixheat), genefeatures)
+mcols(dds_anti) <- cbind(mcols(dds_anti), gene_annotation)
+mcols(dds_heat) <- cbind(mcols(dds_heat), gene_annotation)
+mcols(dds_anti.heat) <- cbind(mcols(dds_anti.heat), gene_annotation)
+mcols(dds_antixheat) <- cbind(mcols(dds_antixheat), gene_annotation)
 ```
 ```{r}
-mcols(dds_HW1) <- cbind(mcols(dds_HW1), genefeatures)
-mcols(dds_HW2) <- cbind(mcols(dds_HW2), genefeatures)
-mcols(dds_WT1) <- cbind(mcols(dds_WT1), genefeatures)
-mcols(dds_WT2) <- cbind(mcols(dds_WT2), genefeatures)
+mcols(dds_HW1) <- cbind(mcols(dds_HW1), gene_annotation)
+mcols(dds_HW2) <- cbind(mcols(dds_HW2), gene_annotation)
+mcols(dds_WT1) <- cbind(mcols(dds_WT1), gene_annotation)
+mcols(dds_WT2) <- cbind(mcols(dds_WT2), gene_annotation)
 ```
 
 ### Perform DESeq2 analyses

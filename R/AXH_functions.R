@@ -74,6 +74,37 @@ color.bar <- function(lut, min, max=-min, nticks=11, ticks=seq(min, max, len=nti
   }	
 }
 
+### Volcano plot for differential gene expression -----------------------------------------------------------------
+volcanoplot <- function(res) {
+  
+  ##Highlight genes that have a padj < 0.05
+  res$threshold <- ifelse(res$padj < 0.05 & res$log2FoldChange > 0, "Upregulated", ifelse(res$padj < 0.05 & res$log2FoldChange < 0, "Downregulated", "NA"))
+  res$log10padj <- -log10(res$padj)
+  dat_genes <- data.frame(cbind(res$log2FoldChange, res$log10padj, res$threshold), stringsAsFactors = FALSE)
+  colnames(dat_genes) <- c("log2FoldChange", "log10padj", "threshold")
+  row.names(dat_genes) <- res$IDGeneInfo
+  #dat_genes <- dat_genes[order(dat_genes$log2FoldChange, decreasing = TRUE),]
+  dat_genes$log2FoldChange <- as.numeric(dat_genes$log2FoldChange)
+  dat_genes$log10padj <- as.numeric(dat_genes$log10padj)
+  dat_genes$threshold <- factor(dat_genes$threshold, levels = c("Upregulated", "Downregulated", "NA"), ordered = TRUE)
+  #Create volcanoplot
+  gVolcano <- dat_genes %>% 
+    ggplot(aes(log2FoldChange, log10padj)) + 
+    geom_point(aes(color = threshold), alpha=0.7, size=2) +
+    scale_color_manual(values = DEGcolors) +
+    scale_x_continuous(limits = c(-6,6), breaks = seq(-10,10,2)) + 
+    ylim(c(0, 10)) +
+    xlab("log2 fold change") +
+    ylab("-log10 p-value") + 
+    #geom_text_repel(data = dat_genes_LPS_ctrl[1:15, ], aes(label = rownames(dat_genes_LPS_ctrl[1:15, ])), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+    theme_bw() +
+    theme(legend.position = "none", 
+          plot.title = element_text(size = 12, hjust = 0, vjust = 1),
+          axis.text = element_text(size = 10),
+          axis.title = element_text(size = 10))
+  print(gVolcano)
+}
+
 ### Function to plot GO_MWU clustering ---------------------------------------------------------------------------
 
 
