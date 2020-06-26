@@ -1,0 +1,52 @@
+---
+title: "HOBO_temperature"
+author: "Mike Connelly"
+date: "5/21/2020"
+output: 
+  html_document:
+      code_folding: hide
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
+options(stringsAsFactors = FALSE)
+```
+```{r packages}
+library("tidyverse")
+library("tibbletime")
+library("lubridate")
+library("scales")
+```
+```{r hobo_data}
+SystemA <- read.csv("./data/hobo/systemA_noheat.csv", stringsAsFactors = FALSE)
+SystemB <- read.csv("./data/hobo/systemB_heat.csv", stringsAsFactors = FALSE)
+```
+```{r tidy_data, echo = FALSE}
+SystemA$system <- rep("control", nrow(SystemA))
+SystemB$system <- rep("heat", nrow(SystemB))
+hobotemp <- rbind(SystemA, SystemB)
+hobotemp <- hobotemp %>% select(-point)
+hobotempdate <- hobotemp %>% select(-Date_Time_GMT.08.00)
+hobotempdate$date <- mdy_hms(hobotemp$Date_Time_GMT.08.00)
+hobotempdate$datetime <- as_datetime(hobotempdate$date)
+hobotempdate$system <- factor(hobotempdate$system, levels = c("control", "heat"), ordered = TRUE)
+hobotempdate <- hobotempdate %>% filter(date > "2017-08-14 12:00:10")
+```
+```{r temp_graph, echo = FALSE}
+ntempgraph <- hobotempdate %>%
+  ggplot(aes(date, temp)) +
+  geom_hline(yintercept = 32, color = "red") + 
+  geom_hline(yintercept = 28, color = "blue") +
+  geom_line(aes(color = system), size = 1, alpha = 1) +
+  #geom_smooth(aes(color = system), size = 1, alpha = 1) +
+  scale_color_manual(values = c("blue", "red")) +
+  #scale_x_date(limits = c("2017-08-14 14:00:10", "2017-08-18 00:00:00")) +
+  scale_y_continuous(limits = c(26,34), breaks = c(26,28,30,32,34)) +
+  ggtitle("Experimental aquarium treatment temperatures") +
+  ylab("Temperature (C)") +
+  xlab("Date") +
+  theme(panel.grid.major = element_line(color = "grey92"),
+        panel.grid.minor = element_line(color = "grey92"))
+ntempgraph
+ggsave(filename = "./manuscript_figures/FigS3_HOBO.pdf", width = 169, height = 80, units = "mm", device = "pdf")
+```

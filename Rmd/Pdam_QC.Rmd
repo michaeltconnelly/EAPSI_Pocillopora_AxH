@@ -1,0 +1,123 @@
+---
+title: "Pdam_QC"
+author: "Mike Connelly"
+date: "10/30/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/scripts/EAPSI.HW-WT-master/")
+```
+```{r}
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+QC_summary <- read_excel("./QCs/QCsummary.xlsx")
+sum(QC_summary$Sequences)
+```
+#filter into separate data frames for each colony
+```{r}
+HW1 <- filter(QC_summary, colony == "Houwan1")
+HW2 <- filter(QC_summary, colony == "Houwan2")
+WT1 <- filter(QC_summary, colony == "Wanglitung1")
+WT2 <- filter(QC_summary, colony == "Wanglitung2")
+```
+#histograms of total read counts per genotype
+```{r}
+hist(QC_summary$Sequences)
+par(mfrow=c(1,1))
+hist(HW1$Sequences, breaks = 20, xlim = c(0, 2.5e7), ylim = c(0,10), col ="light blue")
+hist(HW2$Sequences, breaks = 20, xlim = c(0, 2.5e7), ylim = c(0,10), col ="blue")
+hist(WT1$Sequences, breaks = 20, xlim = c(0, 2.5e7), ylim = c(0,10), col ="light green")
+hist(WT2$Sequences, breaks = 20, xlim = c(0, 2.5e7), ylim = c(0,10), col ="green")
+```
+```{r}
+QC_summary$condition <- factor(QC_summary$condition, levels = c("control", "Antibiotics", "Heat", "LPS", "Antibiotics.Heat", "Antibiotics.Heat.LPS"), ordered = TRUE)
+```
+### #1-#15 below 8 million reads
+### #16-#43 below 10 million reads
+
+```{r}
+condcolors <- c("#0000FF", "#00CCCC", "#FF6600", "#FF66FF", "#FFCC33", "#CC0033")
+colshapes <- c(18, 9, 16, 10)
+FASTQCg <- ggplot(QC_summary, aes(sample, Sequences, color = condition, shape = colony))
+FASTQCg + geom_point() + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + geom_hline(yintercept = 10000000, color  = "green") + geom_hline(yintercept = 8000000) + geom_hline(yintercept = 1000000, color = "red")
+  #geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines")
+```
+```{r}
+pdf(file = "./QCs/seqdepth_genotype", width = 6, height=4)
+FASTQCgg <- ggplot(QC_summary, aes(colony, Sequences, color = condition, shape = colony))
+FASTQCgg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + geom_hline(yintercept = 10000000, color  = "green") + geom_hline(yintercept = 8000000) + geom_hline(yintercept = 1000000, color = "red")
+FASTQCgg + geom_col() + scale_color_manual(values = condcolors)
+```
+```{r}
+pdf(file = "./QCs/seqdepth_condition", width = 6.2, height=4)
+FASTQCggg <- ggplot(QC_summary, aes(condition, Sequences, color = condition, shape = colony))
+FASTQCggg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,22000000) +
+  geom_hline(yintercept = 10000000, color  = "green") +
+  geom_hline(yintercept = 8000000) +
+  geom_hline(yintercept = 1000000, color = "red") #
+#+ geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines"))
+```
+```{r}
+LaneQC <- ggplot(FASTQC_summary, aes(FlowCell, Sequences, color = condition, shape = colony))
+LaneQC + geom_point(size = 3) + geom_hline(yintercept = 10000000, color  = "green") + geom_hline(yintercept = 8000000) + geom_hline(yintercept = 1000000, color = "red") + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes)
+LaneQC + geom_col() + scale_color_manual(values = condcolors)
+```
+
+```{r}
+LaneQCg <- ggplot(FASTQC_summary_GNXIDs, aes(FlowCell, Sequences, color = condition, shape = colony))
+LaneQCg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + geom_hline(yintercept = 10000000, color  = "green") + geom_hline(yintercept = 8000000) + geom_hline(yintercept = 1000000, color = "red") + geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines"))
+```
+```{r}
+trimQCg <- ggplot(QCsummary, aes(colony, TrimmedSequences, color = condition, shape = colony))
+trimQCg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + #ylim(0,100)
+  geom_hline(yintercept = 10000000, color  = "green") +
+  geom_hline(yintercept = 8000000) + 
+  geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+trimQCgg <- ggplot(FASTQC_summary, aes(condition, TrimmedSequences, color = condition, shape = colony))
+trimQCgg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,22000000) +
+  geom_hline(yintercept = 10000000, color  = "green") +
+  geom_hline(yintercept = 8000000) + 
+  geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+alignQCg <- ggplot(FASTQC_summary, aes(colony, uniquely_mapped_percent, color = condition, shape = colony))
+alignQCg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,100)
+  #geom_hline(yintercept = 10000000, color  = "green") +
+  #geom_hline(yintercept = 8000000) + 
+  #geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+alignQCgg <- ggplot(FASTQC_summary, aes(condition, uniquely_mapped_percent, color = condition, shape = colony))
+alignQCgg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,100)
+  #geom_hline(yintercept = 10000000, color  = "green") +
+  #geom_hline(yintercept = 8000000) + 
+  #geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+pdf(file = "./QCs/assignpercent_condition", width = 6, height=4)
+assignQCg <- ggplot(QC_summary, aes(condition, percent_assigned, color = condition, shape = colony))
+assignQCg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,100)
+  #geom_hline(yintercept = 10000000, color  = "green") +
+  #geom_hline(yintercept = 8000000) + 
+  #geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+assignQCg <- ggplot(FASTQC_summary, aes(condition, Assigned, color = condition, shape = colony))
+assignQCg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,22000000) +
+  geom_hline(yintercept = 3000000, color  = "green") +
+  #geom_hline(yintercept = 8000000) + 
+  geom_hline(yintercept = 1000000, color = "red")
+```
+```{r}
+assignQCgg <- ggplot(FASTQC_summary, aes(colony, Assigned, color = condition, shape = colony))
+assignQCgg + geom_point(size = 3) + scale_color_manual(values = condcolors) + scale_shape_manual(values = colshapes) + ylim(0,22000000) +
+  geom_hline(yintercept = 3000000, color  = "green") +
+  #geom_hline(yintercept = 8000000) + 
+  geom_hline(yintercept = 1000000, color = "red")
+```

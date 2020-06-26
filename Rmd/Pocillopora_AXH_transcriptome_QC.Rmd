@@ -1,0 +1,94 @@
+---
+title: "Pocillopora_AXH_transcriptome_QC"
+author: "Mike Connelly"
+date: "5/26/2020"
+output: 
+  html_document:
+      code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
+options(stringsAsFactors = FALSE)
+```
+```{r packages}
+library("tidyverse")
+library("ggrepel")
+library("scales")
+library("patchwork")
+```
+```{r data}
+samples <- read.table("./data/EAPSI_samples_AxH_meta.txt", header = TRUE)
+samples$SampleID <- gsub('-','.', samples$SampleID)
+QC_summary <- read_csv("./data/qcs.csv")
+QC_summary$SampleID <-  gsub('-','.', QC_summary$SampleID)
+sum(QC_summary$rawCounts)
+```
+```{r tidydata}
+QC_summary <- QC_summary %>%
+  pivot_longer(., c(rawCounts, trimmedCounts, singleMapped, geneCounted), names_to = "pipeline_step", values_to = "read_count") %>% 
+  left_join(samples[ ,1:6], ., by = "SampleID")
+QC_summary$pipeline_step <- factor(QC_summary$pipeline_step, levels = c("rawCounts", "trimmedCounts", "singleMapped", "geneCounted"), ordered = TRUE)
+QC_summary$Treatment <- factor(QC_summary$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+```
+
+
+### #1-#15 below 8 million reads
+### #16-#43 below 10 million reads
+
+```{r}
+FASTQCg <- QC_summary %>% 
+  filter(pipeline_step == "rawCounts") %>%
+  ggplot(aes(SampleID, read_count, color = Treatment, shape = Colony))
+FASTQCg + geom_point() + 
+  scale_color_manual(values = condcolors_AxH) + 
+  scale_shape_manual(values = colshapes) +
+  geom_hline(yintercept = 10000000, color  = "green") +
+  geom_hline(yintercept = 8000000) + 
+  geom_hline(yintercept = 1000000, color = "red")
+  #geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines")
+```
+
+```{r read_counts}
+pipeQC_counts <- QC_summary %>%
+  ggplot(aes(pipeline_step, read_count, color = Treatment, shape = Colony, fill = Treatment)) +
+  geom_path(aes(group = SampleID), show.legend = FALSE) +
+  geom_point(size = 2, color = "black", alpha = 0.5, stroke = 0.5, show.legend = FALSE) + 
+  scale_y_continuous(limits = c(0, 2.5e7), breaks = c(0, 5e6, 1e7, 1.5e7, 2e7, 2.5e7)) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes) + 
+  scale_fill_manual(values = condcolors_AxH) +
+  theme(axis.text.x = element_text(angle = 345), panel.grid.major = element_line(color = "grey92")) +
+  ylab("read count") +
+  xlab("pipeline step") + 
+  ggtitle("read counts")
+pipeQC_counts
+```
+
+```{r proportions}
+QC_summary <- QC_summary %>% 
+  dplyr::group_by(SampleID) %>%
+  mutate(proportion = read_count / read_count[pipeline_step == "rawCounts"])
+```
+```{r}
+pipeQC_props <- QC_summary %>%
+  ggplot(aes(pipeline_step, proportion, color = Treatment, shape = Colony, fill = Treatment)) +
+  geom_path(aes(group = SampleID), show.legend = TRUE) +
+  geom_point(size = 2, color = "black", alpha = 0.5, stroke = 0.5, show.legend = TRUE) + 
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes) + 
+  scale_fill_manual(values = condcolors_AxH) +
+  guides(shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5))) +
+  theme(axis.text.x = element_text(angle = 345), panel.grid.major = element_line(color = "grey92")) +
+  ylab("proportion raw reads") +
+  xlab("pipeline step") + 
+  ggtitle("read proportions")
+pipeQC_props
+```
+```{r}
+qcfig <- (pipeQC_counts | pipeQC_props) + plot_annotation(tag_levels = "A")
+ggsave(qcfig, filename = "./manuscript_figures/FigS5_readcounts.pdf", width = 169, height = 80, units = "mm", device = "pdf")
+```
+
