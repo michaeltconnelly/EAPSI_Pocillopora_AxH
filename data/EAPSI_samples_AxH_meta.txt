@@ -1,4 +1,4 @@
-SampleID	Reef	Colony	Environment	Treatment	Batch	control	heat	anti	anti.heat	allheat	allanti	Wanglitung	Houwan	H1	H2	W1	W2
+SampleID	Reef	Colony	Environment	Treatment	Batch	control	Heat	Antibiotics	Antibiotics.Heat	allheat	allanti	Wanglitung	Houwan	HW1	HW2	WT1	WT2
 Hw1-1a	Houwan	HW1	Stable	Antibiotics.Heat	A	0	0	0	1	1	1	0	1	1	0	0	0
 Hw1-1b	Houwan	HW1	Stable	Antibiotics.Heat	A	0	0	0	1	1	1	0	1	1	0	0	0
 Hw1-1c	Houwan	HW1	Stable	Antibiotics.Heat	A	0	0	0	1	1	1	0	1	1	0	0	0

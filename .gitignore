@@ -30,3 +30,9 @@ R/GO_MWU/
 data/pdam_gene2kogClass.tab
 data/pdam_annotations*
 data/pdam_genome_annotations*
+RData*
+manuscript_figures/*
+outputs/QCs/
+.RDataTmp1
+data/hobo/
+outputs/*
