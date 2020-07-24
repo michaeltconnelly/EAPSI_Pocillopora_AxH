@@ -36,3 +36,5 @@ outputs/QCs/
 .RDataTmp1
 data/hobo/
 outputs/*
+RDataTmp2
+.RDataTmp2

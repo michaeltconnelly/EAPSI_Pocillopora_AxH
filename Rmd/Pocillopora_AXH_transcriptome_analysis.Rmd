@@ -204,12 +204,11 @@ mcols(dds) <- cbind(mcols(dds), gene_annotation)
 # Remove genes counted less than 10 times in dataset
 dds <- dds[ rowSums(counts(dds)) > 10, ]
 ```
-
-## Visualize global gene expression
 ```{r vst}
 # Normalize expression data for visualization purposes using VST tranformation
 vsd <- vst(dds, blind = TRUE) # use blind = TRUE to not account for experimental design
 ```
+## Visualize global gene expression
 ```{r}
 ggPCA(vsd, samples, condcolors_AxH, pclab = c(1,2))
 ```
@@ -1136,6 +1135,7 @@ hclustME <- flashClust(as.dist(dissimME), method="average" )
 par(mfrow=c(1,1))
 plot(hclustME, main="Clustering tree based on the module eigengenes")
 ```
+
 ### Module eigengene treatment correlations and heatmap
 ```{r trait_data}
 # Get sample data into tibble
@@ -1158,6 +1158,8 @@ moduleCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
 ```{r uniq_modules}
 # Extract all unique modules
 uniqModules <- sort(setdiff(unique(colnames(MEs1)), "grey"))
+# set in order according to ME clustering dendogram
+uniqModules <- uniqModules[hclustME$order]
 uniqModules
 ```
 ```{r sig_modules}
@@ -1168,9 +1170,14 @@ modP <- as.data.frame(moduleTraitPvalue) %>%
   arrange(module) %>% 
   filter_all(any_vars(. < 0.05)) # %>% dplyr::select(module, lps)
 sigModules <- sort(setdiff(modP$module,  "grey"))
-sigModules
+# 
+uniqModules
+# would like to reorder the sigModules subset to match ME clustering dendrogram order
+sigModules <- uniqModules[uniqModules %in% sigModules]
+# 
 all(sigModules %in% uniqModules) # test that all the significant modules are actually within the modules
 all(sigModules == uniqModules) # are all modules also significantly correlated to one or more traits?
+sigModules
 ```
 ```{r ME_textmatrix}
 # Create text matrix to display correlations and their p-values
@@ -1220,7 +1227,7 @@ me_heatmap <- Heatmap(moduleTraitCor,
                       cluster_rows = hclustME,
                       top_annotation = treatment_annotation,
                       left_annotation = module_annotation,
-                      # right_annotation = module_barplot,
+                      right_annotation = module_barplot,
                       row_split = NULL,
                       border = FALSE,
                       rect_gp = gpar(col = "white", lwd = 1.5),
@@ -1394,7 +1401,7 @@ modules.GO %>%
   filter(p.adj < 0.05 & delta.rank >= 0) %>% 
   count(module)
 ```
-###WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
+### WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
 ```{r wgcna_kog}
 # Create tibble to keep results of WGCNA module KOGMWU enrichment
 modKOG <- tibble("module" = uniqModules)
@@ -1554,22 +1561,10 @@ draw(combmap,  show_annotation_legend = FALSE, heatmap_legend_side = "left")
 ```{r}
 # calculate gene trait significance for each treatment, genotype, etc.
 geneTraitSignificance <- as.data.frame(cor(datExpr, datTraits, use = "p")) 
-# pivot longer
 traitGS <- geneTraitSignificance %>% 
-  rownames_to_column("ID")# %>% 
-  # pivot_longer(cols = control:Antibiotics.Heat, names_to = "Treatment.GS", values_to = "GS")
-# 
-# what is different about module membership and kME statistics?
-# calculate gene module membership, defined as correlation of each gene against the module eigengene expression
-geneModuleMembership <- as.data.frame(cor(datExpr, MEs1, use = "p"))
+  rownames_to_column("ID")
 ```
 ```{r df_kME_GS}
-MM <- geneModuleMembership
-colnames(MM) <- module_colors
-MMlong <- MM %>% 
-  rownames_to_column("ID") %>% 
-  pivot_longer(cols = -ID, names_to = "module.MM", values_to = "MM")
-
 longKME <- datKME %>% 
   rename(gene = "ID") %>% 
   pivot_longer(cols= -ID, names_to = "module", values_to = "kME")
@@ -1594,44 +1589,47 @@ df_mod_GS_kME <- df_gene_GS_kME %>%
 write_csv(df_mod_GS_kME, path = paste("./outputs/WGCNA-results/tables/", module, "_GS_kME.csv", sep = ""))
 }
 ```
-```{r}
-GS <- as.numeric(cor(datExpr, datTraits, use = "p"))
-GScolor <- numbers2colors(GS, signed = T)
-numberOfColumn <- colnames(datKME[-1])
+```{r overall_kME_GS_scatterplot}
+tidy_gene_GS_kME <- pivot_longer(df_gene_GS_kME, cols = control:Antibiotics.Heat, names_to = "Treatment", values_to = "GS")
+tidy_gene_GS_kME$Treatment <- factor(tidy_gene_GS_kME$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+sigmods_kME_GS_scatterplot <- tidy_gene_GS_kME %>% 
+  filter(moduleColor %in% sigModules) %>% 
+  ggplot(aes(kME, GS, color = moduleColor)) +
+  geom_hline(yintercept = 0, color= "grey40") +
+  geom_point(size = 1, alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, weight = 1, fullrange = TRUE) +
+  scale_color_manual(values = sigModules) +
+  coord_cartesian(xlim = c(0,1), ylim = c(-1,1)) +
+  facet_grid(moduleColor ~ Treatment)
+ggsave(sigmods_kME_GS_scatterplot, filename = "./outputs/WGCNA-results/figures/sigmodules_kME_gene_significance_scatterplot.pdf", width = 8.5, height = 11, device = "pdf")
 ```
-
-Fix using large data frame created above, try to facet scatterplots according to treatment trait of interest
-```{r kme_scatterplots}
+```{r focal_kME_GS_scatterplots}
+# want to hide the ugly parts of this in the functions files
 module <- "darkorange"
-# pdf("./outputs/WGCNA-results/figures/module_kME_scatterplots.pdf")
-# for (module in sigModules) {
-  column <- match(module, numberOfColumn)     
-  inModule <- (moduleColors == module)
-  
-# write output tables with gene kME statistics and trait gene significance for each module
-#datKME <- datKME %>% column_to_rownames("gene")
-datKME.GS <- data.frame(cbind(datKME[inModule, column], GS[inModule]))
-colnames(datKME.GS) <- c("kME", "GS")
-datKME.GS$ID <- Genes[inModule]
-hikME <- datKME.GS %>%
-  arrange(desc(kME)) %>% 
-  left_join(., gene_annotation, by = "ID")
-#write_csv(hikME, path = paste("./outputs/WGCNA-results/tables/", module, "_kME.csv", sep = ""))
-
-coef <- coef(lm(GS ~ kME, data = hikME))
-g <- hikME %>% ggplot(., aes(GS, kME)) +
-  geom_point(color = module, size = 2, alpha = 0.2) + 
-  geom_abline(slope = coef[1], intercept = coef[2], color = module) +
-  xlab(paste("Module membership ", module, "module")) + 
-  ylab(paste("Gene Significance", "Control")) +
-  ggtitle(paste("kME.", module, "vs. GS")) + 
-  xlim(-0.5, 1) +
-  ylim(-0,1.0) +
-  theme_bw() +
-  geom_text_repel(data = hikME[1:10, ], aes(label = hikME[1:10, ]$Gene_Info), color = "black", size = 2.5, box.padding = unit(0.35, "lines"))
-print (g)
-# }
-dev.off()
+pdf(file = "./outputs/WGCNA-results/figures/sigmodules_kME_gene_significance_scatterplots", width = 6, height = 4)
+for(module in sigModules) {
+plot <- tidy_gene_GS_kME %>% 
+  filter(moduleColor == module) %>% 
+  ggplot(aes(kME, GS, color = moduleColor)) +
+  geom_hline(yintercept = 0, color= "grey40") +
+  geom_smooth(method = "lm", se = TRUE, weight = 1, fullrange = TRUE) +
+  geom_point(size = 1, alpha = 0.5) +
+  #geom_text_repel(aes(label = ID), color = "black", size = 2.5, box.padding = unit(0.35, "lines")) +
+  scale_color_manual(values = module_colors[module_colors == module]) +
+  coord_cartesian(xlim = c(0,1), ylim = c(-1,1)) +
+  facet_grid(~ Treatment)
+print(plot)
+g_plot <- ggplot_gtable(ggplot_build(plot))
+  strip_both <- which(grepl('strip-', g_plot$layout$name))
+  k <- 1
+  for (i in strip_both) {
+    j <- which(grepl('rect', g_plot$grobs[[i]]$grobs[[1]]$childrenOrder))
+    g_plot$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- condfillcolors_AxH[k]
+    k <- k+1
+  }
+  gp <- grid.draw(g_plot)
+  print(gp)
+}
 ```
 
 ### Module eigengene and gene-scaled profile plots
@@ -1728,11 +1726,88 @@ source("./R/GO_MWU/go_plotresults_WGCNA.R")
 
 ```
 ### GO Term module eigengenes
+```{r GO_genes}
+all_WGCNA_df <- df_gene_GS_kME %>% full_join(gene_annotation, by = "ID")
+# structural constituent of ribosome
+# immune response (GO:0006955), 576 genes annotated in emapper gene2go file
+immune_genes <- all_WGCNA_df %>% 
+  filter(grepl("GO:0006955", GO_Terms_EM)) %>% 
+  filter(moduleColor %in% c("greenyellow", "darkorange")) %>% 
+  group_by(moduleColor) %>% 
+  summarise(n = count(ID))
+# inorganic ion transport GO:0006812;GO:0034220
+# apoptotic process GO:0006915
+apoptosis_genes <- all_WGCNA_df %>% 
+  filter(grepl("GO:0006915", GO_Terms_EM)) %>% 
+  filter(moduleColor %in% sigModules)
+# DNA repair (GO:0006281), 436
+dnarepair_genes <- all_WGCNA_df %>% 
+  filter(grepl("GO:0006281", GO_Terms_EM)) %>% 
+  filter(moduleColor == "lightcyan1")
+```
+```{r GO_module_genes}
+apoptosis_orangered4 <- read_csv("./outputs/WGCNA-results/tables/orangered4_GS_kME.csv") %>% filter(grepl("GO:0006915", GO_Terms_EM))
+mat_apor4 <- assay(vsd)[apoptosis_orangered4$ID,]
+mat_apor4 <- mat_apor4 - rowMeans(mat_apor4)
+Heatmap(mat_apor4, 
+        top_annotation = sample_annotation,
+        row_dend_width = unit(1.5, "in"),
+        row_labels = as.character(gene_annotation[rownames(mat_apor4), 3]))
+```
 ```{r}
-# ribosome
-# immune defense
-# ion transport
-# apoptosis/programmed cell death
+#Calculate eigengene for genes in "apoptotic process" GO term (see go_plotresults script to pull these genes out of GO_MWU results) 
+```
+```{r}
+MEs_apoptosis <-  moduleEigengenes(datExpr[,c(apoptosis_genes$ID)], apoptosis_genes$moduleColor)$eigengenes
+colnames(MEs_apoptosis) <- sigModules
+MEs_apoptosis <- MEs_apoptosis %>%
+  rownames_to_column("SampleID") %>% 
+  pivot_longer(cols = -SampleID, names_to = "module", values_to = "ME") %>% 
+  full_join(samples, by = "SampleID")
+MEs_apoptosis$Treatment <- factor(MEs_apoptosis$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = T)
+MEs_apoptosis$module <- factor(MEs_apoptosis$module, levels = sigModules, ordered = T)
+MEs_apoptosis %>% 
+  ggplot(aes(x = Treatment, y = ME)) +
+  geom_boxplot(aes(fill = Treatment)) + 
+  geom_point() +
+  facet_wrap(module~.) +
+  scale_fill_manual(values = condfillcolors_AxH)
+# to continue with this I need to map color aesthetics, print number of genes to the GO term in each module, and account for module-treatment correlations
+```
+```{r}
+MEs_immune <-  moduleEigengenes(datExpr[,c(immune_genes$ID)], immune_genes$moduleColor)$eigengenes
+MEs_immune <- MEs_immune %>%
+  rownames_to_column("SampleID") %>% 
+  pivot_longer(cols = -SampleID, names_to = "module", values_to = "ME") %>% 
+  full_join(samples, by = "SampleID")
+MEs_immune$Treatment <- factor(MEs_immune$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = T)
+immbox <- MEs_immune %>% 
+  ggplot(aes(x = Treatment, y = ME)) +
+  geom_boxplot(aes(fill = Treatment)) + 
+  geom_point() +
+  facet_grid(module ~ Colony) +
+  ggtitle("Eigengene expression of 'Immune response' genes") +
+  ylab("Eigengene expression") +
+  scale_fill_manual(values = condfillcolors_AxH)
+ggsave(immbox, filename = "./outputs/WGCNA-results/figures/immuneresponse_boxplot.pdf", device = "pdf", width = 6, height = 4)
+```
+```{r}
+MEs_dnarepair <-  moduleEigengenes(datExpr[,c(dnarepair_genes$ID)], dnarepair_genes$moduleColor)$eigengenes
+MEs_dnarepair <- MEs_dnarepair %>%
+  rownames_to_column("SampleID") %>% 
+  pivot_longer(cols = -SampleID, names_to = "module", values_to = "ME") %>% 
+  full_join(samples, by = "SampleID")
+MEs_dnarepair$Treatment <- factor(MEs_dnarepair$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = T)
+dnarepbox <- MEs_dnarepair %>% 
+  ggplot(aes(x = Treatment, y = ME)) +
+  geom_boxplot(aes(fill = Treatment)) + 
+  geom_point() +
+  #facet_grid(module~Colony) +
+  ggtitle("Eigengene expression of 'DNA repair' genes in lightcyan1 module (n = 99 genes)") +
+  ylab("Eigengene expression") +
+  scale_fill_manual(values = condfillcolors_AxH)
+# to continue with this I need to map color aesthetics, print number of genes to the GO term in each module, and account for module-treatment correlations
+ggsave(dnarepbox, filename = "./outputs/WGCNA-results/figures/lightcyan1_dnarepair_boxplot.pdf", device = "pdf", width = 6, height = 3)
 ```
 
 
