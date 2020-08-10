@@ -1,7 +1,7 @@
 ---
 title: "Pocillopora_AXH_microbiome_analysis"
 author: "Mike Connelly"
-date: "4/29/2020"
+date: "7/28/2020"
 output: 
   html_document:
       code_folding: hide
@@ -14,21 +14,33 @@ knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AXH")
 ```{r packages, include=FALSE}
 library("plyr")
 library("tidyverse")
+# Essential microbiome analysis packages
 library("phyloseq")
 library("microbiome")
 library("vegan")
 library("ape")
 library("ALDEx2")
+
+
+# Data visualization packages
 library("pheatmap")
-library("ggpubr")
-library("ggnewscale")
-library("ggrepel")
-library("RColorBrewer")
-library("wesanderson")
-library("grid")
 library("data.table")
 library("DT")
+# Graphics packages
+library("cowplot")
 library("patchwork")
+library("gridExtra")
+library("ggthemes")
+library("ggpubr")
+library("ggrepel")
+library("ggnewscale")
+library("RColorBrewer")
+library("wesanderson")
+library("circlize")
+library("stringr")
+library("extrafont")
+library("extrafontdb")
+# extended visualization functions
 source("./R/ggrare.R")
 source("./R/AXH_functions.R")
 ```
@@ -36,52 +48,49 @@ source("./R/AXH_functions.R")
 ### Set overall theme, colors, and shapes for ggplot2
 # remember to set theme_mec() from transcriptomic script for proper formatting
 theme_set(theme_mec())
-###
-varcolors <- c(wes_palette(n=4, name="Zissou1"), "grey85")
-###
-condcolors_AXH <- c("blue", "darkorange", "cyan", "gold")
-condcolors_heat <- c(condcolors_AXH[1:2])
-condcolors_anti <- c(condcolors_AXH[1], condcolors_AXH[3])
-condcolors_anti.heat <- c(condcolors_AXH[1], condcolors_AXH[4])
-###
-condfillcolors_AXH <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66")
-colshapes <- c(16, 17, 15, 18)
+# colors for experimental treatments
+condcolors_AxH <- c("blue", "darkorange", "cyan", "gold")
+condcolors_heat <- c(condcolors_AxH[1:2])
+condcolors_anti <- c(condcolors_AxH[1], condcolors_AxH[3])
+condcolors_anti.heat <- c(condcolors_AxH[1], condcolors_AxH[4])
+condfillcolors_AxH <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66") # fill colors for some figures
+# shapes and colors for colonies
 colshapes <- c(21, 24, 22, 23)
 colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
-###
+# null colors for presentation figures
 condcolors_null <- c(rep("black", 4))
 colshapes_null <- c(rep(20, 8))
 ```
 ```{r taxa colors, include=FALSE}
-### Bacteria taxa
-## Phyla
+# Bacteria taxa
+# Phyla
 phyla_colors <- read_csv("./Rmd/taxa_colors/phyla_colors.csv", col_names = c("phylum", "color"))
-## Classes
+# Classes
 classes_colors <- read_csv("./Rmd/taxa_colors/classes_colors.csv", col_names = c("phylum", "class", "color"))
-## Orders
+# Orders
 orders_colors <- read_csv("./Rmd/taxa_colors/orders_colors.csv", col_names = c("phylum", "class", "order", "color"))
-## Families
+# Families
 families_colors <- read_csv("./Rmd/taxa_colors/families_colors3.csv", col_names = c("phylum", "class", "order", "family", "color"))
-## Genera
+# Genera
 #genera_colors <- 
-## Specices
+# Specices
 #species_colors <- 
 ```
-## Make phyloseq object
-Read in ASV table
+## Read in ASV table, taxonomy, sample data
 ```{r asv}
+# Read in ASV table
 ASV <- read.table("./outputs/qiime2/export_silva/all_silva_feature-table.tsv", row.names = 1, header = TRUE)
 ASV <- t(ASV)
 ```
-Read in taxononomic classification information
 ```{r taxomony}
+# Read in taxononomic classification information
 taxonomy <- as.matrix(read.table("./outputs/qiime2/export_silva/taxonomy4.txt", sep = "\t", row.names = 1, header = FALSE, fill = TRUE))
 colnames(taxonomy) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 taxonomy[taxonomy==""] <- NA
 taxdf <- as.data.frame(taxonomy)
 ```
-Read in phylogenetic tree, sample metadata and set factor orders
-```{r tree and metadata}
+```{r tree_metadata}
+# Read in phylogenetic tree, sample metadata and set factor orders
 tree <- read_tree("./outputs/qiime2/export_silva/tree.nwk")
 map <- read.table("./data/qiime2_metadata.tsv", sep ="\t", row.names = 1, header = FALSE)
 colnames(map) <- c ("Reef",	"Colony",	"Environment",	"Treatment")
@@ -90,74 +99,71 @@ map$Reef <- factor(map$Reef, levels = c("Houwan", "Wanglitung", "controls"), ord
 map$Colony <- factor(map$Colony, levels = c("HW1", "HW2", "WT1", "WT2", "controls"), ordered = TRUE)
 map$Treatment <- factor(map$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
 ```
-Create phyloseq objects and inspect
+## Create phyloseq object
 ```{r phyloseq}
 ps <- phyloseq(otu_table(ASV, taxa_are_rows = FALSE),
                sample_data(map),
                tax_table(taxonomy),
                phy_tree(tree))
 ps
-summarize_phyloseq(ps)
+# summarize_phyloseq(ps)
 ```
-Read in read depth information
-```{r rd}
-readdepth <- read_csv("./outputs/qiime2/QC/per-sample-fastq-counts.csv")
-colnames(readdepth) <- c("SampleID", "Count")
-readdepth <- merge.data.frame(map, readdepth, by = "SampleID")
-```
-
-## Pre-process, filter, and QC phyloseq object
-      prune_samples
-      subset_samples
-      filterfun_sample
-      genefilter_sample
-
-### Stable site control, Antibiotics, Heat, Antibiotics.Heat sample subset
-```{r}
+```{r ps_AxH_all}
+# Pre-process, filter, and QC phyloseq object
+# Stable site control, Heat, Antibiotics, Antibiotics.Heat sample subset
 nsamples(ps)
 samples <- sample_names(ps)
-samples.AXH <- grep("[HW][wt][1-2].[1456][abc]", samples, value = TRUE)
+# regex to select Hw1, Hw2, Wt1, and Wt2 genotypes in control (6), heat stress (4), antibiotics (5), and combined (1) treatments
+samples.AXH <- grep("[HW][wt][1-2].[1456][abc]", samples, value = TRUE) 
 ps.AXH_allASVs <- prune_samples(samples.AXH, ps)
 ps.AXH_allASVs
+# 48 samples, 5 sample variables
 ```
-Retain only assigned taxa
-```{r}
+```{r ps_assigned}
+# Retain only assigned taxa
 ps_assigned <- subset_taxa(ps, Kingdom!="Unassigned")
 ps_assigned
+# 532 taxa and 7 taxonomic ranks
+# Filter taxa that have a mean count of 5 across all coral samples
+ps_filtered <- filter_taxa(ps_assigned, function(x) mean(x) > 5, TRUE)
+ps_filtered
+# ?filter_taxa
 ```
-```{r}
-nsamples(ps_assigned)
-samples <- sample_names(ps_assigned)
-samples.AXH <- grep("[HW][wt][1-2].[1456][abc]", samples, value = TRUE)
-ps.AXH <- prune_samples(samples.AXH, ps_assigned)
-ps.AXH
+```{r ps_AxH_assigned}
+nsamples(ps_filtered) # 53
+samplenames <- sample_names(ps_assigned)
+
+# select Hw1, Hw2, Wt1, and Wt2 genotypes in control (6), heat stress (4), antibiotics (5), and combined (1) treatments
+ps.AXH <- prune_samples(samples.AXH, ps_filtered)
+ps.AXH # 48
 summarize_phyloseq(ps.AXH)
 ```
-```{r}
-datatable(tax_table(ps.AXH))
-```
-```{r}
+```{r ps_transformations}
+# Relative abundance transformation
 ps.AXH.rel <- transform_sample_counts(ps.AXH, function(x) {x / sum(x)} )
+# Centered log-ratio transformation, recommended by Gloor et al. 2017: https://doi.org/10.3389/fmicb.2017.02224
 ps.AXH.clr <- microbiome::transform(ps.AXH, "clr")
+# summarize_phyloseq(ps.AXH.clr)
 ```
-
-### Control sample subset
-```{r}
+```{r controls}
+# Control sample subset
 nsamples(ps_assigned)
 samples <- sample_names(ps_assigned)
 samplescontrol <- grep("[HW][wt][1-2].[6][abc]", samples, value = TRUE)
 ps.control <- prune_samples(samplescontrol, ps_assigned)
 ps.control
-summarize_phyloseq(ps.control)
-```
-```{r}
-datatable(tax_table(ps.control))
-```
-```{r}
+# summarize_phyloseq(ps.control)
 ps.control.rel <- transform_sample_counts(ps.control, function(x) {x / sum(x)} )
 ps.control.clr <- microbiome::transform(ps.control, "clr")
 ```
 
+## Quality control plots
+```{r rd}
+# Read in read depth information
+readdepth <- read_csv("./outputs/qiime2/QC/per-sample-fastq-counts.csv")
+colnames(readdepth) <- c("SampleID", "Count")
+readdepth <- merge.data.frame(map, readdepth, by = "SampleID")
+```
 ### Read depth QC plot
 ```{r rd_qc}
 readdepth.AXH <- dplyr::filter(readdepth, Treatment == "control" | Treatment == "Heat" | Treatment == "Antibiotics" | Treatment == "Antibiotics.Heat" | Treatment == "positive" | Treatment == "negative") %>% dplyr::filter(Reef == "Houwan" | Reef == "Wanglitung" | Reef == "controls")
@@ -175,7 +181,7 @@ ggdepth <- ggplot(readdepth.AXH, aes(SampleID, Count))
 ggdepth +
   geom_bar(stat = "identity", aes(color = Treatment, fill = Treatment)) +
   #scale_y_continuous(trans = 'log10') +
-  scale_color_manual(values = c(condcolors_AXH, "black", "black")) +
+  scale_color_manual(values = c(condcolors_AxH, "black", "black")) +
   scale_fill_manual(values = c(condfillcolors_AXH, "dark gray", "light gray")) +
   ylab("16S Read Count") +
   theme(axis.text.x = element_text(angle = 90)) +
@@ -184,23 +190,11 @@ ggsave(file = "./outputs/phyloseq-results/figures/readdepth_AXH.pdf", width = 16
 ggsave(file = "./manuscript_figures/FigS##_16S_readdepth.pdf", width = 169, height = 85,  units = "mm", device = "pdf")
 ```
 
-Prune phyloseq object to include samples and sequencing controls
-```{r}
-#samples
-#samplesctrl.LPS.control <- grep("[HWO][bwt][1-2].[3,6][abc]", samples, value = TRUE)
-#psctrl.LPS <- prune_samples(samplesctrl.LPS.control, ps_assigned)
-#psctrl.LPS
-#summarize_phyloseq(psctrl.LPS)
-```
-```{r}
-#sample_data(psctrl.LPS)
-```
-
 ### Rarefaction curve
-```{r rare curve}
+```{r rare_curve}
 grare <- ggrare(ps.AXH, step = 10, color = "Treatment", label = "Colony", plot = FALSE, se = TRUE)
 grare + 
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condfillcolors_AXH) +
   #facet_wrap(~Treatment) +
   ggtitle("Rarefaction curve of 16S amplicon sequence variants")
@@ -208,19 +202,19 @@ ggsave(file = "./outputs/phyloseq-results/figures/rarefaction_.AXH.pdf", width =
 ggsave(file = "./manuscript_figures/FigS##_rarefactioncurve.pdf", width = 169, height = 85,  units = "mm", device = "pdf")
 ```
 
-## Beta diversity plots and statisitics 
 
-### Euclidean
+## Beta diversity ordination plots and statisitical tests
+### Euclidean distances
 ```{r pca_rel}
 ps_euc <- ordinate(ps.AXH.rel, "RDA", "euclidean")
 p1 <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
   #stat_ellipse(aes(fill = Treatment, group = Treatment), geom = "polygon", type = "norm", alpha = 0.1) + 
 #sample points
     geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-    scale_color_manual(values = condcolors_AXH, name = "Treatment") +
-    scale_fill_manual(values = condcolors_AXH, name = "Treatment") +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
     scale_shape_manual(values = colshapes, name = "Colony") + 
-  ggtitle("PCA of control and LPS samples beta diversity", subtitle = "Relative abundance")
+  ggtitle("PCA of 16S beta diversity", subtitle = "Relative abundance")
 print(p1)
 ```
 ```{r}
@@ -233,13 +227,13 @@ ord_trmt <- ord %>%
 ```
 
 ```{r pca_clr}
+# The Aitchison distance is superior to both the widely used Jensen-Shannon divergence and the Bray-Curtis dissimilarity metrics, being more stable to subsetting and aggregating of the data, and being a true linear distance (Gloor et al. 2017)
 ps_euc <- ordinate(ps.AXH.clr, "RDA", "euclidean")
 pcaclr <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
-  #stat_ellipse(aes(fill = Treatment, group = Treatment), geom = "polygon", type = "norm", alpha = 0.1) + 
     #sample points
     geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-    scale_color_manual(values = condcolors_AXH, name = "Treatment") +
-    scale_fill_manual(values = condcolors_AXH, name = "Treatment") +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
     scale_shape_manual(values = colshapes, name = "Colony") + 
   ggtitle("PCA of bacteria community beta diversity", subtitle = "Centered log ratio transformation")
 print(pcaclr)
@@ -275,14 +269,13 @@ names(pdataframe)[1] = "method"
 p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
 #sample points
     geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-    scale_color_manual(values = condcolors_AXH, name = "Treatment") +
-    scale_fill_manual(values = condcolors_AXH, name = "Treatment") +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
     scale_shape_manual(values = colshapes, name = "Colony") + 
   facet_wrap(~method, scales="free")
 p
 ggsave(filename = "./outputs/phyloseq-results/figures/ordinations_bray.pdf", height = 8, width = 10, units = "in")
 ```
-
 ```{r ordinations}
 #principal coordinates analysis, bray-curtis
 ps.AXH.ord.PCoA.brayP <- ordinate(ps.AXH, method="PCoA", distance="bray")
@@ -322,40 +315,6 @@ ggsave(pcoa3, filename = "./outputs/phyloseq-results/figures/pcoa_treatment.pdf"
 ggsave(pcoa3, filename = "./manuscript_figures/Fig3A_PCoA_16S_Treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
 ```
 
-```{r pcoa_ellipse_colony}
-p1 <- plot_ordination(ps.AXH, ps.AXH.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
-  stat_ellipse(aes(fill = Colony), geom = "polygon", type = "norm", alpha = 0.6) + 
-  geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_AXH, name="Treatment") +
-  scale_fill_manual(values = colcolors, name = "Colony") +
-  scale_shape_manual(values = colshapes, name="Colony") + 
-  coord_fixed(1) +
-  ggtitle("Principal Coordinates Analysis") +
-  theme(plot.title = element_text(size = 18),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 14),
-        legend.title = element_text(size = 16),
-        legend.text = element_text(size = 12))
-print(p1)
-```
-```{r pcoa_control}
-p1 <- plot_ordination(ps.control.rel, ps.control.ord.PCoA.brayP, type = "sample", axes = c(1,2)) +
-  geom_polygon(aes(fill = Colony), alpha = 0.9) +
-  geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_AXH[1], name = "Treatment") +
-  scale_fill_manual(values = colcolors, name = "Colony") +
-  scale_shape_manual(values = colshapes, name = "Colony") + 
-  #coord_fixed(17.8/23.5) +
-  ggtitle("") +
-  theme(plot.title = element_text(size = 18),
-        axis.title = element_text(size = 16),
-        axis.text = element_text(size = 14),
-        legend.title = element_text(size = 16),
-        legend.text = element_text(size = 12))
-print(p1)
-```
-
-
 NMDS
 I want to try to calculate treatment centroids for plotting as with the PCoA above
 https://stackoverflow.com/questions/47516448/how-to-get-ordispider-like-clusters-in-ggplot-with-nmds
@@ -365,8 +324,8 @@ nmds1 <- plot_ordination(ps.AXH.rel, ps.AXH.ord.NMDS.brayP, type = "sample", axe
   stat_ellipse(aes(fill = Treatment), geom = "polygon", type = "norm", alpha = 0.15) + 
 #sample points
     geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-    scale_color_manual(values = condcolors_AXH, name = "Treatment") +
-    scale_fill_manual(values = condcolors_AXH, name = "Treatment") +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
     scale_shape_manual(values = colshapes, name = "Colony") + 
   coord_fixed(1) +
   ggtitle("Bacteria Community NMDS") +
@@ -394,7 +353,7 @@ cap_ord <- ordinate(
 cap_plot <- plot_ordination(ps.AXH, cap_ord, type = "sample", axes = c(1,2)) +
   stat_ellipse(aes(fill = Treatment), geom = "polygon", type = "norm", alpha = 0.6) + 
   geom_point(size = 6, aes(color = Treatment, shape = Colony)) +
-  scale_color_manual(values = condcolors_AXH, name="Treatment") +
+  scale_color_manual(values = condcolors_AxH, name="Treatment") +
   scale_fill_manual(values = condfillcolors_AxH, name = "Treatment") +
   scale_shape_manual(values = colshapes, name="Colony") + 
   coord_fixed(1) +
@@ -450,19 +409,13 @@ anova(cap_ord)
 
 
 ### Beta diversity statistical testing
-```{r}
-# Calculate bray curtis distance matrix
+```{r bray-curtis_dist}
+# Calculate Bray-Curtis distance matrix
 psdist_bray <- phyloseq::distance(ps.AXH.rel, method = "bray")
-# Calculate UniFrac distance matrix
-psdist_unifrac <- phyloseq::distance(ps.AXH.rel, method = "unifrac")
-# Calculate bray curtis distance matrix
-psdist_wunifrac <- phyloseq::distance(ps.AXH.rel, method = "wunifrac")
-
 # make a data frame from the sample_data
-sampledf <- data.frame(sample_data(ps.AXH))
+sampledf <- data.frame(sample_data(ps.AXH)) %>% select(-Environment)
 ```
-Bray-Curtis Distances
-```{r}
+```{r permdisp}
 # PERMDISP tests
 beta <- betadisper(psdist_bray, sampledf$Treatment)
 permutest(beta)
@@ -471,49 +424,19 @@ permutest(beta)
 beta <- betadisper(psdist_bray, sampledf$Colony)
 permutest(beta)
 ```
-```{r}
+```{r permanova}
 # Adonis/PERMANOVA tests
 adonis(psdist_bray ~ Treatment, data = sampledf, method = "bray")
+# 
 adonis(psdist_bray ~ Reef, data = sampledf, method = "bray")
+# 
 adonis(psdist_bray ~ Colony, data = sampledf, method = "bray")
 ```
-UniFrac Distances
-```{r}
-# PERMDISP tests
-beta <- betadisper(psdist_unifrac, sampledf$Treatment)
-permutest(beta)
-beta <- betadisper(psdist_unifrac, sampledf$Reef)
-permutest(beta)
-beta <- betadisper(psdist_unifrac, sampledf$Colony)
-permutest(beta)
-```
-```{r}
-# Adonis/PERMANOVA tests
-adonis(psdist_unifrac ~ Treatment, data = sampledf, method = "unifrac")
-adonis(psdist_unifrac ~ Reef, data = sampledf, method = "unifrac")
-adonis(psdist_unifrac ~ Colony, data = sampledf, method = "unifrac")
-```
-Weighted UniFrac Distances
-```{r}
-# PERMDISP tests
-beta <- betadisper(psdist_wunifrac, sampledf$Treatment)
-permutest(beta)
-beta <- betadisper(psdist_wunifrac, sampledf$Reef)
-permutest(beta)
-beta <- betadisper(psdist_wunifrac, sampledf$Colony)
-permutest(beta)
-```
-```{r}
-# Adonis/PERMANOVA tests
-adonis(psdist_wunifrac ~ Treatment, data = sampledf, method = "wunifrac")
-adonis(psdist_wunifrac ~ Reef, data = sampledf, method = "wunifrac")
-adonis(psdist_wunifrac ~ Colony, data = sampledf, method = "wunifrac")
-```
+
 ### Distances to centroids boxplots
 ```{r}
 dis <- vegdist(otu_table(ps.AXH), method ="bray")
-# PERMDISP2 procedure for the analysis of multivariate 
-#homogeneity of group dispersions (variances).
+# PERMDISP2 procedure for the analysis of multivariatehomogeneity of group dispersions (variances).
 mod <- betadisper(dis, sampledf$Treatment, type = "centroid")
 mod
 anova(mod)
@@ -537,8 +460,8 @@ beta_boxplot <- mod_distances %>% ggplot(aes(Treatment, mod.distances)) +
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
   #facet_grid(~Colony) +
@@ -559,17 +482,7 @@ ggsave(beta_boxplot, filename = "./outputs/phyloseq-results/figures/distance_cen
 ###https://chrischizinski.github.io/rstats/adonis/
 ```
 
-
-
 ### ANOSIM
-
-### Taxa ordination plots
-```{r}
-plot_ordination(ps.AXH.rel, ps.AXH.ord.PCoA.brayP, type = "taxa") +
-  geom_point(aes(color = Phylum)) + 
-  #facet_wrap(~Phylum) +
-  coord_fixed(1)
-```
 
 
 ## Taxa composition plots
@@ -1031,8 +944,8 @@ plot_richness(ps.AXH, x="Treatment", measures = alphameasures) +
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony")
 ```
 ```{r}
@@ -1043,8 +956,8 @@ plot_richness(ps.AXH, x="Treatment", measures=c("Chao1", "Simpson", "Shannon")) 
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   ylim(c(0,100)) +
   xlab(NULL) +
@@ -1062,8 +975,8 @@ chao1 <- plot_richness(ps.AXH, x="Treatment", measures=c("Chao1")) +
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A.H")) +
   ylim(c(0,100)) +
@@ -1085,8 +998,8 @@ shannon <- plot_richness(ps.AXH, x="Treatment", measures=c("Shannon")) +
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
   scale_y_continuous(labels = scales::number_format(accuracy = 0.01), limits = c(0,4)) +
@@ -1105,8 +1018,8 @@ simpson <- plot_richness(ps.AXH, x="Treatment", measures=c("Simpson")) +
   new_scale_fill() + 
   geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
   geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes, name="Colony") + 
   scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
   ylim(c(0,1)) +
@@ -1143,7 +1056,7 @@ alpha_geno <- function(ps = ps.AXH, alphameasure) {
 alphabox <- plot_richness(ps, x = "Colony", color = "Treatment", measures = alphameasure) +
   geom_boxplot(aes(fill = Colony)) +
   geom_point(size = 3, aes(shape = Colony)) +
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = colcolors) +
   scale_shape_manual(values = colshapes)
 print(alphabox)
@@ -1198,11 +1111,9 @@ kruskal.test(data=ps_richness_meta, Fisher ~ Colony)
 
 ## Core microbiome
 Coral core microbiome cutoffs: 50%, 80%, 90%, 100%
+
 ```{r}
-ps.AXH <- transform_sample_counts(ps.AXH, function(x) {x / sum(x)} )
-```
-```{r}
-ps.AXH.present <- prune_taxa(taxa_sums(ps.AXH) > 0, ps.AXH)
+ps.AXH.present <- prune_taxa(taxa_sums(ps.AXH) > 0, ps.AXH.rel)
 ps.AXH.present
 summarize_phyloseq(ps.AXH.present)
 ```
@@ -1211,7 +1122,7 @@ datatable(otu_table(ps.AXH.present))
 ```
 ```{r}
 core.taxa <- core_members(ps.AXH.present, detection = 0.001, prevalence = 80/100)
-#core.taxa
+core.taxa
 # Extract the taxonomy table
 taxonomy.present <- as.data.frame(tax_table(ps.AXH.present))
 # Subset this taxonomy table to include only core OTUs  
@@ -1220,27 +1131,6 @@ DT::datatable(core_taxa_id)
 ```
 
 ## Differential abundance testing
-### DESEq2
-```{r}
-ps.AXH.da <- filter_sample(ps.AXH, function(x) sum(x) > 0, TRUE)
-ps.AXH.da <- filter_taxa(ps.AXH, function(x) sum(x > 0) > (0.5*length(x)), TRUE)
-ps.AXH.da
-#Need to comment out the ordered factors in create phyloseq object chunk
-ps_deseq <- phyloseq_to_deseq2(ps.AXH.da, ~ Treatment + Colony)
-```
-```{r}
-dds_phyloseq <- DESeq(ps_deseq)
-```
-```{r}
-deseq.results <- as.data.frame(results(dds_phyloseq))
-deseq.results$taxon <- rownames(results(dds_phyloseq))
-deseq.results.tax <- cbind(deseq.results, taxdf[rownames(taxdf) %in% rownames(deseq.results), 1:7])
-```
-```{r}
-deseq.results.tax <- deseq.results.tax %>%
-                   arrange(pvalue, log2FoldChange)
-sig.deseq.results.tax <- deseq.results.tax %>% filter(pvalue < 0.05 & log2FoldChange > 1.0)
-```
 ### ALDeX2
 #### Heat
 ```{r}
@@ -1349,319 +1239,6 @@ rare <- x.ps[x.ps$rab.all < rare_cutoff, ]
 rare.ASVs <- taxonomy[rownames(rare), ]
 rare.ASVs1 <- cbind(called, rare.ASVs)
 ```
-
-
-## Specific plots for AXH paper 
-```{r combo_pcoa}
-combo_pcoa <- pcoa2 | pcoa3
-ggsave(combo_pcoa, filename = "./manuscript_figures/Fig_PCoA_RNAseq-16S_Treatment.pdf", width = 8, height = 4, units = "in")
-```
-```{r 16S_panel_figures}
-beta_panel <- pcoa3 | beta_boxplot
-ggsave(beta_panel, filename = "./outputs/phyloseq-results/figures/beta_diversity_panel.pdf", width = 10, height = 5, units = "in")
-
-figure3 <- pcoa3 | (richness_boxplots / p_family2)
-ggsave(figure3, filename = "./manuscript_figures/Fig3_16S_panel.pdf", width = 14, height = 8, units = "in")
-```
-```{r}
-alpha_panel <- (chao1 / p_family2 ) | (aldexmw_heat / aldexmw_anti / aldexmw_anti.heat)
-ggsave(alpha_panel, filename = "./outputs/phyloseq-results/figures/alpha_diversity_panel.pdf", width = 12, height = 8, units = "in")
-```
-
-
-## Genotype-specific analyses - beta diversity, differential abundance testing
-### HW1
-```{r}
-samples.AXH.HW1 <- grep("[H][w][1].[3,6][abc]", samples, value = TRUE)
-ps.AXH.HW1 <- prune_samples(samples.AXH.HW1, ps_assigned)
-ps.AXH.HW1
-summarize_phyloseq(ps.AXH.HW1)
-ps.AXH.HW1.rel <- transform_sample_counts(ps.AXH.HW1, function(x) {x / sum(x)} )
-```
-```{r}
-ps_euc <- ordinate(ps.AXH.HW1.rel, "RDA", "euclidean")
-p1 <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
-  geom_point(size = 3) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) + 
-  ggtitle("PCA of control and LPS samples beta diversity")
-print(p1)
-```
-```{r}
-physeq <- ps.AXH.HW1.rel
-dist <- "bray"
-ord_meths <- c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
-psord <- function(i, physeq, dist){
-        ordi <- ordinate(physeq, method = i, distance = dist)
-        plot_ordination(physeq, ordi, type = "sample", color = "Treatment", shape = "Colony", axes = c(1,2))
-        }
-plist <- llply(as.list(ord_meths), psord, physeq, dist)
-names(plist) <- ord_meths
-
-pdataframe = ldply(plist, function(x){
-    df = x$data[, 1:2]
-    colnames(df) = c("Axis_1", "Axis_2")
-    return(cbind(df, x$data))
-})
-names(pdataframe)[1] = "method"
-
-p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_AXH) + 
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) +
-  facet_wrap(~method, scales="free")
-p
-```
-```{r}
-# Calculate bray curtis distance matrix
-psdist_bray <- phyloseq::distance(ps.AXH.HW1.rel, method = "bray")
-# make a data frame from the sample_data
-sampledf <- data.frame(sample_data(ps.AXH.HW1))
-# PERMDISP test
-beta <- betadisper(psdist_bray, sampledf$Treatment)
-permutest(beta)
-# Adonis/PERMANOVA test
-adonis(psdist_bray ~ Treatment, data = sampledf, method = "bray")
-```
-```{r}
-#Need to comment out the ordered factors in create phyloseq object chunk
-ps_deseq_HW1 <- phyloseq_to_deseq2(ps.AXH.HW1, ~ Treatment)
-```
-```{r}
-dds_phyloseq_HW1 <- DESeq(ps_deseq_HW1)
-```
-```{r}
-deseq.results.HW1 <- as.data.frame(results(dds_phyloseq_HW1))
-deseq.results.HW1$taxon <- rownames(results(dds_phyloseq_HW1))
-deseq.results.tax.HW1 <- cbind(deseq.results.HW1, taxdf[rownames(taxdf) %in% rownames(deseq.results.HW1), 1:7])
-```
-```{r}
-deseq.results.tax.HW1 <- deseq.results.tax.HW1 %>%
-                   arrange(pvalue, log2FoldChange)
-sig.deseq.results.tax.HW1 <- deseq.results.tax.HW1 %>% filter(pvalue < 0.05 & log2FoldChange > 1.0)
-```
-
-### HW2
-```{r}
-samples.AXH.HW2 <- grep("[H][w][2].[3,6][abc]", samples, value = TRUE)
-ps.AXH.HW2 <- prune_samples(samples.AXH.HW2, ps_assigned)
-ps.AXH.HW2
-summarize_phyloseq(ps.AXH.HW2)
-ps.AXH.HW2.rel <- transform_sample_counts(ps.AXH.HW2, function(x) {x / sum(x)} )
-```
-```{r}
-ps_euc <- ordinate(ps.AXH.HW2.rel, "RDA", "euclidean")
-p1 <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
-  geom_point(size = 3) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) + 
-  ggtitle("PCA of control and LPS samples beta diversity")
-print(p1)
-```
-```{r}
-physeq <- ps.AXH.HW2.rel
-dist <- "bray"
-ord_meths <- c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
-psord <- function(i, physeq, dist){
-        ordi <- ordinate(physeq, method = i, distance = dist)
-        plot_ordination(physeq, ordi, type = "sample", color = "Treatment", shape = "Colony", axes = c(1,2))
-        }
-plist <- llply(as.list(ord_meths), psord, physeq, dist)
-names(plist) <- ord_meths
-
-pdataframe = ldply(plist, function(x){
-    df = x$data[, 1:2]
-    colnames(df) = c("Axis_1", "Axis_2")
-    return(cbind(df, x$data))
-})
-names(pdataframe)[1] = "method"
-
-p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_AXH) + 
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) +
-  facet_wrap(~method, scales="free")
-p
-```
-```{r}
-# Calculate bray curtis distance matrix
-psdist_bray <- phyloseq::distance(ps.AXH.HW2.rel, method = "bray")
-# make a data frame from the sample_data
-sampledf <- data.frame(sample_data(ps.AXH.HW2))
-# PERMDISP test
-beta <- betadisper(psdist_bray, sampledf$Treatment)
-permutest(beta)
-# Adonis/PERMANOVA test
-adonis(psdist_bray ~ Treatment, data = sampledf, method = "bray")
-```
-```{r}
-#Need to comment out the ordered factors in create phyloseq object chunk
-ps_deseq_HW2 <- phyloseq_to_deseq2(ps.AXH.HW2, ~ Treatment)
-```
-```{r}
-dds_phyloseq_HW2 <- DESeq(ps_deseq_HW2)
-```
-```{r}
-deseq.results.HW2 <- as.data.frame(results(dds_phyloseq_HW2))
-deseq.results.HW2$taxon <- rownames(results(dds_phyloseq_HW2))
-deseq.results.tax.HW2 <- cbind(deseq.results.HW2, taxdf[rownames(taxdf) %in% rownames(deseq.results.HW2), 1:7])
-```
-```{r}
-deseq.results.tax.HW2 <- deseq.results.tax.HW2 %>%
-                   arrange(pvalue, log2FoldChange)
-sig.deseq.results.tax.HW2 <- deseq.results.tax.HW2 %>% filter(pvalue < 0.05 & log2FoldChange > 1.0)
-```
-
-### WT1
-```{r}
-samples.AXH.WT1 <- grep("[W][t][1].[3,6][abc]", samples, value = TRUE)
-ps.AXH.WT1 <- prune_samples(samples.AXH.WT1, ps_assigned)
-ps.AXH.WT1
-summarize_phyloseq(ps.AXH.WT1)
-ps.AXH.WT1.rel <- transform_sample_counts(ps.AXH.WT1, function(x) {x / sum(x)} )
-```
-```{r}
-ps_euc <- ordinate(ps.AXH.WT1.rel, "RDA", "euclidean")
-p1 <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
-  geom_point(size = 3) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) + 
-  ggtitle("PCA of control and LPS samples beta diversity")
-print(p1)
-```
-```{r}
-physeq <- ps.AXH.WT1.rel
-dist <- "bray"
-ord_meths <- c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
-psord <- function(i, physeq, dist){
-        ordi <- ordinate(physeq, method = i, distance = dist)
-        plot_ordination(physeq, ordi, type = "sample", color = "Treatment", shape = "Colony", axes = c(1,2))
-        }
-plist <- llply(as.list(ord_meths), psord, physeq, dist)
-names(plist) <- ord_meths
-
-pdataframe = ldply(plist, function(x){
-    df = x$data[, 1:2]
-    colnames(df) = c("Axis_1", "Axis_2")
-    return(cbind(df, x$data))
-})
-names(pdataframe)[1] = "method"
-
-p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_AXH) + 
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) +
-  facet_wrap(~method, scales="free")
-p
-```
-```{r}
-# Calculate bray curtis distance matrix
-psdist_bray <- phyloseq::distance(ps.AXH.WT1.rel, method = "bray")
-# make a data frame from the sample_data
-sampledf <- data.frame(sample_data(ps.AXH.WT1))
-# PERMDISP test
-beta <- betadisper(psdist_bray, sampledf$Treatment)
-permutest(beta)
-# Adonis/PERMANOVA test
-adonis(psdist_bray ~ Treatment, data = sampledf, method = "bray")
-```
-```{r}
-#Need to comment out the ordered factors in create phyloseq object chunk
-ps_deseq_WT1 <- phyloseq_to_deseq2(ps.AXH.WT1, ~ Treatment)
-```
-```{r}
-dds_phyloseq_WT1 <- DESeq(ps_deseq_WT1)
-```
-```{r}
-deseq.results.WT1 <- as.data.frame(results(dds_phyloseq_WT1))
-deseq.results.WT1$taxon <- rownames(results(dds_phyloseq_WT1))
-deseq.results.tax.WT1 <- cbind(deseq.results.WT1, taxdf[rownames(taxdf) %in% rownames(deseq.results.WT1), 1:7])
-```
-```{r}
-deseq.results.tax.WT1 <- deseq.results.tax.WT1 %>%
-                   arrange(pvalue, log2FoldChange)
-sig.deseq.results.tax.WT1 <- deseq.results.tax.WT1 %>% filter(pvalue < 0.05 & log2FoldChange > 1.0)
-```
-
-### WT2
-```{r}
-samples.AXH.WT2 <- grep("[W][t][2].[3,6][abc]", samples, value = TRUE)
-ps.AXH.WT2 <- prune_samples(samples.AXH.WT2, ps_assigned)
-ps.AXH.WT2
-summarize_phyloseq(ps.AXH.WT2)
-ps.AXH.WT2.rel <- transform_sample_counts(ps.AXH.WT2, function(x) {x / sum(x)} )
-```
-```{r}
-ps_euc <- ordinate(ps.AXH.WT2.rel, "RDA", "euclidean")
-p1 <- plot_ordination(ps.AXH.rel, ps_euc, type = "sample", color = "Treatment", shape = "Colony") +
-  geom_point(size = 3) +
-  scale_color_manual(values = condcolors_AXH) +
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) + 
-  ggtitle("PCA of control and LPS samples beta diversity")
-print(p1)
-```
-```{r}
-physeq <- ps.AXH.WT2.rel
-dist <- "bray"
-ord_meths <- c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
-psord <- function(i, physeq, dist){
-        ordi <- ordinate(physeq, method = i, distance = dist)
-        plot_ordination(physeq, ordi, type = "sample", color = "Treatment", shape = "Colony", axes = c(1,2))
-        }
-plist <- llply(as.list(ord_meths), psord, physeq, dist)
-names(plist) <- ord_meths
-
-pdataframe = ldply(plist, function(x){
-    df = x$data[, 1:2]
-    colnames(df) = c("Axis_1", "Axis_2")
-    return(cbind(df, x$data))
-})
-names(pdataframe)[1] = "method"
-
-p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color = Treatment, shape = Colony)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = condcolors_AXH) + 
-  scale_fill_manual(values = condcolors_AXH) +
-  scale_shape_manual(values = colshapes) +
-  facet_wrap(~method, scales="free")
-p
-```
-```{r}
-# Calculate bray curtis distance matrix
-psdist_bray <- phyloseq::distance(ps.AXH.WT2.rel, method = "bray")
-# make a data frame from the sample_data
-sampledf <- data.frame(sample_data(ps.AXH.WT2))
-# PERMDISP test
-beta <- betadisper(psdist_bray, sampledf$Treatment)
-permutest(beta)
-# Adonis/PERMANOVA test
-adonis(psdist_bray ~ Treatment, data = sampledf, method = "bray")
-```
-```{r}
-#Need to comment out the ordered factors in create phyloseq object chunk
-ps_deseq_WT2 <- phyloseq_to_deseq2(ps.AXH.WT2, ~ Treatment)
-```
-```{r}
-dds_phyloseq_WT2 <- DESeq(ps_deseq_WT2)
-```
-```{r}
-deseq.results.WT2 <- as.data.frame(results(dds_phyloseq_WT2))
-deseq.results.WT2$taxon <- rownames(results(dds_phyloseq_WT2))
-deseq.results.tax.WT2 <- cbind(deseq.results.WT2, taxdf[rownames(taxdf) %in% rownames(deseq.results.WT2), 1:7])
-```
-```{r}
-deseq.results.tax.WT2 <- deseq.results.tax.WT2 %>%
-                   arrange(pvalue, log2FoldChange)
-sig.deseq.results.tax.WT2 <- deseq.results.tax.WT2 %>% filter(pvalue < 0.05 & log2FoldChange > 1.0)
-```
-
 
 ## Examine specific taxa and within-taxa compositions
       filter_taxa
@@ -1911,7 +1488,7 @@ actinobacteria_tree <- plot_tree(ps.AXH_actinobacteria,
                                   plot.margin = 0.4) 
 actinobacteria_tree + 
   #coord_polar(theta = "y") +
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   ggtitle("Phylum Actinobacteria")
 ```
 
@@ -1928,7 +1505,7 @@ rhodobacterales_tree <- plot_tree(ps.AXH_rhodobacterales,
 pdf("./outputs/phyloseq-results/figures/rhodobacterales_tree.pdf", width = 8, height = 2.5)
 rhodobacterales_tree + 
   #coord_polar(theta = "y") +
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   ggtitle("Order Rhodobacterales")
 ```
 ```{r}
@@ -1944,7 +1521,7 @@ oceanospirillales_tree <- plot_tree(ps.AXH_oceanospirillales,
 pdf("./outputs/phyloseq-results/figures/oceanospirillales_tree.pdf", width = 8, height = 5)
 oceanospirillales_tree + 
   #coord_polar(theta = "y") +
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   ggtitle("Order Oceanospirillales")
 ```
 
@@ -1961,7 +1538,7 @@ altermonadaceae_tree <- plot_tree(ps.AXH_alteromonadaceae,
 pdf("./outputs/phyloseq-results/figures/alteromonadaceae_tree.pdf", width = 8, height = 4)
 altermonadaceae_tree + 
   #coord_polar(theta = "y") +
-  scale_color_manual(values = condcolors_AXH) +
+  scale_color_manual(values = condcolors_AxH) +
   ggtitle("Family Alteromonadaceae")
 ```
 

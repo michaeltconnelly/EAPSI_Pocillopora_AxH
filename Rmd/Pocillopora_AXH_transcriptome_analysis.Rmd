@@ -15,8 +15,8 @@ options(stringsAsFactors = FALSE)
 ## Setup packages and working directories
 Include all packages needed for the entire transcriptome analysis and downstream visualizations
 ```{r packages, message=FALSE, include=FALSE}
-#essential analysis packages
 library("tidyverse")
+# Essential RNAseq analysis packages
 library("DESeq2")
 library("apeglm")
 library("variancePartition")
@@ -29,12 +29,12 @@ library("flashClust")
 # GO/KOG enrichment packages and other functions
 library("KOGMWU")
 source("./R/GO_MWU/gomwu.functions.R")
-source("./R/AXH_functions.R")
 # Data visualization packages
 library("pheatmap")
 library("ComplexHeatmap")
 library("VennDiagram")
 library("eulerr")
+# Graphics packages
 library("cowplot")
 library("patchwork")
 library("gridExtra")
@@ -48,6 +48,8 @@ library("circlize")
 library("stringr")
 library("extrafont")
 library("extrafontdb")
+# extended visualization functions
+source("./R/AXH_functions.R")
 ```
 ```{r colors}
 # Set overall colors and shapes for ggplot2
@@ -90,41 +92,6 @@ geneexpcolors2 <- colorRampPalette(rev(c("red", "yellow", "grey10", "cyan", "blu
 #color.bar(geneexpcolors2, -1, 1)
 ```
 ```{r theme}
-# Create ggplot2 theme for Molecular Ecology submission
-theme_mec <- function(base_size = 10, base_family = "Arial") {
-(theme_foundation(base_size=base_size, base_family=base_family)
- + theme(
-   plot.background = element_rect(colour = NA),
-   panel.background = element_blank(),
-   panel.grid.major = element_blank(), 
-   panel.grid.minor = element_blank(), 
-   panel.border = element_rect(color = "black", fill = NA),
-   plot.title = element_text(face = "plain", size = rel(1), hjust = 0),
-   plot.subtitle = element_text(face = "plain", size = rel(0.8)),
-   axis.title = element_text(face = "plain",size = rel(1)),
-   axis.title.x = element_text(vjust = -2),
-   axis.title.y = element_text(angle = 90, vjust = 2),
-   text = element_text(),
-   axis.text = element_text(size = rel(0.8)), 
-   axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 0.5),
-   axis.text.y = element_text(), 
-   #axis.line = element_line(colour = "black"),
-   axis.ticks = element_line(),
-   legend.title = element_text(size = rel(1)),
-   legend.text = element_text(size = rel(0.8), margin = margin(t = 2, b = 2, unit = "mm")),
-   legend.key = element_rect(color = NA),
-   legend.background = element_rect(fill = NA, colour = NA),
-   legend.position = "right",
-   legend.direction = "vertical",
-   legend.spacing.x = unit(2, "mm"),
-   legend.spacing.y = unit(0, "mm"),
-   legend.key.size = unit(2, "mm"),
-   plot.margin = unit(c(2,2,2,2), "mm"),
-   strip.background = element_rect(color = "black", fill = "grey"),
-   strip.text = element_text(face = "plain")
-    ))
-}
-###
 theme_set(theme_mec())
 #image widths: 80 mm (one column), 112 mm (two-thirds page), 169 mm (two columns)
 ```
@@ -155,14 +122,14 @@ all(rownames(countdata.sorted) == gene_annotation$ID)
 all(rownames(countdata.sorted) ==  rownames(gene_annotation))
 # Obtain KOG annotations for P. damicornis genome
 gene2kog <- gene_annotation %>%
-  select(ID, KOG_Class) %>% 
+  dplyr::select(ID, KOG_Class) %>% 
   filter(KOG_Class != "")
 ```
 ```{r coldata}
 # Get sample data into tibble
 coldata <- samples %>%
   as_tibble(.) %>%
-  select(SampleID, Colony, Treatment, Batch)
+  dplyr::select(SampleID, Colony, Treatment, Batch)
 coldata <- coldata %>%
   mutate(Colony.Treatment = interaction(Colony, Treatment)) %>%
   mutate_if(is.character, as.factor) %>% 
@@ -221,6 +188,11 @@ sampleDistMatrix <- as.matrix(sampleDists)
 # Calculate MDS
 mds <- as.data.frame(colData(vsd)) %>% 
   cbind(cmdscale(sampleDistMatrix))
+
+# Calculate MDS and use eigenvectors to determine proport
+mds_eig <- cmdscale(sampleDistMatrix, eig = TRUE)
+mds_eigenvectors <- data.frame(mds_eig$eig) %>% 
+  mutate(prop_var = mds_eig.eig / sum(mds_eig.eig))
 ```
 ```{r colony pcoa}
 # Calculate Colony centroids for plotting
@@ -231,7 +203,9 @@ mds_col <- mds %>%
 # set factor orders 
 mds_col$Colony <- factor(mds$Colony, levels = c("HW1", "HW2", "WT1", "WT2"), ordered = TRUE)
 mds_col$Treatment <- factor(mds$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
-
+# create axis labels
+xlab <- paste("PC1 (", round(mds_eigenvectors$prop_var[1]*100, digits = 1), "%)", sep = "")
+ylab <- paste("PC2 (", round(mds_eigenvectors$prop_var[2]*100, digits = 1), "%)", sep = "")
 # Plot with spiders
 pcoa1 <- ggplot(mds_col, aes(fill = Treatment)) +
   geom_segment(mapping = aes(x = `1`, y = `2`, xend = c1, yend = c2),
@@ -243,7 +217,7 @@ pcoa1 <- ggplot(mds_col, aes(fill = Treatment)) +
   scale_color_manual(values = colcolors) +
   scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
-  labs(x = "PC1", y = "PC2") +
+  labs(x = xlab, y = ylab) +
   coord_fixed(1) +
   guides(fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5))) +
   theme(legend.spacing.y = unit(0, "cm")) 
@@ -277,9 +251,11 @@ pcoa2 <- ggplot(mds_trmt, aes(fill = Treatment)) +
   scale_color_manual(values = condcolors_AxH) +
   scale_fill_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) +
-  labs(x = "PC1", y = "PC2") +
+  labs(x = xlab, y = ylab) +
   coord_fixed(1) +
-  guides(shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5)))
+  guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
+         fill = guide_legend(override.aes = list(fill = condcolors_AxH, alpha = 1, stroke = 1)),
+         shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5)))
 # pcoa2title <- expression(paste("PCoA of ", italic("Pocillopora"), " coral gene expression"))
 # pcoa2 <- pcoa2 + ggtitle(pcoa2title, subtitle = "Plotted with treatment centroids")
 pcoa2
@@ -332,6 +308,7 @@ DE <- crossing(Colony = c("HW1", "HW2", "WT1", "WT2"), contrasts) %>%
 ```
 ```{r overall DESeq}
 #Second, overall colony and treatment interaction model
+# ~ Batch + Colony + Treatment + Colony:Treatment
 design(dds) <- formula(~ Batch + Colony + Treatment)
 #Set control treatment as reference factor level
 dds$Treatment <- factor(dds$Treatment, levels = c("control", "Antibiotics", "Heat", "Antibiotics.Heat"))
@@ -346,6 +323,7 @@ DE <- crossing(Colony = "all", contrasts) %>%
 ```
 ```{r DE_check}
 DE
+warnings()
 ```
 ```{r DEG table}
 DE <- DE %>%
@@ -374,9 +352,6 @@ DEtab <- DE %>%
 DE_table <- DEtab %>% filter(den == "control") 
 write_csv(DE_table, "./outputs/DESeq-results/tables/DE_table.csv")
 ```
-The next chunk writes out the results tables as comma-separated files for all the differential expression results contrasts, with gene ID and annotation information for preparation as a supplemental table.
-Next, I want to bring together the overall and genotype model LFC and padj values for each treatment contrast into a single table.
-
 ```{r sig_tables}
 # Write significant DEG results tables to csv files
 DE %>%
@@ -392,6 +367,26 @@ DE %>%
          data = walk2(df, file_out_path, write_csv))
 # Why are there only 14 differentially expressed genes between the heat and control samples? --> Missing samples...low counts...interaction effect? 
 ```
+```{r DE_master_results_table}
+# Next, I want to bring together the overall and genotype model LFC and padj values for each treatment contrast into a single table.
+DEres <- DE %>%
+  filter(den == "control", Colony == "all") %>%
+  select(num, den, df) %>% 
+  unnest(df) %>% 
+  unite(contrast, num, den) %>% 
+  select(contrast, ID, log2FoldChange, padj) %>% 
+  pivot_wider(names_from = contrast, values_from = log2FoldChange:padj) %>% 
+  left_join(gene_annotation, by = "ID")
+```
+```{r experimental}
+DEres %>% 
+  filter(ID %in% dpvarc$ID[dpvarc$LD1 > 0.0005]) %>% 
+  filter(padj_Antibiotics_control < 0.05, padj_Heat_control < 0.1) %>% 
+  filter(log2FoldChange_Heat_control > 0, log2FoldChange_Antibiotics.Heat_control > 0) %>% View()
+  # select(-contains("Heat_control")) %>% 
+  ggplot(aes(x = log2FoldChange_Heat_control, y = log2FoldChange_Antibiotics.Heat_control)) + geom_point()
+```
+
 ### Assess similarity of responses across colonies
 ```{r DEgenes_colony_comparison}
 shared_DEGs_colonies <- DE %>%
@@ -477,7 +472,7 @@ ggsave(plot = treatment_euler, filename = "./manuscript_figures/Fig1B_AXH_Euler.
 
 
 ### DESeq results visualizations
-### Volcano plots
+#### Volcano plots
 
 For each of these plot styles, create data handling and plotting functions to process essential inputs into the plot
 ```{r}
@@ -489,7 +484,7 @@ ggsave(filename = "./outputs/DESeq-results/figures/all_anti.control_volcano.pdf"
 ```
 
 
-### Gene expression heatmaps
+#### Gene expression heatmaps
 ```{r sampleheatmap}
 ## Sample Clustering Heatmap
 sampleDists <- dist(t(assay(vsd)))
@@ -537,17 +532,18 @@ mat_genes <- mat_genes - rowMeans(mat_genes)
 
 
 
-### Gene counts boxplots
+#### Gene counts boxplots
 ```{r}
 for (i in 1:10) {
   genoboxplot(DE$sig[[5]]$ID[i])
 }
 ```
 
-### Double-treatment plots
+#### Double-treatment plots
 
 ### DESeq Gene Ontology (GO) enrichment analysis
-### Heat vs. control 
+Need to write out supplemental table 3 from here...
+#### Heat vs. control 
 ```{r heat signed logP}
 # Write overall Heat vs. control logP values to file for GO_MWU analysis
 DE %>%
@@ -584,7 +580,9 @@ heat.control.GO %>%
   arrange(ontology, p.adj) %>% 
   write_csv(path = "./outputs/DESeq-results/GO_MWU/tables/heat.control.GO.csv")
 
-heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0) %>% count(ontology)
+heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0) %>% 
+  group_by(ontology) %>% 
+  summarise(n = n())
 ```
 ```{r heat GO_MWU plot}
 # Plot GO_MWU results for Heat vs. control 
@@ -595,7 +593,7 @@ source("./R/GO_MWU/GO_MWU_plot.R")
 commandArgs <- function(...) c("heat.control.logP.txt", "CC", "GO_MWU.heat.control_slim.pdf", 0.05, 0.01, 1e-3, 1)
 source("./R/GO_MWU/GO_MWU_plot.R")
 ```
-### Antibiotics vs. control 
+#### Antibiotics vs. control 
 ```{r anti signed logP}
 # Write overall Antibiotics vs. control logP values to file for GO_MWU analysis
 DE %>%
@@ -632,7 +630,9 @@ anti.control.GO %>%
   arrange(ontology, p.adj) %>% 
   write_csv(path = "./outputs/DESeq-results/GO_MWU/tables/anti.control.GO.csv")
 
-anti.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0) %>% count(ontology)
+anti.control.GO %>% filter(p.adj < 0.01 & delta.rank <= 0) %>% 
+  group_by(ontology) %>% 
+  summarise(n = n())
 ```
 ```{r anti GO_MWU plot}
 # Plot GO_MWU results for Antibiotics vs. control 
@@ -643,7 +643,7 @@ source("./R/GO_MWU/GO_MWU_plot.R")
 commandArgs <- function(...) c("anti.control.logP.txt", "CC", "GO_MWU.anti.control_slim.pdf", 5e-2, 1e-2, 1e-3, 1.0)
 source("./R/GO_MWU/GO_MWU_plot.R")
 ```
-### Antibiotics.Heat vs. control 
+#### Antibiotics.Heat vs. control 
 ```{r anti.heat signed logP}
 # Write overall Antibiotics.Heat vs. control logP values to file for GO_MWU analysis
 DE %>%
@@ -680,7 +680,9 @@ anti.heat.control.GO %>%
   arrange(ontology, p.adj) %>% 
   write_csv(path = "./outputs/DESeq-results/GO_MWU/tables/anti.heat.control.GO.csv")
 
-anti.heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0) %>% count(ontology)
+anti.heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0 & ontology == "BP") %>% 
+  group_by(ontology) %>% 
+  summarise(n = n())
 ```
 ```{r anti.heat GO_MWU plot}
 # Plot GO_MWU results for Antibiotics.Heat vs. control 
@@ -831,8 +833,18 @@ dapc <- dapc %>%
 #set factor orders 
 dapc$Colony <- factor(dapc$Colony, levels = c("HW1", "HW2", "WT1", "WT2"), ordered = TRUE)
 dapc$Treatment <- factor(dapc$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+# 
+dp1
+summary(dp1)
+# use discriminant function eigenvalues to determine percent between-group variance explained by each function
+dp1$eig[1]/sum(dp1$eig)
+# 0.7100686
+dp1$eig[2]/sum(dp1$eig)
+# 0.2739501
 ```
 ```{r dapc_spider}
+xlab <- paste("LD1 (", round(dp1$eig[1]/sum(dp1$eig)*100, digits = 1), "%)", sep = "")
+ylab <- paste("LD2 (", round(dp1$eig[2]/sum(dp1$eig)*100, digits = 1), "%)", sep = "")
 # Plot with spiders
 dapc.fig <- 
   ggplot(dapc, aes(fill = Treatment)) +
@@ -848,7 +860,7 @@ dapc.fig <-
   guides(shape = guide_legend(override.aes = list(shape = colshapes))) +
   theme(plot.margin = unit(c(-0.5, -0.5, 0.5, 0.5), "cm")) +
  # guides(shape = guide_legend(override.aes = list(fill = "black", size = 2))) +
-  labs(x = "LD1", y = "LD2")
+  labs(x = xlab, y = ylab)
 dapc.fig
 ```
 ```{r dapc_plot}
@@ -881,12 +893,18 @@ ggsave(filename = "./manuscript_figures/Fig2_DAPC.pdf", plot = dapcplot, width =
 # The second linear discriminant function (LD2) separates heat-stressed fragments from ambient temperature fragments in the control and antibiotics treatments.
 ```
 ```{r dapc_varcontr}
-dp1
-summary(dp1)
-# dp1$tab
 dpvarc <- as.data.frame(dp1$var.contr) %>%
   rownames_to_column("ID") %>% left_join(gene_annotation, by = "ID") %>%
   arrange(desc(LD1))
+write_csv(dpvarc, path = "./outputs/DAPC_loadings_table.csv")
+# filter out unannotated genes, arrange by loadings
+dpvarc %>% 
+  select(ID, LD1, LD2, Gene_Info) %>% 
+  filter(., !grepl("unknown", Gene_Info)) %>% 
+  arrange(desc(LD2)) %>% 
+  head(20) %>% 
+  select(-LD1) %>% 
+  write_excel_csv(path = "./outputs/DAPC-results/tables/LD2_table2.csv")
 ```
 ```{r dapc_loadingplot}
 set.seed(4)
@@ -969,56 +987,6 @@ pdf("./outputs/DESeq-results/figures/DAPC_LD2_loadings_10genes_boxplots.pdf", he
 for (i in 1:10) {
   genoboxplot(dpvarc_ld2$ID[i])
 }
-```
-```{r dapc_tests, include = FALSE, eval = FALSE}
-# DAPC - axis of heat stress in C corals (Ccontrol vs. Cheat), then see where D's fall along it (sensu Kenkel and Matz)
-
-# use batch-colony-removed vst counts
-vsd2 <- vsd
-#assay(vsd2) <- limma::removeBatchEffect(assay(vsd), vsd$colony)
-## Subset C-control and C-heat corals
-CcCh <- vsd2[, colData(vsd2)$group %in% c("Cc", "Ch")]
-dat <- data.frame(assay(CcCh))
-
-# Fit DAPC axis
-dp1 <- dapc(t(dat), colData(CcCh)$group, n.pca = 12, n.da = 1)
-scatter(dp1, scree.pca = T)
-
-# Calculate values along this axis
-## Subset D-control and D-heat corals
-DcDh <- vsd2[, colData(vsd2)$group %in% c("Dc", "Dh")]
-dat2 <- data.frame(assay(DcDh))
-## Get scores for these samples along the Cc-Ch DAPC axis
-pred.sup <- predict.dapc(dp1, newdata=(t(dat2)))
-
-# Create dapc object to plot new scores
-newdp <- dp1
-newdp$ind.coord<-pred.sup$ind.scores
-newdp$posterior<-pred.sup$posterior
-newdp$assign<-pred.sup$assign
-newdp$grp <- colData(DcDh)$group
-scatter(newdp)
-
-# Get scores for all groups
-dpc <- tibble(group = c(as.character(dp1$grp), as.character(newdp$grp)),
-              core = c(rownames(dp1$ind.coord), rownames(newdp$ind.coord)),
-              colony = str_sub(core, 3, 4),
-              score = c(dp1$ind.coord, newdp$ind.coord))
-ggplot(dpc, aes(x = score, fill = group)) + geom_density(adjust = 1, alpha = 0.5)
-ggplot(dpc, aes(x = group, y = score, shape = colony, color = colony)) + geom_point()
-
-# Test for differences between groups
-mod <- lm(score ~ group, data = dpc)
-anova(mod)
-lsm <- lsmeans(mod, specs = "group")
-contrast(lsm, "pairwise")
-
-# Ccontrol -- -1.94
-# Cheat ---    1.94    (diff = 3.89)
-# Dcontrol -- -0.16
-
-
-# I deemed this approach inappropriate because we shouldn't necessarily constrain the responses of D corals to occur along an axis of heat stress for C corals... they could respond in an entirely different way along an entirely different axis. Therefore, the DAPC with all four groups is more appropriate. LD1 still ends up corresponding very strongly to the axis of heat stress for C corals, and we still C that shuffling to D moves corals toward the heat stress end of the axis. We can still do a statistical test on LD1 values for different groups. 
 ```
 ```{r loadings_scatterplot}
 pdf("./outputs/DESeq-results/figures/DAPC_LD_loadings_scatterplot.pdf", height = 7, width = 7)
@@ -1135,7 +1103,6 @@ hclustME <- flashClust(as.dist(dissimME), method="average" )
 par(mfrow=c(1,1))
 plot(hclustME, main="Clustering tree based on the module eigengenes")
 ```
-
 ### Module eigengene treatment correlations and heatmap
 ```{r trait_data}
 # Get sample data into tibble
@@ -1352,7 +1319,7 @@ source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
 #kMEfiles <- list.files(path = "./R/GO_MWU/", pattern = "_kme.txt")
 ###
 intModules <- c("greenyellow", "brown", "lightcyan1", "darkgrey", "darkred", "midnightblue", "grey60", "darkorange", "skyblue", "paleturquoise", "violet", "orangered4")
-for (module in intModules[c(12)]){
+for (module in intModules[8]){
   print(module)
 ### command for GO_MWU analysis
   #input file name
@@ -1362,14 +1329,14 @@ tab <- paste(module, "_kme.txt", sep = "")
 }
 ```
 ```{r GO_MWU_figures}
-module <- "orangered4"
+module <- "lightcyan1"
 #for (module in sigModules){
 ###
 tab <- paste(module, "_kme.txt", sep = "")
 fig <- as.character(paste("GO_MWU_", module, ".pdf", sep = ""))
 levs <- c(0.05, 1e-10, 1e-15)
 ###
-commandArgs <- function(...) c(tab, "BP", fig, module, 0.001, 1e-5, 1e-15, 1.0)
+commandArgs <- function(...) c(tab, "BP", fig, module, 0.1, 0.05, 0.01, 1.0)
 source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
 #}
 ```
@@ -1389,17 +1356,18 @@ modules.GO <- as.list(
     orangered4 = "./R/GO_MWU/MWU_BP_orangered4_kme.txt")
   ) %>% map(read.table, header = T) %>%
   bind_rows(.id = "module") %>%
-  as_tibble() %>%
-  filter(p.adj < 0.05)
+  as_tibble()
 
 modules.GO %>%
   select(module, delta.rank, p.adj, name, nseqs, level, term) %>%
+  filter(p.adj < 0.05) %>% 
   arrange(module, p.adj) %>% 
   write_csv(path = "./outputs/WGCNA-results/GO_MWU/modules.GO.csv")
 
 modules.GO %>%
-  filter(p.adj < 0.05 & delta.rank >= 0) %>% 
-  count(module)
+  filter(p.adj < 0.1) %>% 
+  dplyr::count(module) %>% 
+  arrange(desc(n))
 ```
 ### WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
 ```{r wgcna_kog}
@@ -1558,7 +1526,7 @@ draw(combmap,  show_annotation_legend = FALSE, heatmap_legend_side = "left")
 ```
 
 ### Module trait gene significance (GS) versus interconnectivity (kME) scatterplots, scaled gene profile plots and edge files
-```{r}
+```{r genesig}
 # calculate gene trait significance for each treatment, genotype, etc.
 geneTraitSignificance <- as.data.frame(cor(datExpr, datTraits, use = "p")) 
 traitGS <- geneTraitSignificance %>% 
@@ -1739,7 +1707,8 @@ immune_genes <- all_WGCNA_df %>%
 # apoptotic process GO:0006915
 apoptosis_genes <- all_WGCNA_df %>% 
   filter(grepl("GO:0006915", GO_Terms_EM)) %>% 
-  filter(moduleColor %in% sigModules)
+  filter(moduleColor %in% sigModules) %>% 
+  filter(moduleColor %in% c("darkred", "skyblue"))
 # DNA repair (GO:0006281), 436
 dnarepair_genes <- all_WGCNA_df %>% 
   filter(grepl("GO:0006281", GO_Terms_EM)) %>% 
@@ -1759,20 +1728,24 @@ Heatmap(mat_apor4,
 ```
 ```{r}
 MEs_apoptosis <-  moduleEigengenes(datExpr[,c(apoptosis_genes$ID)], apoptosis_genes$moduleColor)$eigengenes
-colnames(MEs_apoptosis) <- sigModules
+colnames(MEs_apoptosis) <- c("darkred", "skyblue")
 MEs_apoptosis <- MEs_apoptosis %>%
   rownames_to_column("SampleID") %>% 
   pivot_longer(cols = -SampleID, names_to = "module", values_to = "ME") %>% 
   full_join(samples, by = "SampleID")
 MEs_apoptosis$Treatment <- factor(MEs_apoptosis$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = T)
 MEs_apoptosis$module <- factor(MEs_apoptosis$module, levels = sigModules, ordered = T)
-MEs_apoptosis %>% 
+apobox <- MEs_apoptosis %>% 
   ggplot(aes(x = Treatment, y = ME)) +
   geom_boxplot(aes(fill = Treatment)) + 
   geom_point() +
   facet_wrap(module~.) +
-  scale_fill_manual(values = condfillcolors_AxH)
+  ggtitle("Eigengene expression of 'Apoptotic process' genes in darkred (n = 29) and skyblue (n = 10) modules") +
+  ylab("Eigengene expression") +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony")
 # to continue with this I need to map color aesthetics, print number of genes to the GO term in each module, and account for module-treatment correlations
+ggsave(apobox, filename = "./outputs/WGCNA-results/figures/apoptosis_boxplot.pdf", device = "pdf", width = 8, height = 4)
 ```
 ```{r}
 MEs_immune <-  moduleEigengenes(datExpr[,c(immune_genes$ID)], immune_genes$moduleColor)$eigengenes

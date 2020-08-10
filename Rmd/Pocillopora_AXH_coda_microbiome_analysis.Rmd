@@ -1,0 +1,1015 @@
+---
+title: "Pocillopora_AXH_microbiome_analysis"
+author: "Mike Connelly"
+date: "7/28/2020"
+output: 
+  html_document:
+      code_folding: hide
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AXH")
+# some aspects of this microbiome analysis follow: https://github.com/meyermicrobiolab/Stony-Coral-Tissue-Loss-Disease-SCTLD-Project
+```
+## Setup packages and working directories
+```{r packages, include=FALSE}
+library("plyr")
+library("tidyverse")
+# Essential microbiome analysis packages
+library("phyloseq")
+library("microbiome")
+library("zCompositions")
+library("CoDaSeq") # devtools::install_github('ggloor/CoDaSeq/CoDaSeq')
+library("vegan")
+library("ape")
+library("ALDEx2")
+# Data visualization packages
+library("pheatmap")
+library("data.table")
+library("DT")
+# Graphics packages
+library("ggbiplot") # library(devtools); install_github("vqv/ggbiplot")
+library("ggh4x") # devtools::install_github("teunbrand/ggh4x") 
+library("plotrix")
+library("cowplot")
+library("patchwork")
+library("gtable")
+library("grid")
+library("gridExtra")
+library("ggthemes")
+library("ggpubr")
+library("ggrepel")
+library("ggnewscale")
+library("RColorBrewer")
+library("randomcoloR")
+library("wesanderson")
+library("circlize")
+library("stringr")
+library("extrafont")
+library("extrafontdb")
+# extended visualization functions
+source("./R/ggrare.R")
+source("./R/AXH_functions.R")
+```
+```{r colors}
+### Set overall theme, colors, and shapes for ggplot2
+# remember to set theme_mec() from transcriptomic script for proper formatting
+theme_set(theme_mec())
+# colors for experimental treatments
+condcolors_AxH <- c("blue", "darkorange", "cyan", "gold")
+condcolors_heat <- c(condcolors_AxH[1:2])
+condcolors_anti <- c(condcolors_AxH[1], condcolors_AxH[3])
+condcolors_anti.heat <- c(condcolors_AxH[1], condcolors_AxH[4])
+condfillcolors_AxH <- c("#99CCFF", "#FFCC99", "#99FFFF", "#FFFF66") # fill colors for some figures
+# shapes and colors for colonies
+colshapes <- c(21, 24, 22, 23)
+colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
+# null colors for presentation figures
+condcolors_null <- c(rep("black", 4))
+colshapes_null <- c(rep(20, 8))
+# color vector for barplot facet strips
+cond_col_colors <- c(condfillcolors_AxH[1], colcolors,
+                     condfillcolors_AxH[2], colcolors,
+                     condfillcolors_AxH[3], colcolors,
+                     condfillcolors_AxH[4], colcolors)
+```
+
+## Read in ASV table, taxonomy, sample data
+```{r asv}
+# Read in ASV table
+ASV <- read.table("./outputs/qiime2/export_silva/all_silva_feature-table.tsv", row.names = 1, header = TRUE)
+ASV <- t(ASV)
+```
+```{r taxomony}
+# Read in taxononomic classification information
+taxonomy <- as.matrix(read.table("./outputs/qiime2/export_silva/taxonomy4.txt", sep = "\t", row.names = 1, header = FALSE, fill = TRUE))
+colnames(taxonomy) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+taxonomy[taxonomy==""] <- NA
+taxonomy <- gsub("^D_[0-6]__", "", taxonomy)
+taxonomy <- gsub("^Euryarchaeota archaeon SCGC", "", taxonomy) # remove excessively long family name for ease in plotting later
+taxa_df <- data.frame(taxonomy) %>% rownames_to_column("ASV")
+```
+```{r tree_metadata}
+# Read in phylogenetic tree, sample metadata and set factor orders
+tree <- read_tree("./outputs/qiime2/export_silva/tree.nwk")
+map <- read.table("./data/qiime2_metadata.tsv", sep ="\t", row.names = 1, header = FALSE)
+colnames(map) <- c ("Reef",	"Colony",	"Environment",	"Treatment")
+map$SampleID <- rownames(map)
+map$Reef <- factor(map$Reef, levels = c("Houwan", "Wanglitung", "controls"), ordered = TRUE)
+map$Colony <- factor(map$Colony, levels = c("HW1", "HW2", "WT1", "WT2", "controls"), ordered = TRUE)
+map$Treatment <- factor(map$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat", "positive", "negative"), ordered = TRUE)
+```
+## Create phyloseq object
+```{r phyloseq}
+ps <- phyloseq(otu_table(ASV, taxa_are_rows = FALSE),
+               sample_data(map),
+               tax_table(taxonomy),
+               phy_tree(tree))
+ps
+# summarize_phyloseq(ps)
+```
+```{r ps_AxH_all}
+# Pre-process, filter, and QC phyloseq object
+# Stable site control, Heat, Antibiotics, Antibiotics.Heat sample subset
+nsamples(ps)
+samples <- sample_names(ps)
+# regex to select Hw1, Hw2, Wt1, and Wt2 genotypes in control (6), heat stress (4), antibiotics (5), and combined (1) treatments
+samples_AXH <- grep("[HW][wt][1-2].[1456][abc]", samples, value = TRUE) 
+ps_AXH_all <- prune_samples(samples_AXH, ps)
+ps_AXH_all
+# 48 samples, 5 sample variables
+```
+```{r subset_filter_taxa_samples}
+# Retain only assigned taxa
+ps_assigned <- subset_taxa(ps, Kingdom != "Unassigned") # 9 unassigned taxa filtered out
+ps_assigned <- subset_taxa(ps_assigned, Order != "Chloroplast") # 52 taxa filtered out
+ps_assigned <- subset_taxa(ps_assigned, Family != "Mitochondria") # 10 taxa filtered out
+ps_assigned
+# 470 taxa and 7 taxonomic ranks
+# select Hw1, Hw2, Wt1, and Wt2 genotypes in control (6), heat stress (4), antibiotics (5), and combined (1) treatments
+ps_assigned_AXH <- prune_samples(samples_AXH, ps_assigned)
+# ps_assigned_AXH
+# 48 samples
+# Filter taxa that have a mean count of 3 across all coral samples
+ps_filtered_AXH <- filter_taxa(ps_assigned_AXH, function(x) mean(x) > 3, TRUE) # 60 taxa mean count greater than 1
+# or keep unfiltered 
+# ps_filtered_AXH <- ps_assigned_AXH
+```
+```{r inspect_filtered_phyloseq}
+ntaxa(ps_filtered_AXH) 
+# 
+get_taxa_unique(ps_filtered_AXH, "Phylum") %>% length()
+get_taxa_unique(ps_filtered_AXH, "Class") %>% length()
+get_taxa_unique(ps_filtered_AXH, "Order") %>% length()
+get_taxa_unique(ps_filtered_AXH, "Family") %>% length()
+get_taxa_unique(ps_filtered_AXH, "Genus") %>% length()
+# filtered ASVs with very low abundance with phyloseq, now export otu and taxa tables from phyloseq for codaseq
+otu <- as(otu_table(ps_filtered_AXH), "matrix")
+taxon <- as(tax_table(ps_filtered_AXH), "matrix")
+taxa_df_filtered <- data.frame(taxon) %>% rownames_to_column("ASV")
+sample_metadata <- data.frame(sample_data(ps_filtered_AXH))
+family <- as.character(taxon[,"Family"])
+genus <- as.character(taxon[,"Genus"])
+# genus
+```
+```{r centered_log-ratio_transform}
+# Transform zero counts using the count zero multiplicative method in zCompositions, Palarea-Albaladejo and Martín-Fernández, 2015: https://doi.org/10.1016/j.chemolab.2015.02.019
+# First, replace 0 values with an estimate (because normalization is taking log, can't have 0)
+# Also transpose here, need samples as rows
+otu_czm <- cmultRepl(t(otu), method = "CZM", label = 0) # 464 corrected values
+# Perform the center-log-ratio (CLR) transformation, recommended by Gloor et al. 2017: https://doi.org/10.3389/fmicb.2017.02224
+otu_clr <- codaSeq.clr(otu_czm)
+```
+## Compositional Data Analysis (CoDA) 
+### Beta diversity ordinations
+```{r codaseq}
+# transpose matrix of CLR transformed data for ordination and dendrogram
+e_clr <- t(otu_clr)
+# plot compositional PCA biplot (perform a singular value decomposition)
+d_pcx <- prcomp(e_clr)
+# inspect pca results
+summary(d_pcx)
+str(d_pcx)
+screeplot(d_pcx)
+# calculate percent variance explained for the axis labels
+pc1 <- round(d_pcx$sdev[1]^2/sum(d_pcx$sdev^2),3)*100
+pc2 <- round(d_pcx$sdev[2]^2/sum(d_pcx$sdev^2),3)*100
+xlab <- paste("PC1: ", pc1, "%", sep="")
+ylab <- paste("PC2: ", pc2, "%", sep="")
+```
+```{r clr_pca_biplot}
+pdf("./outputs/phyloseq-results/figures/CoDA_PCA_biplot.pdf")
+biplot(d_pcx, cex=c(0.6,0.4), var.axes=F,scale=1, xlab=xlab, ylab=ylab, ylabs=family)
+ggbiplot(d_pcx,
+         choices = c(1,2),
+         groups = sample_metadata$Treatment,
+         varname.abbrev = T) + scale_color_manual(values = condcolors_AxH)
+```
+```{r clr_ggbiplot}
+pca_clr_biplot <- d_pcx %>% 
+  gg_biplot(., choices = c(1,2),
+            groups = sample_metadata$Treatment,
+            groups2 = sample_metadata$Colony,
+            ellipse = TRUE,
+            taxlabs = "Family",
+            varname.abbrev = F,
+            varname.size = 1.8) +
+  scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+  scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
+  scale_shape_manual(values = colshapes, name = "Colony") +
+  guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
+         shape = guide_legend(override.aes = list(shape = colshapes, fill = "black", alpha = 1, stroke = 0.5))) +
+  coord_fixed(xlim = c(-2, 2.5), ylim = c(-2.6, 2))
+
+ggsave(pca_clr_biplot, filename = "./outputs/phyloseq-results/figures/clr_ggbiplot.pdf", width = 140, height = 120, units = "mm", device = "pdf")
+ggsave(pca_clr_biplot, filename = "./manuscript_figures/Fig3A_CLR_PCA_16S_Treatment.pdf", width = 130, height = 100, units = "mm", device = "pdf")
+```
+```{r clr_pca}
+pcs_clr <- data.frame(d_pcx$x) %>%
+  rownames_to_column("SampleID") %>% 
+  left_join(sample_metadata, by = "SampleID")
+# 
+pcs_clr_centroids <- pcs_clr %>% 
+  group_by(Treatment) %>% 
+  dplyr::summarise(c1 = mean(`PC1`), c2 = mean(`PC2`)) %>% 
+  full_join(pcs_clr, by = "Treatment")
+# 
+pca_clr <- pcs_clr_centroids %>% ggplot(aes(PC1, PC2)) + 
+  #sample-centroid spiders paths
+    # geom_segment(mapping = aes(x = `PC1`, y = `PC2`, xend = c1, yend = c2), lwd = 0.25, col = "dark grey") +
+    #treatment centroid points
+    # geom_point(size = 4, aes(x = c1, y = c2, color = Treatment), fill = "black", shape = 21, stroke = 2, show.legend = F) +
+    #sample points
+    geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_shape_manual(values = colshapes, name = "Colony") +
+    labs(x=xlab, y=ylab) +
+    # guides(shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5))) +
+    coord_fixed()
+print(pca_clr)
+# 
+ggsave(pca_clr, filename = "./outputs/phyloseq-results/figures/clr_pca_treatment.pdf", width = 140, height = 100, units = "mm", device = "pdf")
+```
+```{r clr_taxa_pca}
+# Plot coordintaes of the taxa rotations along axes PC1 and PC2
+pcs_clr_taxa <- data.frame(d_pcx$rotation) %>% 
+  rownames_to_column("ASV") %>% 
+  left_join(taxa_df_filtered, by = "ASV")
+pca_taxa <- pcs_clr_taxa %>% ggplot(aes(PC1, PC2)) + 
+  geom_point(size = 2, color = "black") +
+  geom_text_repel(size = 2, aes(label = Genus)) +
+  scale_color_manual(values = families_colors$colors) +
+  labs(x=xlab, y=ylab) +
+  # guides(fill = guide_legend(nrow = 3)) +
+  # theme(legend.position = "bottom") +
+  coord_fixed()
+  print(pca_taxa)
+ggsave(pca_taxa, filename = "./outputs/phyloseq-results/figures/clr_pca_taxa.pdf", width = 140, height = 100, units = "mm", device = "pdf")
+```
+
+
+
+### Beta diversity statistical testing
+```{r distance_matrix}
+# Calculate Aitchinson distance matrix
+dist_clr <- dist(e_clr)
+# The Aitchison distance is superior to both the widely used Jensen-Shannon divergence and the Bray-Curtis dissimilarity metrics, being more stable to subsetting and aggregating of the data, and being a true linear distance (Gloor et al. 2017)
+# Now obtain data frame from the sample_data
+# head(sample_metadata)
+# Create factors for statistical testing
+treatments <- as.character(sample_metadata$Treatment)
+sites <- as.character(sample_metadata$Reef)
+colonies <- as.character(sample_metadata$Colony)
+```
+
+#### ANOSIM
+```{r anosim}
+# anosim between groups using Aitchison distance
+# Treatment
+anosim_treatment <- anosim(dist_clr, treatments, permutations = 999)
+plot(anosim_treatment)
+# Reef
+anosim_site <- anosim(dist_clr, sites, permutations = 999)
+plot(anosim_site)
+# Colony
+anosim_colony <- anosim(dist_clr, colonies, permutations = 999)
+plot(anosim_colony)
+# All ANOSIM tests for each factor yield significant results
+```
+
+#### PERMDISP
+```{r permdisp}
+# PERMDISP tests
+beta_treatment <- betadisper(dist_clr, treatments)
+permutest(beta_treatment)
+beta_site <- betadisper(dist_clr, sites)
+permutest(beta_site)
+beta_colony <- betadisper(dist_clr, colonies)
+permutest(beta_colony)
+# All PERMDISP tests reject hypothesis for homogeneity of multivariate dispersions
+```
+
+#### PERMANOVA
+```{r permanova}
+# Adonis/PERMANOVA tests
+# Treatment
+permanova_treatment <- adonis(dist_clr ~ treatments, data = sample_metadata)
+print(permanova_treatment)
+# 
+permanova_site <- adonis(dist_clr ~ sites, data = sample_metadata)
+print(permanova_site)
+# 
+permanova_colony <- adonis(dist_clr ~ colonies, data = sample_metadata)
+print(permanova_colony)
+```
+
+#### Distances to centroids boxplots
+```{r betadisper}
+# PERMDISP2 procedure for the analysis of multivariate homogeneity of group dispersions (variances).
+mod <- betadisper(dist_clr, treatments, type = "centroid")
+mod
+# 
+anova(mod)
+# Permutation test for F
+permutest(mod, pairwise = TRUE)
+(mod.HSD <- TukeyHSD(mod))
+# inspect
+plot(mod)
+boxplot(mod)
+```
+```{r beta_boxplot}
+# Draw a boxplot of the distances to centroid for each group
+# first extract the distances to centroids
+mod$distance
+mod_distance <- data.frame(mod$distance) %>%
+  rownames_to_column(., "SampleID") %>%
+  left_join(., sample_metadata, by = "SampleID", .keep = TRUE)
+# 
+beta_boxplot <- mod_distance %>%
+  ggplot(aes(Treatment, mod.distance)) + 
+  geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
+  #ylim(c(0,100)) +
+  xlab(NULL) +
+  ylab("Beta diversity distance to centroid") +
+  # ggtitle("Beta diversity distance to centroid boxplot") +
+  theme(legend.position = "none",
+          axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+beta_boxplot
+ggsave(beta_boxplot, filename = "./outputs/phyloseq-results/figures/beta_dist-centroid_boxplot.pdf", width = 50, height = 80, units = "mm")
+ggsave(beta_boxplot, filename = "./manuscript_figures/Fig3B_beta_dist-centroid_boxplot.pdf", width = 50, height = 80, units = "mm")
+```
+## Taxa composition plots
+```{r relative_abundance_transform}
+ps_filtered_AXH_rel <- transform_sample_counts(ps_filtered_AXH, function(x) {x / sum(x)})
+ps_filtered_AXH_rel
+```
+
+```{r taxa colors, include=FALSE}
+# run below taxa colors command until you get a set of colors you like, then comment out and write to csv file for custom edits!
+
+# # Bacteria taxa
+# # Phyla
+colors_phyla <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Phylum") 
+
+# # Classes
+colors_classes <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Class") 
+
+# # Orders
+colors_orders <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Order")
+
+# # Families
+colors_families <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Family")
+
+# # Genera
+colors_genera <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Genus")
+
+# # Specices
+colors_species <- taxa_color_seq(ps_filtered_AXH_rel, taxa_rank = "Species")
+
+```
+
+### Taxa barplots
+```{r taxa_barplots}
+taxa_barplot(ps_filtered_AXH_rel, "Phylum", colors_phyla$Phylum, colors_phyla)
+taxa_barplot(ps_filtered_AXH_rel, "Class", colors_classes$Class, colors_classes)
+taxa_barplot(ps_filtered_AXH_rel, "Order", colors_orders$Order, colors_orders)
+taxa_barplot(ps_filtered_AXH_rel, "Family", colors_families$Family, colors_families)
+taxa_barplot(ps_filtered_AXH_rel, "Genus", colors_genera$Genus, colors_genera)
+```
+```{r family_barplot_3B}
+pdf("./outputs/phyloseq-results/figures/family_barplot.pdf", height = 3.5, width = 6.5)
+taxa_barplot(ps_filtered_AXH_rel, "Family", colors_families$Family, colors_families)
+pdf("./manuscript_figures/Fig3C_family_barplot.pdf", height = 3.5, width = 6.5)
+taxa_barplot(ps_filtered_AXH_rel, "Family", colors_families$Family, colors_families)
+```
+
+
+## Alpha diversity plots and statistics
+```{r estimate_richness}
+ps_AXH_richness <- estimate_richness(ps_assigned_AXH) %>% rownames_to_column("SampleID")
+alphameasures <- c("Observed", "Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Fisher")
+```
+### Overall alpha diversity boxplots
+```{r}
+plot_richness(ps_filtered_AXH, x="Treatment", measures = alphameasures) +
+  geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony")
+```
+```{r}
+#pdf(file = "./outputs/phyloseq-results/figures/richness_ctrl.LPS.pdf", height = 2.95, width = 4.5)
+plot_richness(ps_filtered_AXH, x="Treatment", measures=c("Chao1", "Simpson", "Shannon")) +
+ geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  ylim(c(0,100)) +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle("Bacteria Community Diversity") +
+  theme(legend.position = "none",
+          axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+```
+```{r chao1_boxplot}
+chao1 <- plot_richness(ps_assigned_AXH, x="Treatment", measures=c("Chao1")) +
+  geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = c("C", "H", "A", "A.H")) +
+  # ylim(c(0,20)) +
+  xlab(NULL) +
+  ylab("Chao1 ASV richness") +
+  #ggtitle("Alpha diversity boxplot: Chao1 estimator") +
+  theme(legend.position = "none",
+          axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+chao1
+# ggsave(chao1, filename = "./outputs/phyloseq-results/figures/chao1boxplot.pdf",  width = 50, height = 75, units = "mm", device = "pdf")
+# ggsave(chao1, filename = "./manuscript_figures/Fig3B_chao1boxplot.pdf",  width = 50, height = 75, units = "mm", device = "pdf")
+```
+```{r shannon_boxplot}
+shannon <- plot_richness(ps.AXH, x="Treatment", measures=c("Shannon")) +
+ geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AXH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01), limits = c(0,4)) +
+  xlab(NULL) +
+  ylab("Shannnon diversity index") +
+  theme(legend.position = "none",
+          axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+shannon
+```
+```{r simpson_boxplot}
+simpson <- plot_richness(ps.AXH, x="Treatment", measures=c("Simpson")) +
+ geom_boxplot(aes(fill = Treatment)) +
+  scale_fill_manual(values = condfillcolors_AXH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  scale_x_discrete(labels = c("C", "H", "A", "A+H")) +
+  ylim(c(0,1)) +
+  xlab(NULL) +
+  ylab("Simpson eveness index") +
+  theme(legend.position = "none",
+          axis.text.x = element_text(angle = 0),
+        strip.background = element_blank(),
+        strip.text = element_blank())
+simpson
+```
+```{r}
+richness_boxplots <- (chao1 | shannon | simpson)
+richness_boxplots 
+```
+
+### Genotype-specific alpha diversity boxplots
+```{r, message=FALSE, warning=FALSE}
+alpha_geno <- function(ps = ps.AXH, alphameasure) {
+alphabox <- plot_richness(ps, x = "Colony", measures = alphameasure) +
+  geom_boxplot(aes(fill = Colony)) +
+  geom_point(size = 3, aes(shape = Colony)) +
+  scale_fill_manual(values = colcolors) +
+  scale_shape_manual(values = colshapes)
+print(alphabox)
+}
+for (alphameasure in alphameasures) {
+  alpha_geno(ps.AXH, alphameasure)
+}
+```
+Incorporate treatment separation
+```{r, message=FALSE, warning=FALSE}
+alpha_geno <- function(ps = ps.AXH, alphameasure) {
+alphabox <- plot_richness(ps, x = "Colony", color = "Treatment", measures = alphameasure) +
+  geom_boxplot(aes(fill = Colony)) +
+  geom_point(size = 3, aes(shape = Colony)) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = colcolors) +
+  scale_shape_manual(values = colshapes)
+print(alphabox)
+}
+for (alphameasure in alphameasures) {
+  alpha_geno(ps.AXH, alphameasure)
+}
+```
+
+## Corrections needed 
+
+### Statistical testing of alpha diversity differences
+```{r}
+# make a data frame from the sample_data
+sampledf <- data.frame(sample_data(ps_filtered_AXH))
+# 
+ps_richness_meta <- left_join(ps_AXH_richness, sampledf, by = "SampleID")
+```
+
+```{r}
+# Kruskal-Wallis testing for treatment effect
+kruskal.test(data=ps_richness_meta, Observed ~ Treatment)
+kruskal.test(data=ps_richness_meta, Chao1 ~ Treatment)
+kruskal.test(data=ps_richness_meta, ACE ~ Treatment)
+kruskal.test(data=ps_richness_meta, Shannon ~ Treatment)
+kruskal.test(data=ps_richness_meta, Simpson ~ Treatment)
+kruskal.test(data=ps_richness_meta, InvSimpson ~ Treatment)
+kruskal.test(data=ps_richness_meta, Fisher ~ Treatment)
+```
+
+```{r}
+# Kruskal-Wallis testing for reef effect
+kruskal.test(data=ps_richness_meta, Observed ~ Reef)
+kruskal.test(data=ps_richness_meta, Chao1 ~ Reef)
+kruskal.test(data=ps_richness_meta, ACE ~ Reef)
+kruskal.test(data=ps_richness_meta, Shannon ~ Reef)
+kruskal.test(data=ps_richness_meta, Simpson ~ Reef)
+kruskal.test(data=ps_richness_meta, InvSimpson ~ Reef)
+kruskal.test(data=ps_richness_meta, Fisher ~ Reef)
+```
+
+```{r}
+# Kruskal-Wallis testing for colony effect
+kruskal.test(data=ps_richness_meta, Observed ~ Colony)
+kruskal.test(data=ps_richness_meta, Chao1 ~ Colony)
+kruskal.test(data=ps_richness_meta, ACE ~ Colony)
+kruskal.test(data=ps_richness_meta, Shannon ~ Colony)
+kruskal.test(data=ps_richness_meta, Simpson ~ Colony)
+kruskal.test(data=ps_richness_meta, InvSimpson ~ Colony)
+kruskal.test(data=ps_richness_meta, Fisher ~ Colony)
+```
+
+## Core microbiome
+Coral core microbiome cutoffs: 50%, 80%, 90%, 100%
+
+```{r}
+ps.AXH.present <- prune_taxa(taxa_sums(ps.AXH) > 0, ps.AXH.rel)
+ps.AXH.present
+summarize_phyloseq(ps.AXH.present)
+```
+```{r}
+datatable(otu_table(ps.AXH.present))
+```
+```{r}
+core.taxa <- core_members(ps.AXH.present, detection = 0.001, prevalence = 80/100)
+core.taxa
+# Extract the taxonomy table
+taxonomy.present <- as.data.frame(tax_table(ps.AXH.present))
+# Subset this taxonomy table to include only core OTUs  
+core_taxa_id <- subset(taxonomy.present, rownames(taxonomy.present) %in% core.taxa)
+DT::datatable(core_taxa_id)
+```
+
+## Differential abundance testing
+### ALDeX2
+#### Heat
+```{r}
+# Treatment sample subsets of phyloseq objects
+nsamples(ps_filtered_AXH)
+samples <- sample_names(ps_filtered_AXH)
+samples.HxC <- grep("[HW][wt][1-2].[46][abc]", samples, value = TRUE)
+ps.HxC <- prune_samples(samples.HxC, ps_filtered_AXH)
+ps.HxC
+summarize_phyloseq(ps.HxC)
+# Read out ASV tables from phyloseq objects
+aldex.asv <- as.data.frame(t(otu_table(ps.HxC)))
+```
+```{r}
+conds <- as.character(sample_data(ps.HxC)$Treatment)
+conds <- factor(conds, levels = c("control", "Heat"), ordered = TRUE)
+```
+```{r}
+x.ps <- aldex(reads = aldex.asv, conditions = conds, mc.samples = 128, test = "t", effect = TRUE, include.sample.summary = FALSE, denom = "all", verbose = TRUE)
+```
+```{r}
+write.csv(x.ps, file = "./outputs/phyloseq-results/aldex2/anti-aldex2.csv")
+```
+```{r}
+#pdf("./outputs/aldex2/anti-aldex2.pdf", height = 4, width = 8)
+par(mfrow=c(1,2))
+aldex.plot(x.ps, type="MW", test="welch", xlab="Dispersion", ylab="Difference")
+aldex.plot(x.ps, type = "MA", test = "welch", xlab = "Log-ratio abundance", ylab = "Difference")
+
+#dev.off()
+```
+```{r}
+aldexmw <- aldex.plot_gg(x.ps, type = "MW", test = "welch")
+aldexmw_heat <- aldexmw + 
+  ggtitle("Heat vs. Control Treatment")
+aldexma <- aldex.plot_gg(x.ps, type = "MA", test = "welch")
+#aldex2 + ggtitle(subtitle = "Antibiotics + Heat vs. Control Treatment", "Bacteria ASV ALDeX2 Differential Abundance MA Plot") 
+ 
+aldexplots <- (aldexmw | aldexma) 
+aldexplots
+ggsave(aldexplots, filename = "./outputs/phyloseq-results/aldex2/anti-asv-aldex2.pdf", width = 8, height = 4, units = "in", device = "pdf")
+```
+```{r}
+cutoff <- 0.1
+called <- x.ps[x.ps$we.eBH <= cutoff, ]
+called.ASVs <- taxonomy[rownames(called), ]
+called.ASVs1 <- cbind(called, called.ASVs)
+```
+```{r}
+rare_cutoff <- 0
+rare <- x.ps[x.ps$rab.all < rare_cutoff, ]
+rare.ASVs <- taxonomy[rownames(rare), ]
+rare.ASVs1 <- cbind(called, rare.ASVs)
+```
+#### Antibiotics
+```{r}
+# Treatment sample subsets of phyloseq objects
+nsamples(ps_assigned)
+samples <- sample_names(ps_assigned)
+samples.AxC <- grep("[HW][wt][1-2].[16][abc]", samples, value = TRUE)
+ps.AxC <- prune_samples(samples.AxC, ps_assigned)
+ps.AxC
+summarize_phyloseq(ps.AxC)
+# Read out ASV tables from phyloseq objects
+aldex.asv <- as.data.frame(t(otu_table(ps.AxC)))
+```
+```{r}
+conds <- as.character(sample_data(ps.AxC)$Treatment)
+conds <- factor(conds, levels = c("control", "Antibiotics.Heat"), ordered = TRUE)
+```
+```{r}
+x.ps <- aldex(reads = aldex.asv, conditions = conds, mc.samples = 128, test = "t", effect = TRUE, include.sample.summary = FALSE, denom = "all", verbose = TRUE)
+```
+```{r}
+write.csv(x.ps, file = "./outputs/phyloseq-results/aldex2/anti-aldex2.csv")
+```
+```{r}
+#pdf("./outputs/aldex2/anti-aldex2.pdf", height = 4, width = 8)
+par(mfrow=c(1,2))
+aldex.plot(x.ps, type="MW", test="welch", xlab="Dispersion", ylab="Difference")
+aldex.plot(x.ps, type = "MA", test = "welch", xlab = "Log-ratio abundance", ylab = "Difference")
+
+#dev.off()
+```
+```{r}
+aldexmw <- aldex.plot_gg(x.ps, type = "MW", test = "welch")
+aldexmw_anti <- aldexmw + 
+  ggtitle("Antibiotics vs. Control Treatment")
+aldexma <- aldex.plot_gg(x.ps, type = "MA", test = "welch")
+#aldex2 + ggtitle(subtitle = "Antibiotics + Heat vs. Control Treatment", "Bacteria ASV ALDeX2 Differential Abundance MA Plot") 
+ 
+aldexplots <- (aldexmw | aldexma) 
+aldexplots
+ggsave(aldexplots, filename = "./outputs/phyloseq-results/figures/anti-asv-aldex2.pdf", width = 8, height = 4, units = "in", device = "pdf")
+ggsave(aldexma, filename = "./outputs/phyloseq-results/figures/anti-asv-aldexma.pdf", width = 4, height = 3, units = "in", device = "pdf")
+```
+```{r}
+cutoff <- 0.1
+called <- x.ps[x.ps$we.eBH <= cutoff, ]
+called.ASVs <- taxonomy[rownames(called), ]
+called.ASVs1 <- cbind(called, called.ASVs)
+```
+```{r}
+rare_cutoff <- 0
+rare <- x.ps[x.ps$rab.all < rare_cutoff, ]
+rare.ASVs <- taxonomy[rownames(rare), ]
+rare.ASVs1 <- cbind(called, rare.ASVs)
+```
+
+## Examine specific taxa and within-taxa compositions
+      filter_taxa
+      prune_taxa
+      subset_taxa
+      
+### Phylum-level subsets
+```{r}
+ps.AXH_proteobacteria <- subset_taxa(ps.AXH, Phylum=="D_1__Proteobacteria")
+ps.AXH_cyanobacteria <- subset_taxa(ps.AXH, Phylum=="D_1__Cyanobacteria")
+ps.AXH_bacteroidetes <- subset_taxa(ps.AXH, Phylum=="D_1__Bacteroidetes")
+ps.AXH_actinobacteria <- subset_taxa(ps.AXH, Phylum=="D_1__Actinobacteria")
+#datatable(tax_table(ps.AXH_cyanobacteria))
+```
+```{r}
+glom_class <- tax_glom(ps.AXH_proteobacteria, taxrank = "Class")
+ps.AXH_class <- psmelt(glom_class)
+ps.AXH_class$Class <- as.character(ps.AXH_class$Class)
+#ps.AXH_class <- filter(ps.AXH_class, Abundance > 0.005)
+#ps.AXH_class$Class[ps.AXH_class$Abundance < 0.01] <- "<1% abundance"
+ps.AXH_class$Sample <- factor(ps.AXH_class$Sample, levels = c("Hw1.6a", "Hw1.6b", "Hw1.6c", "Hw2.6a", "Hw2.6b", "Hw2.6c", "Wt1.6a", "Wt1.6b", "Wt1.6c", "Wt2.6a", "Wt2.6b", "Wt2.6c", "Hw1.3a", "Hw1.3b", "Hw1.3c", "Hw2.3a", "Hw2.3b", "Hw2.3c", "Wt1.3a", "Wt1.3b", "Wt1.3c", "Wt2.3a", "Wt2.3b", "Wt2.3c"))
+
+colCount <- length(unique(ps.AXH_class$Class))
+getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
+### all samples
+p_class <- ggplot(data = ps.AXH_class, aes(x = Sample, y = Abundance, fill = Class))
+p_class <- p_class +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = getPalette(colCount)) +
+  #guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_class + ggtitle("Relative Abundance of Bacteria Classes (Phylum Proteobacteria)")
+
+slices <- c(sum(ps.AXH_class$Abundance[ps.AXH_class$Class == "D_2__Alphaproteobacteria"]),
+            sum(ps.AXH_class$Abundance[ps.AXH_class$Class == "D_2__Deltaproteobacteria"]),
+            sum(ps.AXH_class$Abundance[ps.AXH_class$Class == "D_2__Gammaproteobacteria"]))
+pct <- round((slices/sum(slices)*100), digits = 1)
+lbls <- c("Alphaproteobacteria", "Deltaproteobacteria", "Gammaproteobacteria")
+lbls <- paste(lbls, pct)
+lbls <- paste(lbls, "%", sep="")
+pie(slices, labels = lbls, col = getPalette(colCount))
+```
+Cyanobacteria dominated by Class Oxyphotobacteria
+Bacteroidetes dominated by Class Bacteroidea
+
+### Class-level subsets
+```{r}
+ps.AXH_alphaproteobacteria <- subset_taxa(ps.AXH_proteobacteria, Class=="D_2__Alphaproteobacteria")
+ps.AXH_gammaproteobacteria <- subset_taxa(ps.AXH_proteobacteria, Class=="D_2__Gammaproteobacteria")
+```
+
+```{r}
+ps.AXH_alphaproteobacteria <- transform_sample_counts(ps.AXH_alphaproteobacteria, function(x) {x / sum(x)} )
+glom_order <- tax_glom(ps.AXH_alphaproteobacteria, taxrank = "Order")
+ps.AXH_order <- psmelt(glom_order)
+ps.AXH_order$Order <- as.character(ps.AXH_order$Order)
+#ps.AXH_order <- filter(ps.AXH_order, Abundance > 0.005)
+ps.AXH_order$Order[ps.AXH_order$Abundance < 0.05] <- "<5% abundance"
+ps.AXH_order$Sample <- factor(ps.AXH_order$Sample, levels = c("Hw1.6a", "Hw1.6b", "Hw1.6c", "Hw2.6a", "Hw2.6b", "Hw2.6c", "Wt1.6a", "Wt1.6b", "Wt1.6c", "Wt2.6a", "Wt2.6b", "Wt2.6c", "Hw1.4a", "Hw1.4b", "Hw1.4c", "Hw2.4a", "Hw2.4b", "Hw2.4c", "Wt1.4a", "Wt1.4b", "Wt1.4c", "Wt2.4a", "Wt2.4b", "Hw1.5a", "Hw1.5b", "Hw1.5c", "Hw2.5a", "Hw2.5b", "Hw2.5c", "Wt1.5a", "Wt1.5b", "Wt1.5c", "Wt2.5a", "Wt2.5b", "Wt2.5c", "Hw1.1a", "Hw1.1b", "Hw1.1c", "Hw2.1a", "Hw2.1b", "Hw2.1c", "Wt1.1a", "Wt1.1b", "Wt1.1c", "Wt2.1a", "Wt2.1b", "Wt2.1c"), ordered = TRUE)
+
+colCount <- length(unique(ps.AXH_order$Order))
+getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
+### all samples
+p_order <- ggplot(data = ps.AXH_order, aes(x = Sample, y = Abundance, fill = Order))
+p_order <- p_order +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = c("dark grey", getPalette(colCount))) +
+  guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_order
+```
+
+```{r}
+slices <- c(sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "<5% abundance"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Caulobacterales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Rhizobiales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Rhodobacterales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Rhodospirillales"]))
+pct <- round((slices/sum(slices)*100), digits = 1)
+lbls <- c("<5% abundance", "Caulobacterales", "Rhizobiales", "Rhodobacterales", "Rhodospirillales")
+lbls <- paste(lbls, pct)
+lbls <- paste(lbls, "%", sep="")
+pie(slices, labels = lbls, col = c("dark grey", getPalette(colCount)))
+```
+```{r}
+ps.AXH_gammaproteobacteria <- transform_sample_counts(ps.AXH_gammaproteobacteria, function(x) {x / sum(x)} )
+glom_order <- tax_glom(ps.AXH_gammaproteobacteria, taxrank = "Order")
+ps.AXH_order <- psmelt(glom_order)
+ps.AXH_order$Order <- as.character(ps.AXH_order$Order)
+#ps.AXH_order <- filter(ps.AXH_order, Abundance > 0.005)
+ps.AXH_order$Order[ps.AXH_order$Abundance < 0.01] <- "<1% abundance"
+ps.AXH_order$Sample <- factor(ps.AXH_order$Sample <- factor(ps.AXH_order$Sample, levels = c("Hw1.6a", "Hw1.6b", "Hw1.6c", "Hw2.6a", "Hw2.6b", "Hw2.6c", "Wt1.6a", "Wt1.6b", "Wt1.6c", "Wt2.6a", "Wt2.6b", "Wt2.6c", "Hw1.4a", "Hw1.4b", "Hw1.4c", "Hw2.4a", "Hw2.4b", "Hw2.4c", "Wt1.4a", "Wt1.4b", "Wt1.4c", "Wt2.4a", "Wt2.4b", "Hw1.5a", "Hw1.5b", "Hw1.5c", "Hw2.5a", "Hw2.5b", "Hw2.5c", "Wt1.5a", "Wt1.5b", "Wt1.5c", "Wt2.5a", "Wt2.5b", "Wt2.5c", "Hw1.1a", "Hw1.1b", "Hw1.1c", "Hw2.1a", "Hw2.1b", "Hw2.1c", "Wt1.1a", "Wt1.1b", "Wt1.1c", "Wt2.1a", "Wt2.1b", "Wt2.1c"), ordered = TRUE))
+
+colCount <- length(unique(ps.AXH_order$Order))
+getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
+### all samples
+p_order <- ggplot(data = ps.AXH_order, aes(x = Sample, y = Abundance, fill = Order))
+p_order <- p_order +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = c("dark grey", getPalette(colCount))) +
+  guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_order
+
+```
+
+```{r}
+slices <- c(sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "<5% abundance"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Alteromonadales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Betaproteobacteriales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Cellvibrionales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Coxiellales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Francisellales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__JTB23"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__KI89A clade"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Oceanospirillales"]),
+            sum(ps.AXH_order$Abundance[ps.AXH_order$Order == "D_3__Salinisphaerales"]))
+pct <- round((slices/sum(slices)*100), digits = 1)
+lbls <- c("<5% abundance", "Alteromonadales", "Betaproteobacteriales", "Cellvibrionales", "Coxiellales", "Francisellales", "JTB23", "KI89A clade", "Oceanospirillales", "Salinisphaerales")
+lbls <- paste(lbls, pct)
+lbls <- paste(lbls, "%", sep="")
+pie(slices, labels = lbls, col = c("dark grey", getPalette(colCount)))
+```
+
+### Order-level subsets
+Rhodobacterales
+```{r}
+ps.AXH_rhodobacterales <- subset_taxa(ps.AXH, Order=="D_3__Rhodobacterales")
+ps.AXH_rhodobacterales
+```
+```{r}
+ps.AXH_oceanospirillales <- subset_taxa(ps.AXH, Order=="D_3__Oceanospirillales")
+ps.AXH_oceanospirillales
+```
+
+### Family-level subsets and data exploration
+Endozoicomondaceae
+```{r}
+ps.AXH_endozoicomonadaceae <- subset_taxa(ps.AXH.rel, Family=="D_4__Endozoicomonadaceae")
+ps.AXH_endozoicomonadaceae
+summarize_phyloseq(ps.AXH_endozoicomonadaceae)
+```
+
+```{r}
+#ps.AXH_endozoicomonadaceae <- transform_sample_counts(ps.AXH_endozoicomonadaceae, function(x) {x / sum(x)} )
+glom_species <- tax_glom(ps.AXH_endozoicomonadaceae, taxrank = "Species")
+ps.AXH_species <- psmelt(glom_species)
+ps.AXH_species$Species <- as.character(ps.AXH_species$Species)
+#ps.AXH_species <- filter(ps.AXH_species, Abundance > 0.001)
+#ps.AXH_species$Species[ps.AXH_species$Abundance < 0.001] <- "<0.1% abundance"
+###
+colCount <- length(unique(ps.AXH_species$Species))
+getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
+### all samples
+p_species <- ggplot(data = ps.AXH_species, aes(x = Sample, y = Abundance, fill = Species))
+p_species <- p_species +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = getPalette(colCount)) +
+  guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_species
+### samples collapsed into colonies
+p_species <- ggplot(data = ps.AXH_species, aes(x = Treatment, y = Abundance, fill = Species))
+p_species <- p_species +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  facet_grid(~Colony) +
+  scale_fill_manual(values = getPalette(colCount)) +
+  guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_species
+### samples collapsed into treatments
+p_species <- ggplot(data = ps.AXH_species, aes(x = Treatment, y = Abundance, fill = Species))
+p_species <- p_species +
+  geom_bar(aes(), stat = "identity", position = "fill") +
+  scale_fill_manual(values = getPalette(colCount)) +
+  guides(fill=guide_legend(nrow = 30)) +
+  theme(axis.text.x = element_text(angle = 270))
+p_species
+###
+tree <- plot_tree(ps.AXH_endozoicomonadaceae, ladderize = TRUE, color = "Treatment", size = "Abundance") 
+tree + scale_color_manual(values = condcolors)
+```
+
+Alteromonadaceae
+```{r}
+ps.AXH_alteromonadaceae <- subset_taxa(ps.AXH, Family=="D_4__Alteromonadaceae")
+ps.AXH_alteromonadaceae
+summarize_phyloseq(ps.AXH_alteromonadaceae)
+```
+```{r}
+tree <- plot_tree(ps.AXH_alteromonadaceae, ladderize = TRUE, color = "Treatment", size = "Abundance") 
+tree + scale_color_manual(values = condcolors)
+```
+
+### Genus-level subsets (Endozoicomonas)
+Prevalence and relative abundance of Endozoicomonas across colonies, then treatments
+```{r}
+ps.AXH_endozoicomonas <- subset_taxa(ps.AXH, Genus=="D_5__Endozoicomonas")
+ps.AXH_endozoicomonas
+summarize_phyloseq(ps.AXH_endozoicomonas)
+ps.AXH_endozoicomonas <- transform_sample_counts(ps.AXH_endozoicomonas, function(x) {x / sum(x)} )
+```
+```{r}
+glom_endo <- tax_glom(ps.AXH_endozoicomonas, taxrank = "Genus")
+ps.AXH_endo <- psmelt(glom_endo)
+ps.AXH_endo$Genus <- as.character(ps.AXH_endo$Genus)
+view(ps.AXH_endo)
+```
+
+```{r}
+sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas"])/sum(ps.AXH_genus$Abundance)
+```
+```{r}
+sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas" & ps.AXH_genus$Colony=="HW1"])/sum(ps.AXH_genus$Abundance[ps.AXH_genus$Colony=="HW1"])
+
+sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas" & ps.AXH_genus$Colony=="HW2"])/sum(ps.AXH_genus$Abundance[ps.AXH_genus$Colony=="HW2"])
+
+sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas" & ps.AXH_genus$Colony=="WT1"])/sum(ps.AXH_genus$Abundance[ps.AXH_genus$Colony=="WT1"])
+
+sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas" & ps.AXH_genus$Colony=="WT2"])/sum(ps.AXH_genus$Abundance[ps.AXH_genus$Colony=="WT2"])
+```
+
+```{r}
+relative_endo <- function(samp) {
+rel <- sum(ps.AXH_genus$Abundance[ps.AXH_genus$Genus=="D_5__Endozoicomonas" & ps.AXH_genus$Sample==samp])/sum(ps.AXH_genus$Abundance[ps.AXH_genus$Sample==samp])
+print(rel)
+}
+```
+```{r}
+samps <- c("Hw1.6a", "Hw1.6b", "Hw1.6c", "Hw2.6a", "Hw2.6b", "Hw2.6c", "Wt1.6a", "Wt1.6b", "Wt1.6c", "Wt2.6a", "Wt2.6b", "Wt2.6c", "Hw1.4a", "Hw1.4b", "Hw1.4c", "Hw2.4a", "Hw2.4b", "Hw2.4c", "Wt1.4a", "Wt1.4b", "Wt1.4c", "Wt2.4a", "Wt2.4b", "Hw1.5a", "Hw1.5b", "Hw1.5c", "Hw2.5a", "Hw2.5b", "Hw2.5c", "Wt1.5a", "Wt1.5b", "Wt1.5c", "Wt2.5a", "Wt2.5b", "Wt2.5c", "Hw1.1a", "Hw1.1b", "Hw1.1c", "Hw2.1a", "Hw2.1b", "Hw2.1c", "Wt1.1a", "Wt1.1b", "Wt1.1c", "Wt2.1a", "Wt2.1b", "Wt2.1c")
+for (samp in samps){
+relative_endo(samp)
+}
+```
+
+
+## Phylogenetic trees
+```{r}
+actinobacteria_tree <- plot_tree(ps.AXH_actinobacteria,
+                                  nodelabf = nodeplotboot(95, 0, 3),
+                                  label.tips = "Genus",
+                                  text.size = 3,
+                                  size = "Abundance",
+                                  color ="Treatment",
+                                  ladderize = "left",
+                                  base.spacing = 0.01,
+                                  plot.margin = 0.4) 
+actinobacteria_tree + 
+  #coord_polar(theta = "y") +
+  scale_color_manual(values = condcolors_AxH) +
+  ggtitle("Phylum Actinobacteria")
+```
+
+```{r}
+rhodobacterales_tree <- plot_tree(ps.AXH_rhodobacterales,
+                                  nodelabf = nodeplotboot(95, 0, 3),
+                                  label.tips = "Genus",
+                                  text.size = 3,
+                                  size = "Abundance",
+                                  color ="Treatment",
+                                  ladderize = "left",
+                                  base.spacing = 0.01,
+                                  plot.margin = 0.4) 
+pdf("./outputs/phyloseq-results/figures/rhodobacterales_tree.pdf", width = 8, height = 2.5)
+rhodobacterales_tree + 
+  #coord_polar(theta = "y") +
+  scale_color_manual(values = condcolors_AxH) +
+  ggtitle("Order Rhodobacterales")
+```
+```{r}
+oceanospirillales_tree <- plot_tree(ps.AXH_oceanospirillales,
+                                  nodelabf = nodeplotboot(95, 0, 3),
+                                  label.tips = "Genus",
+                                  text.size = 3,
+                                  size = "Abundance",
+                                  color ="Treatment",
+                                  ladderize = "left",
+                                  base.spacing = 0.01,
+                                  plot.margin = 0.4) 
+pdf("./outputs/phyloseq-results/figures/oceanospirillales_tree.pdf", width = 8, height = 5)
+oceanospirillales_tree + 
+  #coord_polar(theta = "y") +
+  scale_color_manual(values = condcolors_AxH) +
+  ggtitle("Order Oceanospirillales")
+```
+
+```{r}
+altermonadaceae_tree <- plot_tree(ps.AXH_alteromonadaceae,
+                                  nodelabf = nodeplotboot(95, 0, 3),
+                                  label.tips = "Genus",
+                                  text.size = 3,
+                                  size = "Abundance",
+                                  color ="Treatment",
+                                  ladderize = "left",
+                                  base.spacing = 0.01,
+                                  plot.margin = 0.4) 
+pdf("./outputs/phyloseq-results/figures/alteromonadaceae_tree.pdf", width = 8, height = 4)
+altermonadaceae_tree + 
+  #coord_polar(theta = "y") +
+  scale_color_manual(values = condcolors_AxH) +
+  ggtitle("Family Alteromonadaceae")
+```
+
+## Microbial networks
+
+## Summary
+```{r}
+sessionInfo()
+```
+

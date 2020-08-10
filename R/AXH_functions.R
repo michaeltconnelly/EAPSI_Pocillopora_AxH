@@ -1,6 +1,41 @@
 #AxH_functions.R
 #author: "Mike Connelly"
 #date: "05/07/2020"
+# Create ggplot2 theme for journal submission
+theme_mec <- function(base_size = 10, base_family = "Arial") {
+  (theme_foundation(base_size=base_size, base_family=base_family)
+   + theme(
+     plot.background = element_rect(colour = NA),
+     panel.background = element_blank(),
+     panel.grid.major = element_blank(), 
+     panel.grid.minor = element_blank(), 
+     panel.border = element_rect(color = "black", fill = NA),
+     plot.title = element_text(face = "plain", size = rel(1), hjust = 0),
+     plot.subtitle = element_text(face = "plain", size = rel(0.8)),
+     axis.title = element_text(face = "plain",size = rel(1)),
+     axis.title.x = element_text(vjust = -2),
+     axis.title.y = element_text(angle = 90, vjust = 2),
+     text = element_text(),
+     axis.text = element_text(size = rel(0.8)), 
+     axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 0.5),
+     axis.text.y = element_text(), 
+     #axis.line = element_line(colour = "black"),
+     axis.ticks = element_line(),
+     legend.title = element_text(size = rel(1)),
+     legend.text = element_text(size = rel(0.8), margin = margin(t = 2, b = 2, unit = "mm")),
+     legend.key = element_rect(color = NA),
+     legend.background = element_rect(fill = NA, colour = NA),
+     legend.position = "right",
+     legend.direction = "vertical",
+     legend.spacing.x = unit(2, "mm"),
+     legend.spacing.y = unit(0, "mm"),
+     legend.key.size = unit(2, "mm"),
+     plot.margin = unit(c(2,2,2,2), "mm"),
+     strip.background = element_rect(color = "black", fill = "grey"),
+     strip.text = element_text(face = "plain")
+   ))
+}
+###
 
 # EAPSI AXH Transcriptome Analysis Functions ---------------------------------------------------------------------------------
 ### PCA plot with custom PC axes----------------------------------------------------------------------------------
@@ -196,6 +231,212 @@ KOGheatmap <- function(deltaranks, pvals, ...) {
 }
 
 # EAPSI AXH Microbiome Analysis Functions ---------------------------------------------------------------------------------
+### Center log-ratio PCA biplot function 
+# altered ggbiplot function - shorted axis labels, aesthetics, and variable labels
+gg_biplot <- function (pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE, 
+                       obs.scale = 1 - scale, var.scale = scale, groups = NULL, groups2 = NULL, 
+                       ellipse = FALSE, ellipse.prob = 0.68, labels = NULL, labels.size = 3, 
+                       alpha = 1, var.axes = TRUE, circle = FALSE, circle.prob = 0.69, 
+                       varname.size = 3, varname.adjust = 1.5, varname.abbrev = FALSE, taxlabs = NULL,
+                       ...) 
+{
+  library(ggplot2)
+  library(plyr)
+  library(scales)
+  library(grid)
+  stopifnot(length(choices) == 2)
+  if (inherits(pcobj, "prcomp")) {
+    nobs.factor <- sqrt(nrow(pcobj$x) - 1)
+    d <- pcobj$sdev
+    u <- sweep(pcobj$x, 2, 1/(d * nobs.factor), FUN = "*")
+    v <- pcobj$rotation
+  }
+  else if (inherits(pcobj, "princomp")) {
+    nobs.factor <- sqrt(pcobj$n.obs)
+    d <- pcobj$sdev
+    u <- sweep(pcobj$scores, 2, 1/(d * nobs.factor), FUN = "*")
+    v <- pcobj$loadings
+  }
+  else if (inherits(pcobj, "PCA")) {
+    nobs.factor <- sqrt(nrow(pcobj$call$X))
+    d <- unlist(sqrt(pcobj$eig)[1])
+    u <- sweep(pcobj$ind$coord, 2, 1/(d * nobs.factor), FUN = "*")
+    v <- sweep(pcobj$var$coord, 2, sqrt(pcobj$eig[1:ncol(pcobj$var$coord), 
+                                                  1]), FUN = "/")
+  }
+  else if (inherits(pcobj, "lda")) {
+    nobs.factor <- sqrt(pcobj$N)
+    d <- pcobj$svd
+    u <- predict(pcobj)$x/nobs.factor
+    v <- pcobj$scaling
+    d.total <- sum(d^2)
+  }
+  else {
+    stop("Expected a object of class prcomp, princomp, PCA, or lda")
+  }
+  choices <- pmin(choices, ncol(u))
+  df.u <- as.data.frame(sweep(u[, choices], 2, d[choices]^obs.scale, 
+                              FUN = "*"))
+  v <- sweep(v, 2, d^var.scale, FUN = "*")
+  df.v <- as.data.frame(v[, choices])
+  names(df.u) <- c("xvar", "yvar")
+  names(df.v) <- names(df.u)
+  if (pc.biplot) {
+    df.u <- df.u * nobs.factor
+  }
+  r <- sqrt(qchisq(circle.prob, df = 2)) * prod(colMeans(df.u^2))^(1/4)
+  v.scale <- rowSums(v^2)
+  df.v <- r * df.v/sqrt(max(v.scale))
+  if (obs.scale == 0) {
+    u.axis.labs <- paste("PC", choices, sep = "")
+  }
+  else {
+    u.axis.labs <- paste("PC", choices, sep = "")
+  }
+  u.axis.labs <- paste(u.axis.labs, sprintf("(%0.1f%%)", 
+                                            100 * pcobj$sdev[choices]^2/sum(pcobj$sdev^2)))
+  if (!is.null(labels)) {
+    df.u$labels <- labels
+  }
+  if (!is.null(groups)) {
+    df.u$groups <- groups
+  }
+  if (varname.abbrev) {
+    df.v$varname <- abbreviate(rownames(v))
+  }
+  else {
+    df.v$varname <- as.character(taxonomy[rownames(v), taxlabs])
+    # rownames(v) # can make change here to get taxa level names
+  }
+  df.v$angle <- with(df.v, (180/pi) * atan(yvar/xvar))
+  df.v$hjust = with(df.v, (1 - varname.adjust * sign(xvar))/2)
+  g <- ggplot(data = df.u, aes(x = xvar, y = yvar)) + xlab(u.axis.labs[1]) + 
+    ylab(u.axis.labs[2]) + coord_fixed()
+  if (var.axes) {
+    if (circle) {
+      theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, 
+                                                length = 50))
+      circle <- data.frame(xvar = r * cos(theta), yvar = r * 
+                             sin(theta))
+      g <- g + geom_path(data = circle, color = muted("white"), 
+                         size = 1/2, alpha = 1/3)
+    }
+    g <- g + geom_segment(data = df.v, aes(x = 0, y = 0, 
+                                           xend = xvar, yend = yvar), arrow = arrow(length = unit(1/2, 
+                                                                                                  "picas")), color = "grey")
+  }
+  if (!is.null(df.u$groups) && ellipse) {
+    theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, length = 50))
+    circle <- cbind(cos(theta), sin(theta))
+    ell <- ddply(df.u, "groups", function(x) {
+      if (nrow(x) <= 2) {
+        return(NULL)
+      }
+      sigma <- var(cbind(x$xvar, x$yvar))
+      mu <- c(mean(x$xvar), mean(x$yvar))
+      ed <- sqrt(qchisq(ellipse.prob, df = 2))
+      data.frame(sweep(circle %*% chol(sigma) * ed, 2, 
+                       mu, FUN = "+"), groups = x$groups[1])
+    })
+    names(ell)[1:2] <- c("xvar", "yvar")
+    g <- g + geom_path(data = ell, aes(color = groups, group = groups))
+  }
+  if (!is.null(df.u$labels)) {
+    if (!is.null(df.u$groups)) {
+      g <- g + geom_text(aes(label = labels, color = groups), 
+                         size = labels.size)
+    }
+    else {
+      g <- g + geom_text(aes(label = labels), size = labels.size)
+    }
+  }
+  else {
+    if (!is.null(df.u$groups)) {
+      g <- g + geom_point(aes(fill = groups, shape = groups2), size = 3, alpha = alpha)
+    }
+    else {
+      g <- g + geom_point(alpha = alpha)
+    }
+  }
+  if (var.axes) {
+    g <- g + geom_text(data = df.v, aes(label = varname, 
+                                        x = xvar, y = yvar,
+                                        angle = angle,
+                                        hjust = hjust), 
+                       color = "black", size = varname.size)
+  }
+  return(g)
+}
+
+### function for getting ordered dataframe with color assignments based on chose taxonomic ranks
+taxa_color_seq <- function(physeq, taxa_rank) {
+  glom <- tax_glom(physeq, taxrank = taxa_rank)
+  psmelted <- psmelt(glom)
+  psmelted[, taxa_rank] <- as.character(psmelted[ , taxa_rank])
+  psmelted[psmelted$Abundance < 0.01, taxa_rank] <- "<1% abundance"
+  # 
+  taxa_rank_name <- sym(taxa_rank)
+  taxa_colors_table <- psmelted %>% 
+    group_by({{ taxa_rank_name }}) %>% 
+    summarise(cum_rel_ab = sum(Abundance)/48) %>% 
+    arrange(cum_rel_ab) %>% 
+    filter({{ taxa_rank_name }} != "<1% abundance")
+  # 
+  lowtaxa <- data.frame("<1% abundance", 0)
+  colnames(lowtaxa) <- colnames(taxa_colors_table)
+  taxa_colors_df <- rbind(lowtaxa, taxa_colors_table)
+  # 
+  taxa_colors_df$hex <-  distinctColorPalette(length(taxa_colors_df$cum_rel_ab))
+  taxa_colors_df$colors <- sapply(taxa_colors_df$hex, color.id)
+  taxa_colors_df[1, c(3,4)] <- c("#D3D3D3", "lightgrey")
+  taxa_colors_df
+}
+# somehow broken on 8/6/20, unbroken 8/7/20
+
+### Taxa barplot function with colored facet strips, taxa ordered according to cumulative relative abundance and distinct color scheme
+taxa_barplot <- function(physeq, taxa_rank, taxa_levels, taxa_colors) {
+  glom <- tax_glom(physeq, taxrank = taxa_rank)
+  psmelted <- psmelt(glom)
+  psmelted[, taxa_rank] <- as.character(psmelted[ , taxa_rank])
+  psmelted[psmelted$Abundance < 0.01, taxa_rank] <- "<1% abundance"
+  psmelted[, taxa_rank] <- factor(psmelted[, taxa_rank], levels = taxa_levels, ordered = TRUE)
+  
+  # all samples facetted according to treatment
+  barplot <- ggplot(data = psmelted, aes(x = Sample, y = Abundance, fill = psmelted[, taxa_rank]))
+  barplot <- barplot +
+    geom_bar(aes(), stat = "identity") +
+    facet_nested(. ~ Treatment + Colony, scales = "free_x", space = "free", switch = NULL) +
+    scale_fill_manual(values = taxa_colors$hex) +
+    ylab("Relative Abundance") +
+    guides(fill = guide_legend(nrow = 4))
+  barplot <- barplot +
+    theme(axis.text.x = element_blank(), 
+          axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          strip.text = element_text(size = 8),
+          strip.placement = "outside",
+          # strip.background = element_rect(color = "white", fill = "white"),
+          # panel.border = element_rect(color = "white"),
+          legend.text = element_text(size = 6),
+          legend.title = element_blank(),
+          legend.position = "bottom",
+          legend.key.width = unit(5.5, "mm"),
+          legend.key.height = unit(5, "mm"))
+  print(barplot)
+  # modify facet strip colors
+  gt <- ggplotGrob(barplot)
+  strip_both <- which(grepl('strip-', gt$layout$name))
+  k <- 1
+  for (i in strip_both) {
+    j <- which(grepl('rect', gt$grobs[[i]]$grobs[[1]]$childrenOrder))
+    gt$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- cond_col_colors[k]
+    k <- k+1
+  }
+  # draw gtable object
+  gp <- grid.draw(gt)
+  print(gp)
+}
+
 ### PCoA plot with spiders aesthetics
 pcoa_spider <- function(ps, ord, centroids, type = "sample", axes = c(1,2)) {
   pcoa <- plot_ordination(ps, ord, type, axes) +
@@ -208,8 +449,8 @@ pcoa_spider <- function(ps, ord, centroids, type = "sample", axes = c(1,2)) {
     geom_point(data = centroids, size = 4, aes(x = c1, y = c2, color = Treatment), fill = "black", shape = 21, stroke = 2, show.legend = TRUE) +
     #sample points
     geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
-    scale_color_manual(values = condcolors_AXH, name = "Treatment") +
-    scale_fill_manual(values = condcolors_AXH, name = "Treatment") +
+    scale_color_manual(values = condcolors_AxH, name = "Treatment") +
+    scale_fill_manual(values = condcolors_AxH, name = "Treatment") +
     scale_shape_manual(values = colshapes, name = "Colony") + 
     labs(x = "PC1", y = "PC2") +
     guides(shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5))) +
