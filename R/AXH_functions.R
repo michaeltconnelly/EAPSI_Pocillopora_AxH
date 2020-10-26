@@ -193,9 +193,6 @@ genoboxplot <- function(gene) {
   print(gbp)
 }
 
-### Function to plot GO_MWU clustering ---------------------------------------------------------------------------
-
-
 ### Functions to plot KOG delta ranks heatmap ---------------------------------------------------------------------
 #from https://stackoverflow.com/questions/15505607/diagonal-labels-orientation-on-x-axis-in-heatmaps
 draw_main <- function (text, ...) 
@@ -219,14 +216,15 @@ assignInNamespace(x="draw_colnames", value="draw_colnames_330",
 KOGheatmap <- function(deltaranks, pvals, ...) {
   deltaranks <- as.matrix(deltaranks)
   paletteLength <- 100
-  myColor <- colorRampPalette(rev(c("red", "yellow", "grey10", "cyan", "blue")))(paletteLength)
+  myColor <- colorRampPalette(rev(c("red", "white", "blue")))(paletteLength)
   myBreaks <- c(seq(min(deltaranks), 0, length.out = ceiling(paletteLength/2) + 1), 
                 seq(max(deltaranks)/paletteLength, max(deltaranks), 
                     length.out = floor(paletteLength/2)))
   pheatmap(mat = deltaranks, display_numbers = pvals,
            cluster_cols = FALSE, cluster_rows = FALSE,
            treeheight_row = 15, treeheight_col = 15,
-           border_color = "white", scale = "none",
+           number_color = "black",
+           border_color = "black", scale = "none",
            color = myColor, breaks = myBreaks, ...)
 }
 
@@ -310,19 +308,28 @@ gg_biplot <- function (pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
   }
   df.v$angle <- with(df.v, (180/pi) * atan(yvar/xvar))
   df.v$hjust = with(df.v, (1 - varname.adjust * sign(xvar))/2)
+  # 
+  # average out rotations and labels across taxonomic rank (reduces clutter in arrows) for selected taxa
+  df.v.s <- df.v %>% group_by(varname) %>%
+    dplyr::summarise(x_mean = mean(xvar), y_mean = mean(yvar), angle_mean = mean(angle), hjust_mean = mean(hjust)) %>%
+    dplyr::filter(varname %in% int_families)
+  # 
   g <- ggplot(data = df.u, aes(x = xvar, y = yvar)) + xlab(u.axis.labs[1]) + 
     ylab(u.axis.labs[2]) + coord_fixed()
   if (var.axes) {
     if (circle) {
       theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, 
                                                 length = 50))
-      circle <- data.frame(xvar = r * cos(theta), yvar = r * 
-                             sin(theta))
+      circle <- data.frame(xvar = r * cos(theta), yvar = r * sin(theta))
       g <- g + geom_path(data = circle, color = muted("white"), 
                          size = 1/2, alpha = 1/3)
     }
-    g <- g + geom_segment(data = df.v, aes(x = 0, y = 0, 
-                                           xend = xvar, yend = yvar), arrow = arrow(length = unit(1/2, 
+    g <- g + geom_segment(#data = df.v,
+                          data = df.v.s,
+                          aes(x = 0, y = 0, 
+                          # xend = xvar, yend = yvar)
+                          xend = x_mean, yend = y_mean),
+                          arrow = arrow(length = unit(1/2, 
                                                                                                   "picas")), color = "grey")
   }
   if (!is.null(df.u$groups) && ellipse) {
@@ -359,13 +366,16 @@ gg_biplot <- function (pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
     }
   }
   if (var.axes) {
-    g <- g + geom_text(data = df.v, aes(label = varname, 
-                                        x = xvar, y = yvar,
-                                        angle = angle,
-                                        hjust = hjust), 
+    g <- g + geom_text(#data = df.v,
+                       data = df.v.s,
+                       aes(label = varname, 
+                                        # x = xvar, y = yvar, angle = angle,
+                                        x = x_mean, y = y_mean, angle = angle_mean,
+                                        hjust = hjust_mean), 
                        color = "black", size = varname.size)
   }
   return(g)
+  # return(df.v)
 }
 
 ### function for getting ordered dataframe with color assignments based on chose taxonomic ranks
@@ -388,6 +398,7 @@ taxa_color_seq <- function(physeq, taxa_rank) {
   # 
   taxa_colors_df$hex <-  distinctColorPalette(length(taxa_colors_df$cum_rel_ab))
   taxa_colors_df$colors <- sapply(taxa_colors_df$hex, color.id)
+  taxa_colors_df$colors <- as.character(taxa_colors_df$colors)
   taxa_colors_df[1, c(3,4)] <- c("#D3D3D3", "lightgrey")
   taxa_colors_df
 }
@@ -399,16 +410,16 @@ taxa_barplot <- function(physeq, taxa_rank, taxa_levels, taxa_colors) {
   psmelted <- psmelt(glom)
   psmelted[, taxa_rank] <- as.character(psmelted[ , taxa_rank])
   psmelted[psmelted$Abundance < 0.01, taxa_rank] <- "<1% abundance"
-  psmelted[, taxa_rank] <- factor(psmelted[, taxa_rank], levels = taxa_levels, ordered = TRUE)
+  psmelted[, taxa_rank] <- factor(psmelted[, taxa_rank], levels = rev(taxa_levels), ordered = TRUE)
   
   # all samples facetted according to treatment
   barplot <- ggplot(data = psmelted, aes(x = Sample, y = Abundance, fill = psmelted[, taxa_rank]))
   barplot <- barplot +
     geom_bar(aes(), stat = "identity") +
     facet_nested(. ~ Treatment + Colony, scales = "free_x", space = "free", switch = NULL) +
-    scale_fill_manual(values = taxa_colors$hex) +
+    scale_fill_manual(values = rev(taxa_colors$hex)) + # note that order is reversed
     ylab("Relative Abundance") +
-    guides(fill = guide_legend(nrow = 4))
+    guides(fill = guide_legend(nrow = 5))
   barplot <- barplot +
     theme(axis.text.x = element_blank(), 
           axis.ticks = element_blank(),
@@ -417,10 +428,10 @@ taxa_barplot <- function(physeq, taxa_rank, taxa_levels, taxa_colors) {
           strip.placement = "outside",
           # strip.background = element_rect(color = "white", fill = "white"),
           # panel.border = element_rect(color = "white"),
-          legend.text = element_text(size = 6),
+          legend.text = element_text(size = 8),
           legend.title = element_blank(),
           legend.position = "bottom",
-          legend.key.width = unit(5.5, "mm"),
+          legend.key.width = unit(6, "mm"),
           legend.key.height = unit(5, "mm"))
   print(barplot)
   # modify facet strip colors

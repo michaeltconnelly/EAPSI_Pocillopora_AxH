@@ -1,7 +1,7 @@
 ---
 title: "Pocillopora_AXH_transcriptome_analysis"
 author: "Mike Connelly"
-date: "7/21/2020"
+date: "10/07/2020"
 output: 
   html_document:
       code_folding: hide
@@ -13,8 +13,8 @@ knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
 options(stringsAsFactors = FALSE)
 ```
 ## Setup packages and working directories
-Include all packages needed for the entire transcriptome analysis and downstream visualizations
 ```{r packages, message=FALSE, include=FALSE}
+# Include all packages needed for the entire transcriptome analysis and downstream visualizations
 library("tidyverse")
 # Essential RNAseq analysis packages
 library("DESeq2")
@@ -69,13 +69,23 @@ condcolors_null <- c(rep("black", 4))
 colshapes_null <- c(rep(20, 8))
 # differential gene expression volcano plot point colors
 DEGcolors <- c("red", "blue", "dark grey")
+# bacteria family key colors
+# bacteria_colors <- colors_families %>% 
+#   filter(Family %in% colnames(datTaxa_Family)) %>% 
+#   dplyr::select(-cum_rel_ab)
+# bacteria_colors$Family <- factor(bacteria_colors$Family, levels = int_families, ordered = TRUE)
+# 
+# bac_colors <- bacteria_colors$colors
+# names(bac_colors) <- bacteria_colors$Family
 ```
 ```{r heatmap_colors}
 # Create colony and condition annotation colors list
 anno_colors <- list(
   Colony = c(HW1=colcolors[1], HW2=colcolors[2], WT1=colcolors[3], WT2=colcolors[4]),
   Treatment = c(control=condcolors_AxH[1],  Heat=condcolors_AxH[2], Antibiotics=condcolors_AxH[3], Antibiotics.Heat=condcolors_AxH[4]),
-  DEG = c(Upregulated="red", Downregulated="blue"))
+  DEG = c(Upregulated="red", Downregulated="blue")#,
+  # Bacteria = bac_colors
+  )
 # Create sample heatmap cell color
 colonyclustercol <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 # Create gene expression cell color
@@ -95,7 +105,6 @@ geneexpcolors2 <- colorRampPalette(rev(c("red", "yellow", "grey10", "cyan", "blu
 theme_set(theme_mec())
 #image widths: 80 mm (one column), 112 mm (two-thirds page), 169 mm (two columns)
 ```
-
 ## Import sample metadata, counts data, and gene annotation
 ```{r data, echo=TRUE}
 samples <- read.table("./data/EAPSI_samples_AxH_meta.txt", header = TRUE)
@@ -115,7 +124,7 @@ countdata <- countdata[ ,7:ncol(countdata)]
 countdata.sorted <- as.data.frame(countdata[order(rownames(countdata)),])
 ```
 ```{r gene data}
-gene_annotation <- read.delim(file = "./data/pdam_genome_annotations.tab", header = T) %>% arrange(ID)
+gene_annotation <- read.delim(file = "./data/pdam_genome_annotations.tsv", header = T) %>% arrange(ID)
 rownames(gene_annotation) <- gene_annotation$ID
 # Check gene feature annotation and countdata rowname order coherence
 all(rownames(countdata.sorted) == gene_annotation$ID)
@@ -147,6 +156,7 @@ col_fun_ge <- function(mat) {
   colorRamp2(c(max(mat), max(mat)/2, mean(mat), min(mat)/2, min(mat)), c("red", "yellow", "grey10", "cyan", "blue"))
 }
 col_fun_cor <- colorRamp2(c(1, 0.5, 0, -0.5, -1), c("red", "yellow", "grey10", "cyan", "blue"))
+col_fun_KOGfisher <- colorRamp2(c(80, 0), c("red", "white"))
 # ComplexHeatmap sample annotations
 sample_annotation <- HeatmapAnnotation(Colony = samples$Colony,
                                        Treatment = samples$Treatment,
@@ -211,7 +221,7 @@ pcoa1 <- ggplot(mds_col, aes(fill = Treatment)) +
   geom_segment(mapping = aes(x = `1`, y = `2`, xend = c1, yend = c2),
                lwd = 0.25, col = "dark grey") +
   # colony centroid points
-  geom_point(size = 4, aes(x = c1, y = c2, color = Colony, shape = Colony), stroke = 2, fill = "black", show.legend = TRUE) +
+  geom_point(size = 3, aes(x = c1, y = c2, shape = Colony), stroke = 2, fill = "black", show.legend = TRUE) + #color = Colony,
   # sample points
   geom_point(size = 3, aes(x = `1`, y = `2`, fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
   scale_color_manual(values = colcolors) +
@@ -219,13 +229,16 @@ pcoa1 <- ggplot(mds_col, aes(fill = Treatment)) +
   scale_shape_manual(values = colshapes) +
   labs(x = xlab, y = ylab) +
   coord_fixed(1) +
-  guides(fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5))) +
+  # guides(fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5))) +
+  guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
+         fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5)),
+         shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5)))+
   theme(legend.spacing.y = unit(0, "cm")) 
-pcoa1title <- expression(paste("PCoA of overall ", italic("Pocillopora"), " spp. gene expression"))
-pcoa1 <- pcoa1 + ggtitle(pcoa1title, subtitle = "Plotted with colony centroids")
+# pcoa1title <- expression(paste("PCoA of overall ", italic("Pocillopora"), " spp. gene expression"))
+# pcoa1 <- pcoa1 + ggtitle(pcoa1title, subtitle = "Plotted with colony centroids")
 pcoa1
-ggsave(pcoa1, filename = "./outputs/DESeq-results/figures/pcoa_colony.pdf", width = 80, height = 80, units = "mm", device = "pdf")
-ggsave(pcoa1, filename = "./manuscript_figures/Fig1_PCoA_Colony.pdf", width = 80, height = 80, units = "mm", device = "pdf")
+# ggsave(pcoa1, filename = "./outputs/DESeq-results/figures/pcoa_colony.pdf", width = 112, height = 80, units = "mm", device = "pdf")
+# ggsave(pcoa1, filename = "./manuscript_figures/Fig1_PCoA_Colony.pdf", width = 80, height = 80, units = "mm", device = "pdf")
 ```
 ```{r treatment pcoa}
 # Calculate Treatment centroids for plotting
@@ -254,18 +267,18 @@ pcoa2 <- ggplot(mds_trmt, aes(fill = Treatment)) +
   labs(x = xlab, y = ylab) +
   coord_fixed(1) +
   guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
-         fill = guide_legend(override.aes = list(fill = condcolors_AxH, alpha = 1, stroke = 1)),
+         fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5)),
          shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5)))
 # pcoa2title <- expression(paste("PCoA of ", italic("Pocillopora"), " coral gene expression"))
 # pcoa2 <- pcoa2 + ggtitle(pcoa2title, subtitle = "Plotted with treatment centroids")
 pcoa2
-ggsave(pcoa2, filename = "./outputs/DESeq-results/figures/pcoa_treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
-ggsave(pcoa2, filename = "./manuscript_figures/Fig1A_PCoA_Treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
+# ggsave(pcoa2, filename = "./outputs/DESeq-results/figures/pcoa_treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
+# ggsave(pcoa2, filename = "./manuscript_figures/Fig1A_PCoA_Treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
 ```
 
 ### Variance partition
-Partition total transcriptome variance among explanatory factors including sequencing batch, colony/genotype, treatment, and their interaction.
 ```{r varpart_total}
+# Partition total transcriptome variance among explanatory factors including sequencing batch, colony/genotype, treatment, and their interaction
 varformula <- ~ (1|Batch) + (1|Colony) + (1|Treatment) #+ (1|Treatment:Colony)
 varpart_total <- fitExtractVarPartModel(assay(vsd), varformula, coldata)
 # sort variables (i.e. columns) by median fraction of variance explained
@@ -347,10 +360,10 @@ DEtab <- DE %>%
          ndn = map_dbl(down, ~ nrow(.)),
          `DEGs [up, down]` = paste0(nsig, " [", nup, ", ", ndn, "]")) %>%
   mutate(Colony = factor(Colony, levels = c("all", "HW1", "HW2", "WT1", "WT2"))) %>%
-  select(Colony, num, den, `DEGs [up, down]`)
+  dplyr::select(Colony, num, den, `DEGs [up, down]`)
 
 DE_table <- DEtab %>% filter(den == "control") 
-write_csv(DE_table, "./outputs/DESeq-results/tables/DE_table.csv")
+# write_csv(DE_table, "./outputs/DESeq-results/tables/DE_table.csv")
 ```
 ```{r sig_tables}
 # Write significant DEG results tables to csv files
@@ -371,10 +384,10 @@ DE %>%
 # Next, I want to bring together the overall and genotype model LFC and padj values for each treatment contrast into a single table.
 DEres <- DE %>%
   filter(den == "control", Colony == "all") %>%
-  select(num, den, df) %>% 
+  dplyr::select(num, den, df) %>% 
   unnest(df) %>% 
   unite(contrast, num, den) %>% 
-  select(contrast, ID, log2FoldChange, padj) %>% 
+  dplyr::select(contrast, ID, log2FoldChange, padj) %>% 
   pivot_wider(names_from = contrast, values_from = log2FoldChange:padj) %>% 
   left_join(gene_annotation, by = "ID")
 ```
@@ -409,7 +422,7 @@ shared_DEGs_treatments <- DE %>%
 
 ```{r}
 ressig_heat <- DE$sig[DE$num == "Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
-ressig_anti <-  DE$sig[DE$num == "Antibiotics" & DE$den == "control" & DE$Colony == "all"][[1]]
+ressig_anti <-  DE$sig[DE$num == "Antibiotics" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
 ressig_anti.heat <-  DE$sig[DE$num == "Antibiotics.Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
 ```
 ```{r}
@@ -417,6 +430,9 @@ AH <- intersect(ressig_anti, ressig_heat)
 AX <- intersect(ressig_anti, ressig_anti.heat)
 HX <- intersect(ressig_heat, ressig_anti.heat)
 AXH <- intersect(intersect(ressig_anti, ressig_heat), ressig_anti.heat)
+
+gene_annotation %>% 
+  filter(ID %in% AH) %>% nrow()
 
 length(dplyr::setdiff(ressig_anti, ressig_anti.heat))
 length(dplyr::setdiff(ressig_heat, ressig_anti.heat))
@@ -470,6 +486,138 @@ ggsave(plot = treatment_euler, filename = "./outputs/DESeq-results/figures/Euler
 ggsave(plot = treatment_euler, filename = "./manuscript_figures/Fig1B_AXH_Euler.pdf", width = 70, height = 70, units = "mm", device = "pdf")
 ```
 
+#### Up Euler Diagram
+```{r}
+ressig_heat_up <- DE$up[DE$num == "Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+ressig_anti_up <-  DE$up[DE$num == "Antibiotics" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+ressig_anti.heat_up <-  DE$up[DE$num == "Antibiotics.Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+```
+```{r}
+AH_up <- intersect(ressig_anti_up, ressig_heat_up)
+AX_up <- intersect(ressig_anti_up, ressig_anti.heat_up)
+HX_up <- intersect(ressig_heat_up, ressig_anti.heat_up)
+AXH_up <- intersect(intersect(ressig_anti_up, ressig_heat_up), ressig_anti.heat_up)
+
+gene_annotation %>% 
+  filter(ID %in% AH_up) %>% nrow()
+
+length(dplyr::setdiff(ressig_anti_up, ressig_anti.heat_up))
+length(dplyr::setdiff(ressig_heat_up, ressig_anti.heat_up))
+length(dplyr::setdiff(ressig_anti_up, ressig_heat_up))
+```
+```{r treatment_venn_up}
+pdf(file = "./outputs/DESeq-results/figures/Venn_AXH_up.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn_up <- draw.triple.venn(area1 = length(ressig_anti_up),
+                             area2 = length(ressig_heat_up),
+                             area3 = length(ressig_anti.heat_up),
+                             n12 = length(AH_up),
+                             n13 = length(AX_up),
+                             n23 = length(HX_up),
+                             n123 = length(AXH_up),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn_up)
+```
+```{r}
+axh_list_up <- c(82, 37, 3163, 0, 120, 336, 25)
+names(axh_list_up) <- c("H", "A", "X", "H&A", "H&X", "A&X", "H&A&X")
+fit_up <- euler(axh_list_up, shape = "ellipse")
+treatment_euler_up <- plot(fit_up,
+     #main = list(label = "Euler diagram of DEGs in treatment contrasts", fontsize = 10, fontface = 1, hjust = 0.5), 
+     quantities = list(type = c("counts"), fontsize = 8),
+     labels = identical(legend, FALSE),
+     fills = list(fill = condcolors_AxH[2:4], alpha = 1),
+     edges = list(lwd = 0.5),
+     legend = FALSE, 
+     adjust_labels = TRUE)
+treatment_euler_up
+ggsave(plot = treatment_euler_up, filename = "./outputs/DESeq-results/figures/Euler_AXH_up.pdf", width = 80, height = 80, units = "mm", device = "pdf")
+```
+
+#### Down Euler diagram
+
+```{r}
+ressig_heat_down <- DE$down[DE$num == "Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+ressig_anti_down <-  DE$down[DE$num == "Antibiotics" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+ressig_anti.heat_down <-  DE$down[DE$num == "Antibiotics.Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
+```
+```{r}
+AH_down <- intersect(ressig_anti_down, ressig_heat_down)
+AX_down <- intersect(ressig_anti_down, ressig_anti.heat_down)
+HX_down <- intersect(ressig_heat_down, ressig_anti.heat_down)
+AXH_down <- intersect(intersect(ressig_anti_down, ressig_heat_down), ressig_anti.heat_down)
+
+gene_annotation %>% 
+  filter(ID %in% AH_down) %>% nrow()
+
+length(dplyr::setdiff(ressig_anti_down, ressig_anti.heat_down))
+length(dplyr::setdiff(ressig_heat_down, ressig_anti.heat_down))
+length(dplyr::setdiff(ressig_anti_down, ressig_heat_down))
+```
+```{r treatment_venn_down}
+pdf(file = "./outputs/DESeq-results/figures/Venn_AXH_down.pdf", height = 4, width = 4)
+vp = viewport(height = unit(4, "in"),  width = unit(4, "in"))
+grid.newpage()
+grid.rect(vp = vp, gp = gpar(col = "white"))
+
+OverVenn_down <- draw.triple.venn(area1 = length(ressig_anti_down),
+                             area2 = length(ressig_heat_down),
+                             area3 = length(ressig_anti.heat_down),
+                             n12 = length(AH_down),
+                             n13 = length(AX_down),
+                             n23 = length(HX_down),
+                             n123 = length(AXH_down),
+                             #category = c("Antibiotics", "Heat", "Antibiotics + Heat"),
+                             fill = c("#99FFFF", "#FFCC99", "#FFFF66"),
+                             lwd = rep(1,3),
+                             #cat.cex = rep(1.5, 3),
+                             #cat.fontfamily = rep("Arial", 3),
+                             #cat.fontface = rep("bold", 3),
+                             alpha = c(rep(0.5, 3)),
+                             cex = c(rep(2, 4), 3, rep(2, 2)),
+                             fontface = c(rep("plain", 4), "bold", rep("plain", 2)),
+                             fontfamily = c(rep("Arial", 7)),
+                             label.col = c(rep("black", 4), "black", rep("black", 2)),
+                             print.mode = "raw",
+                             sigdigs = 2,
+                             euler.d = TRUE,
+                             overrideTriple = "override",
+                             scaled = FALSE)
+grid.draw(OverVenn_down)
+```
+```{r}
+axh_list_down <- c(216, 21, 3624, 5, 474, 258, 96)
+names(axh_list_down) <- c("H", "A", "X", "H&A", "H&X", "A&X", "H&A&X")
+fit_down <- euler(axh_list_down, shape = "ellipse")
+treatment_euler_down <- plot(fit_down,
+     #main = list(label = "Euler diagram of DEGs in treatment contrasts", fontsize = 10, fontface = 1, hjust = 0.5), 
+     quantities = list(type = c("counts"), fontsize = 8),
+     labels = identical(legend, FALSE),
+     fills = list(fill = condcolors_AxH[2:4], alpha = 1),
+     edges = list(lwd = 0.5),
+     legend = FALSE, 
+     adjust_labels = TRUE)
+treatment_euler_down
+ggsave(plot = treatment_euler_down, filename = "./outputs/DESeq-results/figures/Euler_AXH_down.pdf", width = 80, height = 80, units = "mm", device = "pdf")
+```
 
 ### DESeq results visualizations
 #### Volcano plots
@@ -707,7 +855,7 @@ write_csv(allGO, path = "./outputs/DESeq-results/GO_MWU/allGO.csv")
 ```
 ### DESeq EuKaryotic Orthologous Groups (KOG) enrichment analysis
 ```{r KOG, results = 'hide'}
-# Using the signed log(p-values) from the differential expression analysis, we can analyze which KOG classifications are up- or down-regulated within each colony, and across all four colonies together.
+# Using the signed log(p-values) from the differential expression analysis, we can analyze which KOG classifications are up- or down-regulated within each colony, and across all four colonies together
 # Ensure gene KOG annotation is present
 head(gene2kog)
 # Run KOG.MWU analysis on all contrasts
@@ -748,7 +896,7 @@ ggsave(filename = "./outputs/DESeq-results/KOGMWU/figures/KOGanti.heat.control.p
 kogtable_contrasts <- KOG %>%
   unnest(KOG) %>%
   filter(Colony == "all") %>%
-  select(num, den, term, delta.rank) %>%
+  dplyr::select(num, den, term, delta.rank) %>%
   unite("contrast", num, den, sep = ".") %>%
   spread(contrast, delta.rank) %>%
   column_to_rownames("term")
@@ -756,14 +904,14 @@ kogtable_contrasts <- KOG %>%
 kogpval_contrasts <- KOG %>%
   unnest(KOG) %>%
   filter(Colony == "all") %>%
-  select(num, den, term, padj) %>%
+  dplyr::select(num, den, term, padj) %>%
   unite("contrast", num, den, sep = ".") %>%
   spread(contrast, padj) %>%
   column_to_rownames("term") %>%
   transmute_all(gtools::stars.pval)
 
-kog_contrasts <- bind_cols(kogtable_contrasts, kogpval_constrasts)
-write_csv(kog_contrasts, path = "./outputs/DESeq-results/KOGMWU/kog_contrasts.csv")
+kog_contrasts <- bind_cols(kogtable_contrasts, kogpval_contrasts)
+# write_csv(kog_contrasts, path = "./outputs/DESeq-results/KOGMWU/kog_contrasts.csv")
 
 KOGtitle <- expression(plain("Heatmap of KOG classes delta ranks"))
 contrast_labs <- c(expression("Heat"~"vs."~"Control"),
@@ -771,15 +919,15 @@ contrast_labs <- c(expression("Heat"~"vs."~"Control"),
                  expression("Antibiotics.Heat"~"vs."~"Control"))
 
 KOG_treatments <- KOGheatmap(
-  select(kogtable_contrasts, Heat.control, Antibiotics.control, Antibiotics.Heat.control),
-  select( kogpval_constrasts, Heat.control, Antibiotics.control, Antibiotics.Heat.control),
+  dplyr::select(kogtable_contrasts, Heat.control, Antibiotics.control, Antibiotics.Heat.control),
+  dplyr::select(kogpval_contrasts, Heat.control, Antibiotics.control, Antibiotics.Heat.control),
   labels_col = contrast_labs,
   #main = KOGtitle,
   fontsize = 8,
   fontsize_row = 7,
   fontsize_col = 8)
 
-ggsave(filename = "./outputs/DESeq-results/KOGMWU/figures/KOG_treatment_heatmap.pdf", KOG_treatments, width = 80, height = 85, units = "mm")
+ggsave(filename = "./outputs/DESeq-results/KOGMWU/figures/KOG_treatment_heatmap.pdf", KOG_treatments, width = 112, height = 150, units = "mm")
 ggsave(filename = "./manuscript_figures/Fig1C_KOGheatmap.pdf", KOG_treatments, width = 112, height = 92, units = "mm")
 ```
 
@@ -791,7 +939,7 @@ ggsave(filename = "./manuscript_figures/Fig1C_KOGheatmap.pdf", KOG_treatments, w
 dat <- data.frame(assay(vsd))
 # use batch-colony-removed vst counts - no major difference
 # vsd_col <- limma::removeBatchEffect(assay(vsd), vsd$Colony)
-# dat <- data.frame(vsd_col) 
+# dat <- data.frame(vsd_col)
 
 # How many PCs should be kept?
 dapcopt <- dapc(t(dat), colData(dds)$Treatment, n.da=100, n.pca=46)
@@ -813,7 +961,8 @@ my.dapc <- function(n.pca) dapc(t(dat), colData(dds)$Treatment, n.pca = n.pca, n
 #   head()
 
 # Retaining 7 PC's gives highest a-score (44%) but only utilizes 75% of the cumulative variance. Retaining 11 PC's gives a high a-score and uses 83% of cumulative variance. Therefore, let's use 11 PC's for the DA. 
-
+```
+```{r}
 dp1 <- dapc(t(dat), colData(dds)$Treatment,
             n.pca = 11, n.da = 2)   # Retain 11 PCs and 2 discriminant functions
 scatter(dp1, bg="white", scree.da=TRUE, scree.pca=TRUE, legend=TRUE) 
@@ -842,6 +991,7 @@ dp1$eig[1]/sum(dp1$eig)
 dp1$eig[2]/sum(dp1$eig)
 # 0.2739501
 ```
+### Create DAPC spider plot
 ```{r dapc_spider}
 xlab <- paste("LD1 (", round(dp1$eig[1]/sum(dp1$eig)*100, digits = 1), "%)", sep = "")
 ylab <- paste("LD2 (", round(dp1$eig[2]/sum(dp1$eig)*100, digits = 1), "%)", sep = "")
@@ -877,7 +1027,7 @@ yplot <-
             palette = condcolors_AxH) +
   clean_theme() + rremove("legend") + 
   theme(plot.margin = unit(c(0, 0.0, 0, -0.1), "cm")) + ggpubr::rotate()
-# yplot 
+# yplot
 
 dapcplot <- plot_grid(xplot, NULL, dapc.fig, yplot,
                       nrow = 2, ncol = 2,
@@ -906,6 +1056,7 @@ dpvarc %>%
   select(-LD1) %>% 
   write_excel_csv(path = "./outputs/DAPC-results/tables/LD2_table2.csv")
 ```
+### Explore DAPC axis loadings
 ```{r dapc_loadingplot}
 set.seed(4)
 par(mfrow = c(2,1))
@@ -1021,7 +1172,8 @@ sft$powerEstimate
 adjacency <- adjacency(datExpr,
       # Network construction arguments:  correlation, adjacency function,  and topological overlap map options
                        corFnc = "bicor", # bimidweight correlation
-                       power=sft$powerEstimate, # 10
+                       # power = sft$powerEstimate, # 10
+                       power = 10,
                        type = "signed") # signed
 # 
 TOM <- TOMsimilarity(adjacency,
@@ -1070,7 +1222,7 @@ abline(h=MEDissThres, col = "red")
 mergedMods <- mergeCloseModules(datExpr, dynamicColors, cutHeight = 0.3, verbose = 5)
 # The merged module colors
 mergedColors <- mergedMods$colors
-table(mergedColors)
+table(mergedColors) 
 ```
 ```{r dendrogram_modules}
 pdf(file = "./outputs/WGCNA-results/dendrogram.pdf", width = 8, height = 6)
@@ -1103,25 +1255,6 @@ hclustME <- flashClust(as.dist(dissimME), method="average" )
 par(mfrow=c(1,1))
 plot(hclustME, main="Clustering tree based on the module eigengenes")
 ```
-### Module eigengene treatment correlations and heatmap
-```{r trait_data}
-# Get sample data into tibble
-datTraits <- samples %>% 
-  select(-Reef, -Colony, -Environment, -Treatment, -Batch, -allanti, -allheat, -Houwan, -Wanglitung) %>%
-  select(SampleID, control, Heat, Antibiotics, Antibiotics.Heat) %>%
-  #select(SampleID, HW1, HW2, WT1, WT2) %>%
-  arrange(SampleID) %>% #Order rows by sample name                         
-  column_to_rownames(var = "SampleID")
-#Define numbers of genes and samples
-nGenes <- ncol(datExpr)
-nSamples <- nrow(datExpr)
-```
-```{r ME_correlations}
-# Correlate module eigengene-trait associations
-moduleTraitCor <- cor(MEs1, datTraits, use = "p")
-moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
-moduleCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
-```
 ```{r uniq_modules}
 # Extract all unique modules
 uniqModules <- sort(setdiff(unique(colnames(MEs1)), "grey"))
@@ -1129,10 +1262,111 @@ uniqModules <- sort(setdiff(unique(colnames(MEs1)), "grey"))
 uniqModules <- uniqModules[hclustME$order]
 uniqModules
 ```
+### Module genes and hub genes
+```{r modules_genes}
+# Generate GeneIDs
+Genes <- colnames(datExpr)
+# Output genes and annotations for each module
+for (module in uniqModules)
+{
+# Select module genes
+inModule <- (moduleColors == module)
+# Get gene IDs
+modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
+# Write gene annotations into a file
+fileName = paste("./outputs/WGCNA-results/notes/", module, ".csv", sep="");
+module_annotation <- gene_annotation[modGeneIDs, ]
+write_csv(module_annotation, path = fileName)
+}
+```
+```{r hub_genes}
+hubs <- chooseTopHubInEachModule(datExpr,
+                         mergedColors,
+                         corFnc = "bicor", # bimidweight correlation
+                         # power=sft$powerEstimate, # 10
+                         power = 10,
+                         type = "signed")
+hub_genes <- gene_annotation[hubs, ]
+hub_genes$module <- names(hubs)
+row.names(hub_genes) <- NULL
+hub_genes <- hub_genes %>% dplyr::select(module, everything())
+write_csv(hub_genes, path = "./outputs/WGCNA-results/hub_genes.csv")
+```
+```{r sig_hubs}
+sig_hubs <- hub_genes %>%
+  filter(module %in% uniqModules) %>%
+  dplyr::select(module, ID, Gene_Info) %>% 
+  dplyr::rename("hub gene" = ID, "UniProt best match" = Gene_Info) 
+write_csv(sig_hubs, path = "./outputs/WGCNA-results/sig_hub_genes_table.csv")
+write_excel_csv(sig_hubs, path = "./manuscript_figures/Table3.csv")
+```
+```{r datkME}
+#this section is adapted from Rachel Wright's GitHub: https://github.com/rachelwright8/Ahya-White-Syndromes/
+colnames(MEs1) <- MEmodule_colors
+datKME <- signedKME(datExpr, MEs1, outputColumnName = "") %>% rownames_to_column(., "ID")
+genecolors <- data.frame(ID = Genes, moduleColor = moduleColors)
+genecolors_kME <- left_join(genecolors, datKME, by = "ID") 
+###
+```
+```{r kME_files}
+# Assemble input for WGCNA GO_MWU: dataframe with gene IDs and kME values for all genes within a module, 0 for all genes without
+for (module in uniqModules){
+modkME <- genecolors_kME %>% dplyr::select(., "ID", "moduleColor", module)#paste("kME", module, sep = ""))
+colnames(modkME) <- c("gene", "moduleColor", "kME")
+###
+modkME$kME[modkME$moduleColor!=module] <- 0  #also need to change column names for color you pick above
+#modkME$kME[modkME$moduleColor==module] <- 1 #leave commented out to keep kME values
+modkME <- modkME %>% dplyr::select(., -moduleColor)
+# write csv
+#write.csv(modkME, file = paste("./outputs/WGCNA-results/tables/", module,"_kme.csv",sep=""), quote=F, row.names=F)
+write.csv(modkME, file = paste("./R/GO_MWU/", module,"_kme.txt",sep=""), quote=F, row.names=F)
+#repeat for each module
+}
+```
+
+### Module eigengene correlations
+```{r treatment_trait_data}
+# Get sample data into tibble
+datTraits <- samples %>% 
+  dplyr::select(-Reef, -Colony, -Environment, -Treatment, -Batch, -allanti, -allheat, -Houwan, -Wanglitung) %>%
+  dplyr::select(SampleID, control, Heat, Antibiotics, Antibiotics.Heat) %>%
+  #dplyr::select(SampleID, HW1, HW2, WT1, WT2) %>%
+  arrange(SampleID) %>% #Order rows by sample name                         
+  column_to_rownames(var = "SampleID")
+#Define numbers of genes and samples
+nGenes <- ncol(datExpr)
+nSamples <- nrow(datExpr)
+```
+```{r ME_correlations_treatments}
+# Correlate module eigengene-trait associations
+moduleTraitCor <- cor(MEs1, datTraits, use = "p")
+moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
+moduleTraitCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
+moduleTraitStars <- as.data.frame(moduleTraitPvalue) %>% 
+  transmute_all(gtools::stars.pval) %>% 
+  cbind.data.frame("module" = rownames(moduleTraitPvalue)) %>% 
+  column_to_rownames("module")
+```
+```{r taxa_relative_abundance_traits}
+# Combined analysis linking WGCNA modules and bacteria relative abundance
+# read in table with relative abundances of interesting bacteria taxa
+datTaxa_Family <- read_csv("./outputs/phyloseq-results/datTaxa_Family.csv")
+datTaxa_Family <- datTaxa_Family %>% dplyr::select(-Alteromonadaceae, -Endozoicomonadaceae)
+```
+```{r ME_correlations_taxa}
+moduleTaxaCor <- cor(MEs1, datTaxa_Family, use = "p")
+moduleTaxaPvalue <- corPvalueStudent(moduleTaxaCor, nSamples)
+moduleTaxaCors <- as.data.frame(moduleTaxaCor, moduleTaxaPvalue)
+moduleTaxaStars <- as.data.frame(moduleTaxaPvalue) %>% 
+  transmute_all(gtools::stars.pval) %>% 
+  cbind.data.frame("module" = rownames(moduleTraitPvalue)) %>% 
+  column_to_rownames("module")
+```
 ```{r sig_modules}
 # Identify all unique and interesting modules based on trait correlations
-# Filter for only modules that have a significant correlation to any treatment or genotype
-modP <- as.data.frame(moduleTraitPvalue) %>%
+# Filter for all the modules that have a significant correlation to any treatment, genotype, bacteria taxa, etc.
+p_values <- cbind(moduleTraitPvalue, moduleTaxaPvalue)
+modP <- as.data.frame(p_values) %>%
   rownames_to_column("module") %>%
   arrange(module) %>% 
   filter_all(any_vars(. < 0.05)) # %>% dplyr::select(module, lps)
@@ -1146,6 +1380,297 @@ all(sigModules %in% uniqModules) # test that all the significant modules are act
 all(sigModules == uniqModules) # are all modules also significantly correlated to one or more traits?
 sigModules
 ```
+### Module gene significance (GS) and interconnectivity (kME)
+```{r genesig}
+# calculate gene trait significance for each treatment, genotype, etc.
+geneTraitSignificance <- as.data.frame(cor(datExpr, datTraits, use = "p")) 
+traitGS <- geneTraitSignificance %>% 
+  rownames_to_column("ID")
+```
+```{r df_kME_GS}
+longKME <- datKME %>% 
+  # rename(gene = "ID") %>% 
+  pivot_longer(cols= -ID, names_to = "module", values_to = "kME")
+
+df_gene_GS_kME <- genecolors %>%
+  # rename(gene = "ID") %>% 
+  full_join(traitGS, by = "ID") %>% 
+  full_join(longKME, by = "ID") %>%
+  filter(moduleColor == module) %>%
+  dplyr::select(-module)
+```
+```{r module_GS_kME_results_tables}
+# write output tables with gene kME statistics and trait gene significance for each module
+ for (module in uniqModules) {
+# datKME <- datKME %>% column_to_rownames("gene")
+df_mod_GS_kME <- df_gene_GS_kME %>%
+  filter(moduleColor == module) %>% 
+  dplyr::select(-moduleColor) %>% 
+  dplyr::select(ID, kME, everything()) %>% 
+  arrange(desc(kME)) %>% 
+  left_join(., gene_annotation, by = "ID")
+write_csv(df_mod_GS_kME, path = paste("./outputs/WGCNA-results/tables/", module, "_GS_kME.csv", sep = ""))
+}
+```
+### WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
+```{r wgcna_kog}
+# Create tibble to keep results of WGCNA module KOGMWU enrichment
+# Choose whether to use Fisher's test for module membership or MWU test of enrichment of within-module kME ranks
+modKOG <- tibble("module" = uniqModules)
+modset <- uniqModules
+for (i in seq_along(modset)) {
+module <- modset[i]
+modkME <- genecolors_kME %>% dplyr::select(., ID, moduleColor, module)
+colnames(modkME) <- c("ID", "moduleColor", "kME")
+###
+modkME$kME[modkME$moduleColor!=module] <- 0  # also need to change column names for color you pick above
+modkME$kME[modkME$moduleColor==module] <- 1 # leave uncommented for Fisher's test, comment out to keep kME values for MWU test
+modkME <- modkME %>% dplyr::select(., -moduleColor)
+modKOG$kME[i] <- list("kME" = modkME)
+###
+kogmwu_module <- kog.mwu(modkME, gene2kog) #%>% arrange("KOG_Class")
+modKOG$KOG[i] <- list("KOG" = kogmwu_module)
+#names(modKOGlist[i]) <- module
+}
+modKOG$KOG
+```
+```{r module_kog_results}
+modKOG 
+```
+```{r KOG_Fishers_purrr}
+# Only use this section to extract results from Fisher's exact tests in KOGMWU
+# Generate all KOG adjusted p-values (Fisher's test does not calculate delta rank)
+modkogtables_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  mutate(signedpadj = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, signedpadj)) %>% 
+  map(~ column_to_rownames(., "term"))
+
+# Generate KOG adjusted p-value stars
+modkogpvals_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, padj)) %>%
+  map(~ column_to_rownames(., "term")) %>%
+  map(~ transmute_all(., gtools::stars.pval))
+  
+###
+signedpadj <- function(x){-1*log(x, base = 10)}
+signedpadj(0.05)
+signedpadj(modKOG$KOG[[5]]$padj)
+
+modkogtable_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  mutate(signedpadj = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>%
+  spread(module, signedpadj) %>%
+  column_to_rownames("term") 
+  
+modkogpadj_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  spread(module, padj) %>%
+  column_to_rownames("term") %>%
+  transmute_all(gtools::stars.pval)
+```
+```{r KOG_MWU_purrr}
+# Only use this section to extract results from gene kME MWU tests in KOGMWU
+modKOG <- modKOG %>% mutate(
+         # If a KOG term has <10 genes associated with it, set delta rank to zero
+         KOG = map(KOG, ~ mutate(., delta.rank = ifelse(nseqs < 10, 0, delta.rank))))
+
+# Generate all KOG delta rank tables
+modkogtables_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, delta.rank) %>% 
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, delta.rank)) %>% 
+  map(~ column_to_rownames(., "term"))
+
+# Generate KOG adjusted p-value stars
+modkogpvals_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, padj)) %>%
+  map(~ column_to_rownames(., "term")) %>%
+  map(~ transmute_all(., gtools::stars.pval))
+```
+```{r modules_KOG_heatmap}
+modkog_all <- bind_cols(modkogtables, modkogpvals)
+modkog_all$term <- rownames(modkogtables)
+write_csv(modkog_all, path = "./outputs/WGCNA-results/KOGMWU/kog_modules.csv")
+
+modkogtable <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, delta.rank) %>% 
+  spread(module, delta.rank) %>%
+  column_to_rownames("term")
+  
+modkogpadj <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  spread(module, padj) %>%
+  column_to_rownames("term") %>%
+  transmute_all(gtools::stars.pval)
+
+KOG_modules <- KOGheatmap(modkogtable, modkogpadj,
+  #labels_col = contrast_labs,
+  #main = KOGtitle,
+  fontsize = 8,
+  fontsize_row = 7,
+  fontsize_col = 8)
+
+ggsave(filename = "./outputs/WGCNA-results/KOGMWU/KOG_modules_heatmap.pdf", KOG_modules, width = 200, height = 170, units = "mm")
+```
+```{r ComplexHeatmap_annotation}
+# column annotation for treatments
+
+# annotation to include module colors
+module_annotation_col <- HeatmapAnnotation(modules = moddf$module_colors,
+                                       col = list(modules = module_anno),
+                                       which = "col",
+                                       annotation_name_rot = 0,
+                                       show_legend = FALSE
+                                       )
+# text matrix annotation for cell text - Fisher's p-values
+ cell_fun_KOG_fisher <- function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 6))
+ }
+# text matrix annotation for cell text - MWU p-values
+  cell_fun_KOG_mwu <- function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", t(modkogpadj_mwu)[i, j]), x, y, gp = gpar(fontsize = 6))
+ }
+```
+```{r ComplexHeatmap_Fisher}
+# pdf("./outputs/WGCNA-results/figures/modules_KOGenrichment_heatmap.pdf", height = 8.5, width = 10)
+kog_heatmap_fisher <- Heatmap(t(modkogtable_fisher),
+                      col = col_fun_KOGfisher,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 6))},
+                      cluster_rows = hclustME,
+                      right_annotation = module_barplot,
+                      # row_split = NULL,
+                      # border = FALSE,
+                      # rect_gp = gpar(col = "white", lwd = 1.5),
+                      # column_title_gp = gpar(fontsize = 8, fontface = "plain"),
+                      column_order = rownames(modkogtable_fisher),
+                      column_names_rot = 90,
+                      column_names_side = "bottom",
+                      # column_names_centered = TRUE,
+                      column_names_gp = gpar(fontsize = 8, fontface = "plain"),
+                      # row_names_gp = gpar(fontsize = 8, fontface = "plain"),
+                      # show_heatmap_legend = TRUE,
+                      heatmap_legend_param = list(title = "KOG enrichment delta-rank",
+                                                  direction = "vertical",
+                                                  title_position = "leftcenter-rot",
+                                                  legend_height = unit(1.0, "in"),
+                       height = unit(4, "in"),
+                       width = unit(4, "in")
+                      ))
+draw(kog_heatmap, column_title = "Module KOG enrichment heatmap", 
+     show_annotation_legend = FALSE, heatmap_legend_side = "left"
+     )
+```
+```{r ComplexHeatmap_MWU}
+
+```
+
+### WGCNA Gene Ontology (GO) enrichment analysis
+```{r module_GO_MWU}
+# Run GO_MWU for any given module for Biological Process (BP) GO terms
+commandArgs <- function(...) c("salmon_kme.txt", "BP")
+source("./R/GO_MWU/GO_MWU_WGCNA.R")
+
+# Run GO_MWU for Heat vs. control for Molecular Function GO terms
+commandArgs <- function(...) c("brown_kme.txt", "MF")
+source("./R/GO_MWU/GO_MWU_WGCNA.R")
+
+# Run GO_MWU for Heat vs. control for Cellular Component (CC) GO terms
+commandArgs <- function(...) c("salmon_kme.txt", "CC")
+source("./R/GO_MWU/GO_MWU.R")
+```
+```{r module GO_MWU plot}
+# Plot GO_MWU results
+commandArgs <- function(...) c("salmon_kme.txt", "BP", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+commandArgs <- function(...) c("salmon_kme.txt", "MF", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+commandArgs <- function(...) c("salmon_kme.txt", "CC", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+```
+```{r module_GO_MWU_loop}
+#kMEfiles <- list.files(path = "./R/GO_MWU/", pattern = "_kme.txt")
+###
+# intModules <- c("greenyellow", "brown", "lightcyan1", "darkgrey", "darkred", "midnightblue", "grey60", "darkorange", "skyblue", "paleturquoise", "violet", "orangered4")
+intModules <- c("steelblue", "ivory", "darkolivegreen", "green", "white", "darkgreen", "purple")
+for (module in intModules[7]){
+  print(module)
+### command for GO_MWU analysis
+  #input file name
+tab <- paste(module, "_kme.txt", sep = "")
+  commandArgs <- function(...) c(tab, "BP")
+  source("./R/GO_MWU/GO_MWU_WGCNA.R")
+}
+```
+```{r GO_MWU_figures}
+keyModules <- c("darkgrey", "midnightblue", "darkorange", "darkgreen", "ivory")
+module <- "darkgreen"
+#for (module in sigModules){
+###
+tab <- paste(module, "_kme.txt", sep = "")
+fig <- as.character(paste("GO_MWU_", module, ".pdf", sep = ""))
+levs <- c(0.05, 1e-10, 1e-15)
+##01
+commandArgs <- function(...) c(tab, "BP", fig, module, 0.25, 0.1, 0.05, 1.0)
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+#}
+```
+```{r modules_GO}
+modules.GO <- as.list(
+  c(greenyellow = "./R/GO_MWU/MWU_BP_greenyellow_kme.txt",
+    brown = "./R/GO_MWU/MWU_BP_brown_kme.txt",
+    lightcyan1 = "./R/GO_MWU/MWU_BP_lightcyan1_kme.txt",
+    darkgrey = "./R/GO_MWU/MWU_BP_darkgrey_kme.txt",
+    darkred = "./R/GO_MWU/MWU_BP_darkred_kme.txt",
+    midnightblue = "./R/GO_MWU/MWU_BP_midnightblue_kme.txt",
+    grey60 = "./R/GO_MWU/MWU_BP_grey60_kme.txt",
+    darkorange = "./R/GO_MWU/MWU_BP_darkorange_kme.txt",
+    skyblue = "./R/GO_MWU/MWU_BP_skyblue_kme.txt",
+    paleturquoise = "./R/GO_MWU/MWU_BP_paleturquoise_kme.txt",
+    violet = "./R/GO_MWU/MWU_BP_violet_kme.txt",
+    orangered4 = "./R/GO_MWU/MWU_BP_orangered4_kme.txt",
+    steelblue = "./R/GO_MWU/MWU_BP_steelblue_kme.txt",
+    ivory = "./R/GO_MWU/MWU_BP_ivory_kme.txt",
+    green = "./R/GO_MWU/MWU_BP_green_kme.txt",
+    darkgreen = "./R/GO_MWU/MWU_BP_darkgreen_kme.txt",
+    white = "./R/GO_MWU/MWU_BP_white_kme.txt",
+    purple = "./R/GO_MWU/MWU_BP_purple_kme.txt")
+  ) %>% map(read.table, header = T) %>%
+  bind_rows(.id = "module") %>%
+  as_tibble()
+
+modules.GO %>%
+  dplyr::select(module, delta.rank, p.adj, name, nseqs, level, term) %>%
+  filter(module == "ivory") %>%
+  filter(p.adj < 0.5) %>% 
+  arrange(module, p.adj) %>% 
+  slice_head(n = 15) %>% 
+  write_excel_csv(path = "./outputs/WGCNA-results/GO_MWU/ivory.GO.csv")
+
+modules.GO %>%
+  filter(p.adj < 0.05) %>% 
+  dplyr::count(module) %>% 
+  arrange(desc(n))
+```
+
+
+
+### Module eigengene treatment heatmap
 ```{r ME_textmatrix}
 # Create text matrix to display correlations and their p-values
 #textMatrix <- paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue, 2), ")", sep = "")
@@ -1186,15 +1711,14 @@ module_barplot <- HeatmapAnnotation(module_size = anno_barplot(moddf$module_size
                                     )
 ```
 ```{r ME_heatmap_ComplexHeatmap}
-pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_treatments.pdf", width = 6.5, height = 6)
-#pdf(file = "./manuscript_figures/Fig4A_ME_heatmap.pdf", width = 6, height = 6)
+# pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_treatments.pdf", width = 6.5, height = 6)
 me_heatmap <- Heatmap(moduleTraitCor,
                       #col = col_fun_cor,
                       cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", textMatrix[i, j]), x, y, gp = gpar(fontsize = 6))},
                       cluster_rows = hclustME,
                       top_annotation = treatment_annotation,
                       left_annotation = module_annotation,
-                      right_annotation = module_barplot,
+                      # right_annotation = module_barplot,
                       row_split = NULL,
                       border = FALSE,
                       rect_gp = gpar(col = "white", lwd = 1.5),
@@ -1224,230 +1748,196 @@ I would also like to...
 ...add heatmap to show module eigengene correlations to bacteria taxa...
 ...include text cloud annotation based on GO enrichment...
 
-### Module "Volcano" Plots
-```{r}
 
-```
-```{r module_volcano}
-
-```
-
-### Module genes and hub genes
-```{r modules_genes}
-# Generate GeneIDs
-Genes <- colnames(datExpr)
-# Output genes and annotations for each module
-for (module in uniqModules)
-{
-# Select module genes
-inModule <- (moduleColors == module)
-# Get gene IDs
-modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
-# Write gene annotations into a file
-fileName = paste("./outputs/WGCNA-results/notes/", module, ".csv", sep="");
-module_annotation <- gene_annotation[modGeneIDs, ]
-write_csv(module_annotation, path = fileName)
+### Multi-component complex heatmap
+I would also like to...
+...add treatment color annotation to top of heatmap...and fix legend label position (modules, Treatment, module_size)
+...adjust legend position...
+...add heatmap to show module eigengene correlations to bacteria taxa...
+...include text cloud annotation based on GO enrichment...
+```{r heatmap_annotation}
+# ComplexHeatmap colors
+col_fun_ge <- function(mat) {
+  colorRamp2(c(max(mat), max(mat)/2, mean(mat), min(mat)/2, min(mat)), c("red", "yellow", "grey10", "cyan", "blue"))
 }
+col_fun_cor <- colorRamp2(c(1, 0, -1), c("red", "white", "blue"))
+col_fun_KOGfisher <- colorRamp2(c(80, 0), c("red", "white"))
+# ComplexHeatmap sample annotations
+sample_annotation <- HeatmapAnnotation(Colony = samples$Colony,
+                                       Treatment = samples$Treatment,
+                                       col = anno_colors,
+                                       annotation_name_rot = 0,
+                                       show_legend = FALSE
+                                       )
+treatment_annotation <- HeatmapAnnotation(Treatment = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"),
+                                          col = anno_colors[2],
+                                          gp = gpar(col = "black", lwd = 0.5),
+                                          show_legend = FALSE,
+                                          show_annotation_name = FALSE
+                                          )
+# bacteria_annotation <- HeatmapAnnotation(Family = bacteria_colors$Family,
+#                                           col = anno_colors[4],
+#                                           gp = gpar(col = "black", lwd = 0.5),
+#                                           show_legend = FALSE,
+#                                           show_annotation_name = FALSE
+#                                           )
+# anno_colors[4]
 ```
-```{r hub_genes}
-hubs <- chooseTopHubInEachModule(datExpr,
-                         mergedColors,
-                         corFnc = "bicor", # bimidweight correlation
-                         power=sft$powerEstimate, # 10
-                         type = "signed")
-hub_genes <- gene_annotation[hubs, ]
-hub_genes$module <- names(hubs)
-row.names(hub_genes) <- NULL
-hub_genes <- hub_genes %>% select(module, everything())
-write_csv(hub_genes, path = "./outputs/WGCNA-results/hub_genes.csv")
-```
-```{r sig_hubs}
-sig_hubs <- hub_genes %>%
-  filter(module %in% sigModules) %>%
-  select(module, ID, Gene_Info) %>% 
-  rename("hub gene" = ID, "UniProt best match" = Gene_Info) 
-write_csv(sig_hubs, path = "./WGCNA-results/sig_hub_genes_table.csv")
-write_excel_csv(sig_hubs, path = "./manuscript_figures/Table3.csv")
-```
-```{r datkME}
-#this section is adapted from Rachel Wright's GitHub: https://github.com/rachelwright8/Ahya-White-Syndromes/
-colnames(MEs1) <- MEmodule_colors
-datKME <- signedKME(datExpr, MEs1, outputColumnName = "") %>% rownames_to_column(., "gene")
-genecolors <- data.frame(gene = Genes, moduleColor = moduleColors)
-genecolors_kME <- left_join(genecolors, datKME, by = "gene") 
-###
-```
-```{r kME_files}
-# Assemble input for WGCNA GO_MWU: dataframe with gene IDs and kME values for all genes within a module, 0 for all genes without
-for (module in uniqModules){
-modkME <- genecolors_kME %>% select(., "gene", "moduleColor", paste("kME", module, sep = ""))
-colnames(modkME) <- c("gene", "moduleColor", "kME")
-###
-modkME$kME[modkME$moduleColor!=module] <- 0  #also need to change column names for color you pick above
-#modkME$kME[modkME$moduleColor==module] <- 1 #leave commented out to keep kME values
-modkME <- modkME %>% select(., -moduleColor)
-# write csv
-#write.csv(modkME, file = paste("./outputs/WGCNA-results/tables/", module,"_kme.csv",sep=""), quote=F, row.names=F)
-write.csv(modkME, file = paste("./R/GO_MWU/", module,"_kme.txt",sep=""), quote=F, row.names=F)
-#repeat for each module
+#### Module-treatment correlation heatmap
+```{r ME_treatment_textmatrix}
+# Create text matrix to display module-treatment correlations and their p-values
+#textMatrix_treatment <- paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue, 2), ")", sep = "")
+# Only displays significant correlations p < 0.05
+textMatrix_treatment <- character()
+for (i in 1:length(moduleTraitPvalue)){
+  if(moduleTraitPvalue[i] < 0.05){ text <-  paste(signif(moduleTraitCor[i], 2), "\n(", signif(moduleTraitPvalue[i], 2), ")", sep = "") } else { text <- "" }
+  textMatrix_treatment[i] <- text
 }
+dim(textMatrix_treatment) <- dim(moduleTraitCor)
+textMatrix_treatment
+# 
+starMatrix_treatment <- as.matrix(moduleTraitStars)
+starMatrix_treatment
 ```
-### WGCNA Gene Ontology (GO) enrichment analysis
-```{r module_GO_MWU}
-# Run GO_MWU for any given module for Biological Process (BP) GO terms
-commandArgs <- function(...) c("salmon_kme.txt", "BP")
-source("./R/GO_MWU/GO_MWU_WGCNA.R")
-
-# Run GO_MWU for Heat vs. control for Molecular Function GO terms
-commandArgs <- function(...) c("brown_kme.txt", "MF")
-source("./R/GO_MWU/GO_MWU_WGCNA.R")
-
-# Run GO_MWU for Heat vs. control for Cellular Component (CC) GO terms
-commandArgs <- function(...) c("salmon_kme.txt", "CC")
-source("./R/GO_MWU/GO_MWU.R")
-```
-```{r module GO_MWU plot}
-# Plot GO_MWU results
-commandArgs <- function(...) c("salmon_kme.txt", "BP", "GO_MWU.salmon.png")
-source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
-commandArgs <- function(...) c("salmon_kme.txt", "MF", "GO_MWU.salmon.png")
-source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
-commandArgs <- function(...) c("salmon_kme.txt", "CC", "GO_MWU.salmon.png")
-source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
-```
-```{r module_GO_MWU_loop}
-#kMEfiles <- list.files(path = "./R/GO_MWU/", pattern = "_kme.txt")
-###
-intModules <- c("greenyellow", "brown", "lightcyan1", "darkgrey", "darkred", "midnightblue", "grey60", "darkorange", "skyblue", "paleturquoise", "violet", "orangered4")
-for (module in intModules[8]){
-  print(module)
-### command for GO_MWU analysis
-  #input file name
-tab <- paste(module, "_kme.txt", sep = "")
-  commandArgs <- function(...) c(tab, "BP")
-  source("./R/GO_MWU/GO_MWU_WGCNA.R")
-}
-```
-```{r GO_MWU_figures}
-module <- "lightcyan1"
-#for (module in sigModules){
-###
-tab <- paste(module, "_kme.txt", sep = "")
-fig <- as.character(paste("GO_MWU_", module, ".pdf", sep = ""))
-levs <- c(0.05, 1e-10, 1e-15)
-###
-commandArgs <- function(...) c(tab, "BP", fig, module, 0.1, 0.05, 0.01, 1.0)
-source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
-#}
-```
-```{r modules_GO}
-modules.GO <- as.list(
-  c(greenyellow = "./R/GO_MWU/MWU_BP_greenyellow_kme.txt",
-    brown = "./R/GO_MWU/MWU_BP_brown_kme.txt",
-    lightcyan1 = "./R/GO_MWU/MWU_BP_lightcyan1_kme.txt",
-    darkgrey = "./R/GO_MWU/MWU_BP_darkgrey_kme.txt",
-    darkred = "./R/GO_MWU/MWU_BP_darkred_kme.txt",
-    midnightblue = "./R/GO_MWU/MWU_BP_midnightblue_kme.txt",
-    grey60 = "./R/GO_MWU/MWU_BP_grey60_kme.txt",
-    darkorange = "./R/GO_MWU/MWU_BP_darkorange_kme.txt",
-    skyblue = "./R/GO_MWU/MWU_BP_skyblue_kme.txt",
-    paleturquoise = "./R/GO_MWU/MWU_BP_paleturquoise_kme.txt",
-    violet = "./R/GO_MWU/MWU_BP_violet_kme.txt",
-    orangered4 = "./R/GO_MWU/MWU_BP_orangered4_kme.txt")
-  ) %>% map(read.table, header = T) %>%
-  bind_rows(.id = "module") %>%
-  as_tibble()
-
-modules.GO %>%
-  select(module, delta.rank, p.adj, name, nseqs, level, term) %>%
-  filter(p.adj < 0.05) %>% 
-  arrange(module, p.adj) %>% 
-  write_csv(path = "./outputs/WGCNA-results/GO_MWU/modules.GO.csv")
-
-modules.GO %>%
-  filter(p.adj < 0.1) %>% 
-  dplyr::count(module) %>% 
-  arrange(desc(n))
-```
-### WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
-```{r wgcna_kog}
-# Create tibble to keep results of WGCNA module KOGMWU enrichment
-modKOG <- tibble("module" = uniqModules)
-modset <- uniqModules
-for (i in 1:length(modset)) {
-module <- modset[i]
-modkME <- genecolors_kME %>% select(., gene, moduleColor, module)
-colnames(modkME) <- c("gene", "moduleColor", "kME")
-###
-modkME$kME[modkME$moduleColor!=module] <- 0  #also need to change column names for color you pick above
-# modkME$kME[modkME$moduleColor==module] <- 1 #leave commented out to keep kME values
-modkME <- modkME %>% select(., -moduleColor)
-modKOG$kME[i] <- list("kME" = modkME)
-###
-kogmwu_module <- kog.mwu(modkME, gene2kog) #%>% arrange("KOG_Class")
-modKOG$KOG[i] <- list("KOG" = kogmwu_module)
-#names(modKOGlist[i]) <- module
-}
-modKOG$KOG
-```
-```{r KOG_purrr}
-modKOG <- modKOG %>% mutate(
-         # If a KOG term has <10 genes associated with it, set delta rank to zero
-         KOG = map(KOG, ~ mutate(., delta.rank = ifelse(nseqs < 10, 0, delta.rank))))
-
-# Generate all KOG delta rank tables
-modkogtables <- modKOG %>%
-  unnest(KOG) %>%
-  select(module, term, delta.rank) %>% 
-  split(list(.$module), drop = TRUE) %>% 
-  map(~ spread(., module, delta.rank)) %>% 
-  map(~ column_to_rownames(., "term"))
-
-# Generate KOG p-value stars
-modkogpvals <- modKOG %>%
-  unnest(KOG) %>%
-  select(module, term, padj) %>%
-  split(list(.$module), drop = TRUE) %>% 
-  map(~ spread(., module, padj)) %>%
-  map(~ column_to_rownames(., "term")) %>%
-  map(~ transmute_all(., gtools::stars.pval))
-```
-```{r modKOG_heatmaps}
-KOG_brown <- KOGheatmap(modkogtables$brown, modkogpvals$brown, main = "Brown", 
-                      fontsize = 6)
-ggsave(filename = "./outputs/WGCNA-results/KOGMWU/KOGheat.control.pdf", plot = KOG_brown, width = 80, height = 85, units = "mm", device = "pdf")
-
-```
-```{r modules_KOG_heatmap}
-modkog_all <- bind_cols(modkogtables, modkogpvals)
-modkog_all$term <- rownames(modkogtables)
-write_csv(modkog_all, path = "./outputs/WGCNA-results/KOGMWU/kog_modules.csv")
-
-modkogtable <- modKOG %>%
-  unnest(KOG) %>%
-  select(module, term, delta.rank) %>% 
-  spread(module, delta.rank) %>%
-  column_to_rownames("term")
-  
-modkogpadj <- modKOG %>%
-  unnest(KOG) %>%
-  select(module, term, padj) %>% 
-  spread(module, padj) %>%
-  column_to_rownames("term") %>%
-  transmute_all(gtools::stars.pval)
-
-KOG_modules <- KOGheatmap(modkogtable, modkogpadj,
-  #labels_col = contrast_labs,
-  #main = KOGtitle,
-  fontsize = 8,
-  fontsize_row = 7,
-  fontsize_col = 8)
-
-ggsave(filename = "./outputs/WGCNA-results/KOGMWU/KOG_modules_heatmap.pdf", KOG_modules, width = 200, height = 170, units = "mm")
-```
-```{r ComplexHeatmap_annotation}
+```{r ME_treatment_ComplexHeatmap_annotation}
 # column annotation for treatments
 
+# annotation to include module colors
+moddf <- data.frame(module_colors)
+module_anno  <- module_colors
+names(module_anno) <- module_colors
+module_sizes <- data.frame(table(moduleColors)) %>% filter(moduleColors != "grey") %>% arrange(desc(Freq))
+colnames(module_sizes) <- c("module_colors", "module_size")
+moddf <- left_join(moddf, module_sizes, by = "module_colors")
+module_annotation <- HeatmapAnnotation(modules = moddf$module_colors,
+                                       col = list(modules = module_anno),
+                                       which = "row",
+                                       annotation_name_rot = 0,
+                                       gp = gpar(col = "black", lwd = 0.5),
+                                       show_legend = FALSE,
+                                       show_annotation_name = FALSE
+                                       )
+# text matrix annotation for cell text for treatment
+ cell_fun_treatment <- function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", textMatrix_treatment[i, j]), x, y, gp = gpar(fontsize = 6))
+ }
+cn = colnames(moduleTraitCor)
+```
+```{r ME_treatment_ComplexHeatmap}
+# pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_treatments.pdf", width = 6.5, height = 6)
+# pdf(file = "./manuscript_figures/Fig4A_ME_heatmap.pdf", width = 6, height = 6)
+me_treatment_heatmap <- Heatmap(moduleTraitCor,
+                      #col = col_fun_cor,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", starMatrix_treatment[i, j]), x, y, gp = gpar(fontsize = 12))},
+                      cluster_rows = hclustME,
+                      top_annotation = treatment_annotation,
+                      left_annotation = module_annotation,
+                      # right_annotation = module_barplot,
+                      bottom_annotation = HeatmapAnnotation(text = anno_text(cn,
+                                                                             rot = 330,
+                                                                             offset = unit(1, "npc"),
+                                                                             just = "left"),
+                                                            annotation_height = max_text_width(cn)),
+                      row_split = 3,
+                      border = FALSE,
+                      rect_gp = gpar(col = "black", lwd = 0.5),
+                      column_order = colnames(datTraits),
+                      show_column_names = FALSE,
+                      # column_names_rot = 60,
+                      # column_names_side = "bottom",
+                      # # column_names_centered = TRUE,
+                      # column_names_gp = gpar(fontsize = 8, fontface = "plain"),
+                      column_title = "Treatments",
+                      column_title_gp = gpar(fontsize = 12, fontface = "plain"),
+                      row_title = "Cluster %s",
+                      row_title_gp = gpar(fontsize = 12, fontface = "plain"),
+                      row_dend_width = unit(1, "in"),
+                      row_names_gp = gpar(fontsize = 12, fontface = "plain"),
+                      row_title_rot = 0,
+                      show_heatmap_legend = FALSE,
+                      heatmap_legend_param = list(title = "Module eigengene correlation",
+                                                  direction = "horizontal",
+                                                  # title_position = "leftcenter-rot",
+                                                  legend_height = unit(1.0, "cm"),
+                      width = unit(2, "cm"))
+                      )
+draw(me_treatment_heatmap,
+     show_annotation_legend = FALSE, heatmap_legend_side = "left"
+     )
+```
+#### Module-bacteria correlation heatmap
+```{r ME_bacteria_textmatrix}
+# Create text matrix to display module-bacteria correlations and their p-values
+#textMatrix_bacteria <- paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue, 2), ")", sep = "")
+# Only displays significant correlations p < 0.05
+textMatrix_bacteria <- character()
+for (i in 1:length(moduleTaxaPvalue)){
+  if(moduleTaxaPvalue[i] < 0.05){ text <-  paste(signif(moduleTaxaCor[i], 2), "\n(", signif(moduleTaxaPvalue[i], 2), ")", sep = "") } else { text <- "" }
+  textMatrix_bacteria[i] <- text
+}
+dim(textMatrix_bacteria) <- dim(moduleTaxaCor)
+# 
+starMatrix_bacteria <- as.matrix(moduleTaxaStars)
+starMatrix_bacteria
+```
+```{r ME_bacteria_ComplexHeatmap_annotation}
+# text matrix annotation for cell text
+ cell_fun_bacteria <- function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", textMatrix_bacteria[i, j]), x, y, gp = gpar(fontsize = 10))
+ }
+cn = colnames(moduleTaxaCor)
+```
+```{r ME_bacteria_ComplexHeatmap}
+# pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_taxa.pdf", width = 10, height = 8)
+me_bacteria_heatmap <- Heatmap(moduleTaxaCor,
+                      # col = col_fun_cor,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", starMatrix_bacteria[i, j]), x, y, gp = gpar(fontsize = 12))},
+                      cluster_rows = hclustME,
+                      top_annotation = HeatmapAnnotation(text = anno_text(cn,
+                                                                             rot = 45,
+                                                                             offset = unit(0.05, "npc"),
+                                                                             just = "left"),
+                                                            annotation_height = max_text_width(cn)),
+                      left_annotation = module_annotation,
+                      right_annotation = module_barplot,
+                      # bottom_annotation = HeatmapAnnotation(text = anno_text(cn,
+                                                            #                  rot = 330,
+                                                            #                  offset = unit(1, "npc"),
+                                                            #                  just = "left"),
+                                                            # annotation_height = max_text_width(cn)),
+                      row_split = 3,
+                      border = FALSE,
+                      rect_gp = gpar(col = "black", lwd = 0.5),
+                      column_order = colnames(datTaxa_Family),
+                      show_column_names = FALSE,
+                      # column_names_rot = 330,
+                      # column_names_side = "bottom",
+                      # column_names_centered = FALSE,
+                      # column_names_gp = gpar(fontsize = 8, fontface = "plain"),
+                      # column_title = "Bacteria abundances",
+                      # column_title_gp = gpar(fontsize = 12, fontface = "plain", just = "right"),
+                      row_title = "Cluster %s",
+                      row_title_gp = gpar(fontsize = 12, fontface = "plain"),
+                      row_names_gp = gpar(fontsize = 12, fontface = "plain"),
+                      row_dend_width = unit(2.5, "cm"),
+                      row_title_rot = 0,
+                      show_heatmap_legend = FALSE,
+                      heatmap_legend_param = list(title = "Module correlation",
+                                                  at = c(-1, 0, 1),
+                                                  direction = "horizontal",
+                                                  title_position = "topcenter",
+                                                  legend_width = unit(3, "cm"),
+                                                  grid_width = unit(0.5, "cm"),
+                                                  labels_gp = gpar(fontsize = 10, fontface = "plain"),
+                                                  border = "black")
+                      )
+# 
+draw(me_bacteria_heatmap, 
+     show_annotation_legend = FALSE, heatmap_legend_side = "left"
+     )
+```
+#### Module KOG enrichment heatmap
+```{r ME_KOG_ComplexHeatmap_annotation}
 # annotation to include module colors
 module_annotation_col <- HeatmapAnnotation(modules = moddf$module_colors,
                                        col = list(modules = module_anno),
@@ -1457,116 +1947,130 @@ module_annotation_col <- HeatmapAnnotation(modules = moddf$module_colors,
                                        )
 # text matrix annotation for cell text
  cell_fun <- function(j, i, x, y, width, height, fill) {
-        grid.text(sprintf("%.1f", t(modkogpadj)[i, j]), x, y, gp = gpar(fontsize = 6))
+        grid.text(sprintf("%.1f", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 6))
  }
+ # barplot annotation of module sizes
+module_barplot <- HeatmapAnnotation("# genes" = anno_barplot(moddf$module_size,
+                                                  gp = gpar(fill = as.character(moddf$module_colors)),
+                                                  bar_width = 0.8,
+                                                  axis_param = list(side = "top",
+                                                      at = c(0, 1000, 2000, 3000, 4000, 5000),
+                                                      # labels = c("zero", "half", "one"),
+                                                      labels_rot = 45)),
+                                    #module_sizes$moduleColors)),
+                                    which = "row",
+                                    show_legend = FALSE,
+                                    annotation_name_side = "top",
+                                    annotation_name_rot = "0",
+                                    annotation_name_gp = gpar(fontsize = 14, fontface = "plain"),
+                                    width = unit(3.5, "cm")
+                                    )
 ```
-```{r modKOG_ComplexHeatmap}
-pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_KOG.pdf", width = 8, height = 6)
-kog_heatmap <- Heatmap(modkogtable,
-                      # col = col_fun_ge(modkogtable),
-                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", modkogpadj[i, j]), x, y, gp = gpar(fontsize = 6))},
-                      cluster_columns = hclustME,
-                      top_annotation = module_annotation_col,
-                      row_split = NULL,
-                      border = FALSE,
-                      rect_gp = gpar(col = "white", lwd = 1.5),
-                      column_title_gp = gpar(fontsize = 8, fontface = "plain"),
-                      row_order = rownames(modkogtable),
-                      # column_names_rot = 0,
-                      column_names_side = "top",
-                      # column_names_centered = TRUE,
-                      column_names_gp = gpar(fontsize = 8, fontface = "plain"),
-                      # row_names_gp = gpar(fontsize = 8, fontface = "plain"),
-                      # show_heatmap_legend = TRUE,
-                      # heatmap_legend_param = list(title = "Eigengene treatment correlation",
-                      #                             direction = "vertical",
-                      #                             title_position = "leftcenter-rot",
-                      #                             legend_height = unit(1.0, "in"),
-                       height = unit(4, "in"),
-                       width = unit(4, "in")
-                      )
-draw(kog_heatmap, column_title = "Module KOG enrichment heatmap", 
-     show_annotation_legend = FALSE, heatmap_legend_side = "left"
-     )
-column_order(kog_heatmap)
-```
-```{r}
-pdf("./outputs/WGCNA-results/figures/modules_KOGenrichment_heatmap.pdf", height = 8.5, width = 10)
-kog_heatmap2 <- Heatmap(t(modkogtable),
-                      # col = col_fun_delta(modkogtable),
-                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", t(modkogpadj)[i, j]), x, y, gp = gpar(fontsize = 6))},
+```{r ME_KOG_ComplexHeatmap}
+me_kog_heatmap_fisher <- Heatmap(t(modkogtable_fisher),
+                      col = col_fun_KOGfisher,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 10))},
                       cluster_rows = hclustME,
                       right_annotation = module_barplot,
-                      # row_split = NULL,
-                      # border = FALSE,
-                      # rect_gp = gpar(col = "white", lwd = 1.5),
-                      # column_title_gp = gpar(fontsize = 8, fontface = "plain"),
+                      row_split = NULL,
+                      border = FALSE,
+                      rect_gp = gpar(col = "black", lwd = 0.5),
                       column_order = rownames(modkogtable),
-                      column_names_rot = 90,
+                      column_names_rot = 60,
                       column_names_side = "bottom",
                       # column_names_centered = TRUE,
-                      column_names_gp = gpar(fontsize = 8, fontface = "plain"),
-                      # row_names_gp = gpar(fontsize = 8, fontface = "plain"),
-                      # show_heatmap_legend = TRUE,
-                      heatmap_legend_param = list(title = "KOG enrichment delta-rank",
+                      column_names_gp = gpar(fontsize = 8, fontface = "plain", vjust = 1, hjust = 0),
+                      column_title = "KOG enrichments",
+                      column_title_gp = gpar(fontsize = 10, fontface = "plain"),
+                      row_names_gp = gpar(fontsize = 10, fontface = "plain"),
+                      show_heatmap_legend = FALSE,
+                      heatmap_legend_param = list(title = "KOG class -log(padj)",
                                                   direction = "vertical",
                                                   title_position = "leftcenter-rot",
-                                                  legend_height = unit(1.0, "in"),
-                       height = unit(4, "in"),
-                       width = unit(4, "in")
+                                                  legend_height = unit(1.0, "cm"),
+                       width = unit(4, "cm")
                       ))
-draw(kog_heatmap2, column_title = "Module KOG enrichment heatmap", 
+# 
+draw(me_kog_heatmap_fisher, 
      show_annotation_legend = FALSE, heatmap_legend_side = "left"
      )
 ```
+#### Module-treatment-bacteria-enrichment heatmap
+```{r correlation_legend}
+cor_lgd <- 
+  Legend(col_fun = col_fun_cor,
+         title = "Module correlation",
+         title_gp = gpar(fontsize = 12, fontface = "plain"),
+         at = c(-1, 0, 1),
+         direction = "horizontal",
+         title_position = "topcenter",
+         legend_width = unit(3.5, "cm"),
+         grid_width = unit(0.5, "cm"),
+         labels_gp = gpar(fontsize = 10, fontface = "plain"),
+         border = "black")
+draw(cor_lgd)
+```
+
+```{r ME_transkingdom_ComplexHeatmap}
+pdf("./outputs/WGCNA-results/combo_heatmap.pdf", height = 8.5, width = 11)
+
+combmap <- me_treatment_heatmap + me_bacteria_heatmap + me_kog_heatmap_fisher
+
+draw(combmap,
+     column_title = "WGCNA module correlations and functional enrichment",
+     column_title_gp = gpar(fontsize = 12, fontface = "plain"),
+     ht_gap = unit(c(1, 2), "mm"),
+     row_dend_width = unit(1.5, "cm"),
+     row_split = 3,
+     show_annotation_legend = FALSE,
+     heatmap_legend_side = "left",
+     heatmap_width = unit(14, "cm"),
+     heatmap_height = unit(14, "cm"))
+```
 ```{r}
-pdf("./outputs/WGCNA-results/modules_correlations_KOGenrichment_heatmap.pdf", height = 8, width = 12)
-combmap <- me_heatmap + kog_heatmap2
-draw(combmap,  show_annotation_legend = FALSE, heatmap_legend_side = "left")
+# pdf("./outputs/WGCNA-results/figures/treatment_bacteria_heatmap.pdf", height = 6.5, width = 7)
+pdf("./manuscript_figures/Fig4A_ME_heatmap.pdf", height = 6.5, width = 7)
+combomap <- me_treatment_heatmap + me_bacteria_heatmap
+draw(combomap,
+     # column_title = "WGCNA module correlations",
+     column_title_gp = gpar(fontsize = 14, fontface = "plain"),
+     ht_gap = unit(c(1, 2), "mm"),
+     row_dend_width = unit(1.5, "cm"),
+     row_split = 3,
+     show_annotation_legend = FALSE,
+     heatmap_legend_side = "left",
+     heatmap_width = unit(14, "cm"),
+     heatmap_height = unit(16, "cm"))
+draw(cor_lgd, x = unit(1, "cm"), y = unit(3, "cm"), just = c("left", "bottom"))
+```
+```{r}
+# pdf("./outputs/WGCNA-results/figures/treatment_bacteria_heatmap.pdf", height = 6.5, width = 7)
+pdf("./manuscript_figures/MBE702_bacteria_heatmap.pdf", height = 8, width = 6.5)
+draw(me_bacteria_heatmap,
+     # column_title = "WGCNA module correlations",
+     column_title_gp = gpar(fontsize = 14, fontface = "plain"),
+     ht_gap = unit(c(1, 2), "mm"),
+     row_dend_width = unit(3.5, "cm"),
+     row_split = 3,
+     show_annotation_legend = FALSE,
+     heatmap_legend_side = "left",
+     heatmap_width = unit(14, "cm"),
+     heatmap_height = unit(18, "cm"))
+draw(cor_lgd, x = unit(2.5, "cm"), y = unit(16, "cm"), just = c("left", "bottom"))
 ```
 
-### Module trait gene significance (GS) versus interconnectivity (kME) scatterplots, scaled gene profile plots and edge files
-```{r genesig}
-# calculate gene trait significance for each treatment, genotype, etc.
-geneTraitSignificance <- as.data.frame(cor(datExpr, datTraits, use = "p")) 
-traitGS <- geneTraitSignificance %>% 
-  rownames_to_column("ID")
-```
-```{r df_kME_GS}
-longKME <- datKME %>% 
-  rename(gene = "ID") %>% 
-  pivot_longer(cols= -ID, names_to = "module", values_to = "kME")
 
-df_gene_GS_kME <- genecolors %>%
-  rename(gene = "ID") %>% 
-  full_join(traitGS, by = "ID") %>% 
-  full_join(longKME, by = "ID") %>%
-  filter(moduleColor == module) %>% 
-  select(-module)
-```
-```{r module_GS_kME_results_tables}
-# write output tables with gene kME statistics and trait gene significance for each module
- for (module in sigModules) {
-#datKME <- datKME %>% column_to_rownames("gene")
-df_mod_GS_kME <- df_gene_GS_kME %>%
-  filter(moduleColor == module) %>% 
-  select(-moduleColor) %>% 
-  select(ID, kME, everything()) %>% 
-  arrange(desc(kME)) %>% 
-  left_join(., gene_annotation, by = "ID")
-write_csv(df_mod_GS_kME, path = paste("./outputs/WGCNA-results/tables/", module, "_GS_kME.csv", sep = ""))
-}
-```
+### Module GS vs. kME scatterplots, scaled gene profile plots and edge files
 ```{r overall_kME_GS_scatterplot}
 tidy_gene_GS_kME <- pivot_longer(df_gene_GS_kME, cols = control:Antibiotics.Heat, names_to = "Treatment", values_to = "GS")
 tidy_gene_GS_kME$Treatment <- factor(tidy_gene_GS_kME$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
 sigmods_kME_GS_scatterplot <- tidy_gene_GS_kME %>% 
-  filter(moduleColor %in% sigModules) %>% 
+  filter(moduleColor %in% uniqModules) %>% 
   ggplot(aes(kME, GS, color = moduleColor)) +
   geom_hline(yintercept = 0, color= "grey40") +
   geom_point(size = 1, alpha = 0.3) +
   geom_smooth(method = "lm", se = TRUE, weight = 1, fullrange = TRUE) +
-  scale_color_manual(values = sigModules) +
+  scale_color_manual(values = uniqModules) +
   coord_cartesian(xlim = c(0,1), ylim = c(-1,1)) +
   facet_grid(moduleColor ~ Treatment)
 ggsave(sigmods_kME_GS_scatterplot, filename = "./outputs/WGCNA-results/figures/sigmodules_kME_gene_significance_scatterplot.pdf", width = 8.5, height = 11, device = "pdf")
@@ -1599,6 +2103,7 @@ g_plot <- ggplot_gtable(ggplot_build(plot))
   print(gp)
 }
 ```
+
 
 ### Module eigengene and gene-scaled profile plots
 ```{r}
@@ -1634,13 +2139,14 @@ lines(MEagg$V1, type = "l", lwd = 5,col=module)
 ```
 ### VisANT Network edge files export
 ```{r visant_edge_file}
-for (module in intModules)
+geneInfo <- df_gene_GS_kME %>% dplyr::select(ID, moduleColor, kME) %>% dplyr::rename("module" = moduleColor, "membership" = kME) %>% arrange(module, membership)
+for (module in uniqModules)
 {
 inModule <- (moduleColors == module)
 # Select the genes within each module and extract gene info
 modGeneIDs <- Genes[inModule]
 # Select the highly connected genes 
-conmodGeneIDs <- rownames(geneInfo)[geneInfo$module == module & geneInfo$membership > 0.75]
+conmodGeneIDs <- geneInfo$ID[geneInfo$module == module & geneInfo$membership > 0.75]
 modGeneNames <-gene_annotation[modGeneIDs, 2]
 conmodGeneNames <-gene_annotation[conmodGeneIDs, 2]
 # Select the corresponding Topological Overlap
@@ -1737,13 +2243,19 @@ MEs_apoptosis$Treatment <- factor(MEs_apoptosis$Treatment, levels = c("control",
 MEs_apoptosis$module <- factor(MEs_apoptosis$module, levels = sigModules, ordered = T)
 apobox <- MEs_apoptosis %>% 
   ggplot(aes(x = Treatment, y = ME)) +
+  # altered to have new scale for points
   geom_boxplot(aes(fill = Treatment)) + 
-  geom_point() +
+  scale_fill_manual(values = condfillcolors_AxH) +
+  new_scale_fill() + 
+  geom_point(aes(color = Treatment, shape = Colony), size = 3, alpha = 0.8) +
+  geom_point(size = 3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+  scale_color_manual(values = condcolors_AxH) +
+  scale_fill_manual(values = condcolors_AxH) +
+  scale_shape_manual(values = colshapes, name="Colony") + 
+  # 
   facet_wrap(module~.) +
   ggtitle("Eigengene expression of 'Apoptotic process' genes in darkred (n = 29) and skyblue (n = 10) modules") +
-  ylab("Eigengene expression") +
-  scale_fill_manual(values = condfillcolors_AxH) +
-  scale_shape_manual(values = colshapes, name="Colony")
+  ylab("Eigengene expression")
 # to continue with this I need to map color aesthetics, print number of genes to the GO term in each module, and account for module-treatment correlations
 ggsave(apobox, filename = "./outputs/WGCNA-results/figures/apoptosis_boxplot.pdf", device = "pdf", width = 8, height = 4)
 ```
@@ -1785,144 +2297,13 @@ ggsave(dnarepbox, filename = "./outputs/WGCNA-results/figures/lightcyan1_dnarepa
 
 
 
-## Trans-kingdom network analysis 
-```{r dat_phyla}
-glom_phylum <- tax_glom(ps.AXH.rel, taxrank = "Phylum")
-ps.AXH_phylum <- psmelt(glom_phylum)
-#ps.AXH_phylum <- filter(ps.AXH_phylum, Abundance > 0)
-ps.AXH_phylum$Phylum <- as.character(ps.AXH_phylum$Phylum)
-ps.AXH_phylum$Kingdom <- gsub("D_0__", "", ps.AXH_phylum$Kingdom)
-ps.AXH_phylum$Phylum <- gsub("D_1__", "", ps.AXH_phylum$Phylum)
-#ps.AXH_phylum$Phylum[ps.AXH_phylum$Abundance < 0.01] <- "<1% abundance"
-### create properly formatted table
-datPhyla <- ps.AXH_phylum %>% select(Phylum, Sample, Abundance) %>%
-  tidyr::pivot_wider(names_from = Phylum, values_from = Abundance) %>% 
-  arrange(Sample) %>%
-  filter(Sample!='Hw2.6a')
-rownames(datPhyla) <- gsub('.', '-', datPhyla$Sample, fixed = TRUE)
-datPhyla <- datPhyla[-1]
-row.names(datPhyla) <- rownames(datTraits)
-```
-```{r ME_correlations_phyla}
-modulePhylaCor <- cor(MEs1, datPhyla, use = "p")
-modulePhylaPvalue <- corPvalueStudent(modulePhylaCor, nSamples)
-modulePhylaCors <- as.data.frame(modulePhylaCor, modulePhylaPvalue)
-```
-```{r ME_correlations_alpha}
-datAlpha <- ps.AXH_richness %>% filter(ID!='Hw2.6a')
-moduleAlphaCor <- cor(MEs1, datAlpha, use = "p")
-moduleAlphaPvalue <- corPvalueStudent(moduleAlphaCor, nSamples)
-moduleAlphaCors <- as.data.frame(moduleAlphaCor, moduleAlphaPvalue)
-```
-```{r ME_phyla_heatmap}
-# Will display correlations and their p-values
-#textMatrix <- paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue, 2), ")", sep = "")
-# Only displays significant correlations p < 0.05
-textMatrix <- character()
-for (i in 1:length(modulePhylaPvalue)){
-  if(modulePhylaPvalue[i] < 0.05){ text <-  paste(signif(modulePhylaCor[i], 2), "\n(", signif(modulePhylaPvalue[i], 2), ")", sep = "") } else { text <- "" }
-  textMatrix[i] <- text
-}
-dim(textMatrix) <- dim(modulePhylaCor)
-#par(mar = c(10, 8.5, 3, 3));
-# Display the correlation values within a heatmap plot
-pdf(file = "./outputs/WGCNA-results/figures/ME_phyla_heatmap.pdf", width = 11, height = 8.5)
-labeledHeatmap(Matrix = modulePhylaCor,
-               colors = geneexpcolors2,
-               textMatrix = textMatrix,
-               xLabels = names(datPhyla),
-               xLabelsPosition = "bottom",
-               xLabelsAngle = 345,
-               xLabelsAdj = 0,
-               yLabels = names(MEs1),
-               ySymbols = gsub("ME", "", names(MEs1)),
-               yLabelsPosition = "left",
-               yColorWidth = 0.01,
-               x.adj.lab.y = 1,
-               #verticalSeparator.x = names(moduleTraitCor),
-               verticalSeparator.interval = 1,
-               verticalSeparator.col = "white",
-               verticalSeparator.lwd = 3,
-               horizontalSeparator.interval = 1,
-               horizontalSeparator.col = "white",
-               horizontalSeparator.lwd = 3,
-               colorLabels = FALSE,
-               setStdMargins = TRUE,
-               margins = c(2,2),
-               plotLegend = TRUE,
-               cex.text = 0.4,
-               cex.lab.x = 0.9,
-               zlim = c(-1,1),
-main = paste("Module-Phyla correlations"),
-xlab = "Bacterial Phyla (decreasing relative abundance -->)")
-```
-```{r phyla_ComplexHeatmap_annotation}
-# column annotation for treatments
 
-# annotation to include module colors
-moddf <- data.frame(module_colors)
-module_anno  <- module_colors
-names(module_anno) <- module_colors
-module_sizes <- data.frame(table(moduleColors)) %>% filter(moduleColors != "grey") %>% arrange(desc(Freq))
-colnames(module_sizes) <- c("module_colors", "module_size")
-moddf <- left_join(moddf, module_sizes, by = "module_colors")
-module_annotation <- HeatmapAnnotation(modules = moddf$module_colors,
-                                       col = list(modules = module_anno),
-                                       which = "row",
-                                       annotation_name_rot = 0,
-                                       show_legend = FALSE
-                                       )
-# text matrix annotation for cell text
- cell_fun <- function(j, i, x, y, width, height, fill) {
-        grid.text(sprintf("%.1f", textMatrix[i, j]), x, y, gp = gpar(fontsize = 10))
- }
-# barplot annotation of module sizes
-module_barplot <- HeatmapAnnotation(module_size = anno_barplot(moddf$module_size,
-                                                  gp = gpar(fill = as.character(moddf$module_colors))),#module_sizes$moduleColors)),
-                                    which = "row",
-                                    show_legend = FALSE,
-                                    width = unit(1.5, "in")
-                                    )
-```
-```{r ME_phyla_heatmap_ComplexHeatmap}
-pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_phyla.pdf", width = 10, height = 8)
-me_heatmap <- Heatmap(modulePhylaCor,
-                      col = col_fun_cor,
-                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", textMatrix[i, j]), x, y, gp = gpar(fontsize = 6))},
-                      cluster_rows = hclustME,
-                      #top_annotation = treatment_annotation,
-                      left_annotation = module_annotation,
-                      right_annotation = module_barplot,
-                      row_split = NULL,
-                      border = FALSE,
-                      rect_gp = gpar(col = "white", lwd = 3),
-                      column_title_gp = gpar(fontsize = 12, fontface = "plain"),
-                      column_order = colnames(datPhyla),
-                      column_names_rot = 60,
-                      column_names_side = "bottom",
-                      column_names_centered = FALSE,
-                      column_names_gp = gpar(fontsize = 12, fontface = "plain"),
-                      row_dend_width = unit(1.5, "in"),
-                      show_heatmap_legend = TRUE,
-                      heatmap_legend_param = list(title = "Eigengene treatment correlation",
-                                                  direction = "vertical",
-                                                  title_position = "leftcenter-rot",
-                                                  legend_height = unit(3, "in"),
-                      height = unit(7, "in"),
-                      width = unit(4, "in"))
-                      )
-draw(me_heatmap, column_title = "Module eigengene bacteria phylum correlation heatmap", 
-     show_annotation_legend = FALSE, heatmap_legend_side = "left"
-     )
-```
-I would also like to...
-...add treatment color annotation to top of heatmap...and fix legend label position (modules, Treatment, module_size)
-...adjust legend position...
-...add heatmap to show module eigengene correlations to bacteria taxa...alpha diversity, beta diversity, etc.
-...include text cloud annotation based on GO enrichment...
+# Exploratory code
+### Module "Volcano" Plots
+```{r}
 
-
-```{r ME_transkingdom_ComplexHeatmap}
+```
+```{r module_volcano}
 
 ```
 
@@ -2290,8 +2671,4 @@ source("./R/GO_MWU/GO_MWU_plot.R")
 
 commandArgs <- function(...) c("anti.heat.control.logP.txt", "BP", "GO_MWU.heat.control.pdf", 1e-4, 1e-5, 1e-6, 1)
 source("./R/GO_MWU/GO_MWU_plot.R")
-```
-## clusterProfiler
-```{r}
-library("clusterProfiler")
 ```

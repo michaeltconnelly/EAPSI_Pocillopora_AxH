@@ -1,0 +1,226 @@
+---
+title: "AxH_MBE702_figures"
+author: "Mike Connelly"
+date: "10/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = "~/computing/projects/EAPSI_Pocillopora_AxH/")
+```
+### WGCNA dendrogram
+```{r}
+pdf(file = "./manuscript_figures/MBE702_WGCNA_dendrogram.pdf", width = 8, height = 4)
+plotDendroAndColors(dendro = geneTree, 
+                    colors = mergedColors,
+                    groupLabels = "Modules",
+                    dendroLabels = FALSE, 
+                    # hang = 0.03,
+                    addGuide = TRUE,
+                    main = NULL,
+                    axes = FALSE,
+                    marAll = c(2, 2, 2, 2),
+                    ylab = NULL)
+```
+### WGCNA TOM plot
+```{r TOMplot}
+# # Transform dissTOM with a power to make moderately strong connections more visible in the heatmap
+# rm(TOM)
+# plotTOM <- dissTOM^7;
+# rm(dissTOM)
+# rm(vsd)
+# rm(countdata)
+# rm(coldata, samples)
+# rm(countdata_vst, countdata.sorted)
+# rm(colcounts)
+# rm(gene_annotation, gene2kog)
+# rm(dds)
+# rm(datExpr)
+# # Set diagonal to NA for a nicer plot
+# diag(plotTOM) <- NA;
+# # Call the plot function
+# # >  Sys.setenv('R_MAX_VSIZE'=32000000000)
+# # > Sys.getenv('R_MAX_VSIZE')
+# start_time <- Sys.time()
+# pdf(file = "./manuscript_figures/MBE702_WGCNA_TOMplot.pdf", width = 10, height = 10)
+# TOMplot(plotTOM, 
+#         dendro =  geneTree,
+#         # mergedColors,
+#         main = "Network heatmap plot, all genes")
+# end_time <- Sys.time()
+```
+```{r}
+start_time - end_time
+```
+### Basic heatmap for Endozoicomonas correlation
+
+```{r}
+endo_cor <- data.frame(cbind(moduleTaxaCor, moduleTaxaPvalue))
+colnames(endo_cor) <- c("correlation", "pval")
+endo_cor <- endo_cor %>%
+  rownames_to_column("module") %>% 
+  arrange(desc(correlation))
+
+endo_cor_sig <- endo_cor %>% filter(pval < 0.01 & correlation > 0)
+
+endo_cor_mat <- endo_cor_sig %>%
+  dplyr::select(-pval) %>%
+  column_to_rownames("module") %>% 
+  as.matrix()
+```
+```{r}
+Heatmap(endo_cor_mat,
+        col = col_fun_cor)
+```
+### scatterplot of ME expression vs. Endozoicoomonas abundance
+```{r}
+endo_me <- datME %>%
+  rownames_to_column("SampleID") %>% 
+  dplyr::select(SampleID, darkgrey) #darkgreen, steelblue, ivory
+endo_samp <- datTaxa_Family %>%
+  rownames_to_column("SampleID") %>% 
+  dplyr::select(SampleID, Rhodobacteraceae) #Endozoicomonadaceae
+endo_samp_meta <- left_join(endo_samp, samples, by = "SampleID")
+endo_me_rel <- left_join(endo_me, endo_samp, by = "SampleID") %>% pivot_longer(cols = darkgrey, names_to = "module", values_to = "eigengene_expression") %>% full_join(samples, by = "SampleID")
+
+xlabel <- expression("Rhodobacteraceae"~"relative abundance") #italic("Endozoicomonas")
+facet_labels <- c(
+  'ivory'="Ivory (674 genes)",
+  'darkgreen'="Darkgreen (5,010 genes)",
+  'steelblue'="Steelblue (200 genes)",
+  'darkgrey'="Darkgrey (514 genes)"
+)
+
+endo_me_rel$module <- factor(endo_me_rel$module, levels = key_modules_2, ordered = TRUE)
+endo_me_rel$Treatment <- factor(endo_me_rel$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+module_scatter_endo_plot <- endo_me_rel %>% 
+  ggplot(aes(Rhodobacteraceae, eigengene_expression)) +
+  geom_point(
+    size=3, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = TRUE
+    ) +
+  geom_smooth(method = "lm", aes(color = module), show.legend = FALSE) +
+  facet_grid(~module, labeller = as_labeller(facet_labels)) +
+  scale_color_manual(values = c("black", "steelblue", "darkgreen")) +
+  scale_fill_manual(values=condcolors_AxH, name="Treatment") +
+  scale_shape_manual(values=colshapes, name="Colony") +
+  ylab(NULL) +
+  xlab(xlabel) + 
+  theme(plot.margin = margin(10,10,30,10, unit = "pt" ),
+        panel.spacing = unit(1, "lines"),
+        axis.text = element_text(size = 10),
+        axis.title.x = element_text(size = 12), 
+        axis.title.y = element_text(size = 12),
+        strip.text = element_text(size = 10))
+print(module_scatter_endo_plot)
+ggsave(module_scatter_endo_plot, file = "./manuscript_figures/MBE702_modscatter_rhodo.pdf", device = "pdf", height = 4, width = 5, units = "in")
+```
+
+```{r}
+library(patchwork)
+scatterkogplot <- module_scatter_endo_plot / moduleKOGplot
+ggsave(scatterkogplot, file = "./manuscript_figures/MBE702_scatterkog.pdf", device = "pdf", height = 6, width = 8.5, units = "in")
+```
+
+
+### GO/KOG enrichment score barplot
+```{r}
+moduleGOcol <- modules.GO %>%
+  dplyr::select(module, p.adj, name, nseqs, level, term) %>%
+  filter(module == "brown") %>%
+  arrange(p.adj) %>% 
+  slice_head(n = 15)
+
+moduleGOcol$name <- factor(moduleGOcol$name, levels = rev(moduleGOcol$name), ordered = TRUE)
+
+moduleGOplot <- moduleGOcol %>% 
+  mutate(score = -log(p.adj, base = 10)) %>% 
+  arrange(desc(score)) %>% 
+  ggplot(aes(name, score)) +
+  geom_col(fill = moduleGOcol$module) + 
+  # geom_hline(yintercept = -log10(0.05)) +
+  xlab("Gene Ontology term") +
+  ylab("-log10(padj)") +
+  coord_flip(#ylim = c(0, 2.5)
+             )
+print(moduleGOplot)
+ggsave(moduleGOplot, file = "./manuscript_figures/MBE702_brown_GO.pdf", device = "pdf", height = 3, width = 5, units = "in")
+```
+
+```{r}
+key_modules <- c("ivory", "steelblue", "darkgreen")
+key_modules_2 <- c("darkgrey")
+module_KOG <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  mutate(score = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>% 
+  filter(module %in% key_modules_2) %>% 
+  # filter(module == "darkgreen") %>% 
+  arrange(module, desc(score))
+
+module_KOG$module <- factor(module_KOG$module, levels = key_modules_2, ordered = TRUE)
+
+moduleKOGplot <- module_KOG %>% 
+  filter(score > -log10(0.05)) %>% 
+  arrange(module, desc(score)) %>% 
+  ggplot(aes(term, score)) +
+  facet_grid(.~module, scales = "free", labeller = as_labeller(facet_labels)) +
+  geom_hline(yintercept = -log10(0.05), linetype = 2) +
+  geom_col(aes(fill = module), show.legend = FALSE) +
+  scale_fill_manual(values = c("darkgrey")) + #"black", "steelblue", "darkgreen"
+  xlab(NULL) +
+  ylab("-log10(adjusted p-value)") +
+  coord_flip(ylim = c(0, 6)
+             ) +
+  theme(plot.margin = margin(10,10,10,10, unit = "pt" ),
+         panel.spacing = unit(1, "lines"),
+        axis.text = element_text(size = 10), 
+        axis.title.x = element_text(size = 12), 
+        strip.text = element_text(size = 10))
+
+#
+
+print(moduleKOGplot)
+ggsave(moduleKOGplot, file = "./manuscript_figures/MBE702_KOG_darkgrey.pdf", device = "pdf", height = 3, width = 5, units = "in")
+```
+
+```{r}
+kog_modules <- c("darkgreen", "ivory", "steelblue", "darkgrey", "green")
+kmodule <- "darkgreen"
+for (kmodule in kog_modules) {
+module_KOG <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  mutate(score = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>% 
+  filter(module == kmodule) %>% 
+  arrange(desc(score))
+
+module_KOG$term <- factor(module_KOG$term, levels = rev(module_KOG$term), ordered = TRUE)
+
+moduleKOGplot <- module_KOG %>% 
+  filter(score > -log10(0.05)) %>% 
+  ggplot(aes(term, score)) +
+  geom_col(fill = kmodule) +
+  geom_hline(yintercept = -log10(0.05)) +
+  xlab("KOG term") +
+  ylab("-log10(padj)") +
+  coord_flip(ylim = c(0, 6)
+             )
+print(moduleKOGplot)
+}
+```
+
+
+
+
+```{r}
+endo_samp_meta$Treatment <- factor(endo_samp_meta$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+endo_samp_meta %>% 
+  ggplot(aes(x = Treatment, y = Rhodobacteraceae, fill = Treatment)) +
+  geom_boxplot() +
+  # facet_grid(~Colony) +
+  scale_fill_manual(values = condcolors_AxH)
+```
+

@@ -40,6 +40,6 @@ gene_annotation <- gene_annotation %>%
 is.na(gene_annotation) <- gene_annotation == ''
 ```
 ```{r}
-write_tsv(gene_annotation, path = "../pdam_genome_annotations.tab")
+write_tsv(gene_annotation, path = "../pdam_genome_annotations.tsv")
 ```
 
