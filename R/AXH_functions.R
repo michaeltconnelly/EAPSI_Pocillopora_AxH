@@ -73,7 +73,7 @@ plotPCA.custom <-  function(object, intgroup="Treatment", ntop=500, returnData=F
 
 ### PCA plot formatted with aesthetics ---------------------------------------------------------------------------
 ggPCA <- function(vsd, samples, condcolors, ntop = 500,  pclab = c(1,2)) {
-  
+  #
   PCAtmtdata <- plotPCA.custom(vsd, intgroup = c("Colony", "Treatment"), ntop = 500, returnData = TRUE,  pcs = c(pclab[1],pclab[2]))
   #set factor orders 
   PCAtmtdata$Colony <- factor(PCAtmtdata$Colony, levels = c("HW1", "HW2", "WT1", "WT2"), ordered = TRUE)
@@ -82,17 +82,37 @@ ggPCA <- function(vsd, samples, condcolors, ntop = 500,  pclab = c(1,2)) {
   PCAtmtpercentVar <- round(100* attr(PCAtmtdata, "percentVar"))
   
   PCAplot <-  PCAtmtdata %>% ggplot(aes(PC1,PC2)) +
-    geom_point(size=4, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = TRUE) +
+    geom_point(size=4, aes(fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
     xlab(paste0( "PC", pclab[1], ": ", PCAtmtpercentVar[pclab[1]], "% variance")) + 
     ylab(paste0( "PC", pclab[2], ": ", PCAtmtpercentVar[pclab[2]], "% variance")) + 
     coord_fixed(1) + 
     scale_fill_manual(values=condcolors, name="Treatment") + 
     scale_shape_manual(values=colshapes, name="Colony") +
     theme(legend.position = "right") +
-    guides(fill = guide_legend(override.aes = list(fill = condcolors, shape = 21, alpha = 1, stroke = 0.5))) +
-    ggtitle("Principal Component Analysis")
+    guides(fill = guide_legend(override.aes = list(fill = condcolors, shape = 21, alpha = 1, stroke = 0.5))) 
   
 PCAplot
+}
+
+### PCoA plot formatted with aesthetics ------------------------------------------------------------------------------
+ggPCoA <- function(mds) {
+  #
+  # Plot with spiders
+  PCoAplot <- ggplot(mds, aes(fill = Treatment)) +
+    geom_segment(mapping = aes(x = `1`, y = `2`, xend = c1, yend = c2), lwd = 0.25, col = "dark grey") +
+    # treatment centroid points
+    geom_point(size = 3, aes(x = c1, y = c2, color = Treatment), fill = "black", shape = 21, stroke = 2, show.legend = FALSE) +
+    # sample points
+    geom_point(size = 3, aes(x = `1`, y = `2`, fill = Treatment, shape = Colony), color = "black", stroke = 0.5, show.legend = FALSE) +
+    scale_color_manual(values = condcolors_AxH) +
+    scale_fill_manual(values = condcolors_AxH) +
+    scale_shape_manual(values = colshapes) +
+    labs(x = xlab, y = ylab) +
+    coord_fixed(1) +
+    guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
+           fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5)),
+           shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5)))
+  PCoAplot
 }
 
 ### Function to plot color bar -------------------------------------------------------------------------------------
