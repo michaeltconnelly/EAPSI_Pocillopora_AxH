@@ -219,9 +219,8 @@ all(rownames(dds_coral) == rownames(gene_annotation_coral))
 mcols(dds_coral) <- cbind(mcols(dds_coral), gene_annotation_coral)
 # Subset DESeqDataSet
 # Remove genes with counts less than 10 in 90% of samples
-keep_tencounts <-  rowSums(counts(dds_coral)) >= 10
-keep_ninety <- rowSums(counts(dds_coral) >= 10) > (47*0.9)
-dds_coral <- dds_coral[keep_ninety, ]
+keep <- rowSums(counts(dds_coral) >= 10) > (47*0.9)
+dds_coral <- dds_coral[keep, ]
 # Normalize expression data for visualization purposes using VST tranformation
 vsd_coral <- vst(dds_coral, blind = TRUE) # use blind = TRUE to not account for experimental design
 ```
@@ -237,19 +236,17 @@ all(rownames(dds_symbiont) == rownames(gene_annotation_symbiont))
 mcols(dds_symbiont) <- cbind(mcols(dds_symbiont), gene_annotation_symbiont)
 # Subset DESeqDataSet
 # Remove genes with counts less than 10 in 90% of samples
-keep_tencounts <-  rowSums(counts(dds_symbiont)) >= 10
-keep_ninety <- rowSums(counts(dds_symbiont) >= 10) > (47*0.9)
-dds_symbiont <- dds_symbiont[keep_ninety, ]
+keep <- rowSums(counts(dds_symbiont) >= 10) > (47*0.9)
+dds_symbiont <- dds_symbiont[keep, ]
 # Normalize expression data for visualization purposes using VST tranformation
 vsd_symbiont <- vst(dds_symbiont, blind = TRUE) # use blind = TRUE to not account for experimental design
 ```
-
 
 ## Visualize global gene expression
 ```{r choose_vsd, include=FALSE}
 # Choose vsd for host/symbiont analysis
 vsd <- vsd_coral
-vsd <- vsd_symbiont
+# vsd <- vsd_symbiont
 ```
 ```{r pca_combined, echo=FALSE}
 pca_coral <- ggPCA(vsd_coral, samples, condcolors_AxH, pclab = c(1,2))
@@ -257,6 +254,7 @@ pca_symbiont <- ggPCA(vsd_symbiont, samples, condcolors_AxH, pclab = c(1,2))
 pca_combined <- pca_coral + pca_symbiont
 ggsave(pca_combined, filename = "./outputs/DESeq_results/figures/pca_combined.pdf", width = 200, height = 100, units = "mm", device = "pdf")
 ```
+
 ### Principal Coordinate Analysis (PCoA)
   Must choose a vsd object (coral or symbiont) to use for the PCoA 
 ```{r mds, eval = TRUE}
@@ -290,14 +288,13 @@ mds_trmt <- mds %>%
 mds_trmt$Colony <- factor(mds_trmt$Colony, levels = c("HW1", "HW2", "WT1", "WT2"), ordered = TRUE)
 mds_trmt$Treatment <- factor(mds_trmt$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
 ```
-
 ```{r pcoa_treatment}
 # pcoa_treatment_coral <- ggPCoA(mds_trmt)
 # pcoa_treatment_symbiont <- ggPCoA(mds_trmt)
 # 
 # Save single treatment PCoA plot
-pcoa_plot <- pcoa_treatment_coral
-pcoa_plot <- pcoa_treatment_symbiont
+# pcoa_plot <- pcoa_treatment_coral
+# pcoa_plot <- pcoa_treatment_symbiont
 #
 ggsave(pcoa_plot, filename = "./outputs/DESeq_results/figures/pcoa_treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
 # ggsave(pcoa_plot, filename = "./manuscript_figures/Fig1A_PCoA_Treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
@@ -306,18 +303,22 @@ ggsave(pcoa_plot, filename = "./outputs/DESeq_results/figures/pcoa_treatment.pdf
 pcoa_combined <- pcoa_treatment_coral + pcoa_treatment_symbiont
 # ggsave(pcoa_combined, filename = "./outputs/DESeq_results/figures/pcoa_combined.pdf", width = 200, height = 100, units = "mm", device = "pdf")
 ggsave(pcoa_combined, filename = "./manuscript_figures/Fig1A_PCoA_Treatment.pdf", width = 112, height = 80, units = "mm", device = "pdf")
+print(pcoa_combined)
 ```
 
 ## Differential gene expression analysis (DESeq2)
+  Must choose a dds object and gene annotation (coral or symbiont) to use for the PCoA 
 ```{r choose_dds_annotation}
 # Choose DESeq dataset and annotation for coral or symbiont differential gene expression analysis
-dds <- dds_coral
-gene_annotation <- gene_annotation_coral
+# dds <- dds_coral
+# gene_annotation <- gene_annotation_coral
+# partner <- "coral"
 #
-# dds <- dds_symbiont
-# gene_annotation <- gene_annotation_symbiont
+dds <- dds_symbiont
+gene_annotation <- gene_annotation_symbiont
+partner <- "symbiont"
 ```
-```{r genotypic DESeq}
+```{r genotype_DESeq}
 #First, genotype-specific treatment models
 design(dds) <- formula(~ Batch + Colony.Treatment)
 #Set control treatment as reference factor level
@@ -334,7 +335,7 @@ DE <- crossing(Colony = c("HW1", "HW2", "WT1", "WT2"), contrasts) %>%
    mutate(dsr = pmap(list(Colony, num, den), function(x, y, z) {
    results(dsr1, contrast = c("Colony.Treatment", paste0(x, ".", c(y, z))))}))
 ```
-```{r overall DESeq}
+```{r overall_DESeq}
 #Second, overall colony and treatment interaction model
 # ~ Batch + Colony + Treatment + Colony:Treatment
 design(dds) <- formula(~ Batch + Colony + Treatment)
@@ -348,10 +349,6 @@ resultsNames(dsr2)
 DE <- crossing(Colony = "all", contrasts) %>%
   mutate(dsr = map2(num, den, ~ results(dsr2, contrast = c("Treatment", .x, .y)))) %>%
   bind_rows(DE)
-```
-```{r DE_check}
-DE
-warnings()
 ```
 ```{r DE_table}
 DE <- DE %>%
@@ -369,10 +366,18 @@ DE <- DE %>% mutate(logP = map(dsr, ~ data.frame(
   gene = rownames(data.frame(.)),
   logP = -log10(data.frame(.)$pvalue) * sign(data.frame(.)$log2FoldChange))))
 ```
+```{r DE_check}
+DE
+warnings()
+```
 ```{r DE_store}
 # Store DE results tibbles
 # DE_coral <- DE
 # DE_symbiont <- DE
+```
+```{r DE_load}
+# DE <- DE_coral
+# DE <- DE_symbiont
 ```
 ```{r DEG_contrasts_table}
 # Count number of differentially expressed genes within each colony, and overall, for each contrast
@@ -381,58 +386,76 @@ DEtab <- DE %>%
          nup = map_dbl(up, ~ nrow(.)),
          ndn = map_dbl(down, ~ nrow(.)),
          `DEGs [up, down]` = paste0(nsig, " [", nup, ", ", ndn, "]")) %>%
-  mutate(Colony = factor(Colony, levels = c("all", "HW1", "HW2", "WT1", "WT2"))) %>%
-  dplyr::select(Colony, num, den, `DEGs [up, down]`)
+  mutate(Colony = factor(Colony, levels = c("HW1", "HW2", "WT1", "WT2", "all"), ordered = TRUE),
+         num = factor(num, levels = c("Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE),
+         den = factor(den, levels = c("control", "Heat", "Antibiotics"), ordered = TRUE)) %>%
+  arrange(Colony, num, den) %>% 
+  filter(den == "control") %>% 
+  mutate("Contrast" = paste0(num, " vs. ", den)) %>% 
+  dplyr::select(Colony, Contrast, `DEGs [up, down]`) %>% 
+  pivot_wider(names_from = Colony, values_from = `DEGs [up, down]`)
 ```
-```{r}
+```{r DE_contrasts_summary_table}
 # Store DE results tables
 # DEtab_coral <- DEtab
 # DEtab_symbiont <- DEtab
 # Bind together coral and symbiont DEG contrast results
-DE_table <- cbind(DEtab_coral, DEtab_symbiont$`DEGs [up, down]`)
-# Filter only contrasts against the control treatment
-DE_table %>%
-  filter(den == "control") %>% 
-  write_csv("./outputs/DESeq_results/tables/DE_table.csv")
+DE_table <- bind_rows("Coral" = DEtab_coral, "Symbiont" = DEtab_symbiont, .id = "Holobiont Partner")
+# Write output to file
+# DE_table %>%
+#   write_csv("./outputs/DESeq_results/tables/DE_table.csv")
 ```
 ```{r significant_results_tables}
 # Write significant DEG results tables to csv files
 DE %>%
   filter(den == "control") %>%
-  mutate(sig_file_out = paste0(num, "_", den, "_", Colony, "_", "sig", ".csv"),
+  mutate(sig_file_out = paste0(num, "_", den, "_", Colony, "_", partner, "_", "sig", ".csv"),
          sig_file_out_path = file.path("./outputs/DESeq_results/tables/sig/", sig_file_out),
          data = walk2(sig, sig_file_out_path, write_csv))
 # Write ALL DEG results tables to csv files
 DE %>%
   filter(den == "control") %>%
-  mutate(file_out = paste0(num, "_", den, "_", Colony, "_", "all", ".csv"),
+  mutate(file_out = paste0(num, "_", den, "_", Colony, "_", partner, "_", "all", ".csv"),
          file_out_path = file.path("./outputs/DESeq_results/tables/all/", file_out),
          data = walk2(df, file_out_path, write_csv))
 # Why are there only 14 differentially expressed genes between the heat and control samples? --> Missing samples...low counts...interaction effect? 
 ```
 ```{r DE_master_results_table}
 # Next, I want to bring together the overall and genotype model LFC and padj values for each treatment contrast into a single table.
-DEres <- DE %>%
-  filter(den == "control", Colony == "all") %>%
+DE_results <- DE %>%
+  mutate(Colony = factor(Colony, levels = c("HW1", "HW2", "WT1", "WT2", "all"), ordered = TRUE),
+         num = factor(num, levels = c("Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE),
+         den = factor(den, levels = c("control", "Heat", "Antibiotics"), ordered = TRUE)) %>%
+  arrange(Colony, num, den) %>% 
+  # filter to include only overall contrasts against the control treatment
+  filter(den == "control") %>% 
+  filter(Colony == "all") %>%
   dplyr::select(num, den, df) %>% 
-  unnest(df) %>% 
+  unnest(df) %>%
   unite(contrast, num, den) %>% 
   dplyr::select(contrast, ID, log2FoldChange, padj) %>% 
   pivot_wider(names_from = contrast, values_from = log2FoldChange:padj) %>% 
-  left_join(gene_annotation_coral, by = "ID")
+  left_join(gene_annotation, by = "ID")
+```
+```{r DE_master_results_store}
+# DE_results_coral <- DE_results
+# DE_results_symbiont <- DE_results
+write_csv(DE_results_symbiont, "./outputs/DESeq_results/tables/DE_results_symbiont.csv")
 ```
 
+
 ### Assess similarity of responses across colonies
-```{r DEgenes_colony_comparison}
+```{r DEgenes_colony_comparison, message=FALSE}
 shared_DEGs_colonies <- DE %>%
   unnest(sig) %>%
   filter(Colony != "all") %>%
-  group_by(num, den) %>%
-  dplyr::count(ID, log2FoldChange > 0) %>%   # In how many colonies is same gene DE in same direction?
+  group_by(num, den) %>% View()
+  dplyr::count(ID, log2FoldChange > 0) %>%  # In how many colonies is same gene DE in same direction?
   summarise(`1 colony` = sum(n==1), `2 colonies` = sum(n==2), `3 colonies` = sum(n==3), `4 colonies` = sum(n==4))
 ```
+
 ### Assess similarity of responses across treatments
-```{r DEgenes_treatment_comparison}
+```{r DEgenes_treatment_comparison, message=FALSE}
 shared_DEGs_treatments <- DE %>%
   unnest(sig) %>%
   #filter(Colony == "all") %>%
@@ -441,10 +464,7 @@ shared_DEGs_treatments <- DE %>%
   dplyr::count(ID, log2FoldChange > 0) %>% #View()
   summarise(`1 treatment` = sum(n==1), `2 treatments` = sum(n==2), `3 treatments` = sum(n==3))
 ```
-```{r}
-DE <- DE_coral
-DE <- DE_symbiont
-```
+
 
 ```{r}
 ressig_heat <- DE$sig[DE$num == "Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
@@ -649,6 +669,7 @@ For each of these plot styles, create data handling and plotting functions to pr
 
 ```
 ```{r}
+# Perhaps try the enhanced volcano package here?
 all_anti.control_volcano <- volcanoplot(DE$dsr[[1]])
 ggsave(filename = "./outputs/DESeq_results/figures/all_anti.control_volcano.pdf", height = 3, width = 4, device = "pdf")
 ```
