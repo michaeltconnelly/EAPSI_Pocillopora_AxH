@@ -244,7 +244,7 @@ vsd_symbiont <- vst(dds_symbiont, blind = TRUE) # use blind = TRUE to not accoun
 
 ## Visualize global gene expression
 ```{r choose_vsd, include=FALSE}
-# Choose vsd for host/symbiont analysis
+# Choose vsd for host/symbiont analysis with PCoA and WGCNA
 vsd <- vsd_coral
 # vsd <- vsd_symbiont
 ```
@@ -310,13 +310,13 @@ print(pcoa_combined)
   Must choose a dds object and gene annotation (coral or symbiont) to use for the PCoA 
 ```{r choose_dds_annotation}
 # Choose DESeq dataset and annotation for coral or symbiont differential gene expression analysis
-# dds <- dds_coral
-# gene_annotation <- gene_annotation_coral
-# partner <- "coral"
-#
-dds <- dds_symbiont
-gene_annotation <- gene_annotation_symbiont
-partner <- "symbiont"
+dds <- dds_coral
+gene_annotation <- gene_annotation_coral
+partner <- "coral"
+# #
+# dds <- dds_symbiont
+# gene_annotation <- gene_annotation_symbiont
+# partner <- "symbiont"
 ```
 ```{r genotype_DESeq}
 #First, genotype-specific treatment models
@@ -405,7 +405,7 @@ DE_table <- bind_rows("Coral" = DEtab_coral, "Symbiont" = DEtab_symbiont, .id = 
 # DE_table %>%
 #   write_csv("./outputs/DESeq_results/tables/DE_table.csv")
 ```
-```{r significant_results_tables}
+```{r Write_significant_results_tables}
 # Write significant DEG results tables to csv files
 DE %>%
   filter(den == "control") %>%
@@ -421,7 +421,7 @@ DE %>%
 # Why are there only 14 differentially expressed genes between the heat and control samples? --> Missing samples...low counts...interaction effect? 
 ```
 ```{r DE_master_results_table}
-# Next, I want to bring together the overall and genotype model LFC and padj values for each treatment contrast into a single table.
+# Next, I want to bring together the overall model LFC and padj values for each treatment contrast into a single table.
 DE_results <- DE %>%
   mutate(Colony = factor(Colony, levels = c("HW1", "HW2", "WT1", "WT2", "all"), ordered = TRUE),
          num = factor(num, levels = c("Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE),
@@ -435,36 +435,82 @@ DE_results <- DE %>%
   unite(contrast, num, den) %>% 
   dplyr::select(contrast, ID, log2FoldChange, padj) %>% 
   pivot_wider(names_from = contrast, values_from = log2FoldChange:padj) %>% 
+  mutate(DE_Heat = ifelse(padj_Heat_control < 0.05 & log2FoldChange_Heat_control > 0, "UP", 
+                            ifelse(padj_Heat_control < 0.05 & log2FoldChange_Heat_control < 0, "DOWN", "NA")),
+         DE_Antibiotics = ifelse(padj_Antibiotics_control < 0.05 & log2FoldChange_Antibiotics_control > 0, "UP", 
+                            ifelse(padj_Antibiotics_control < 0.05 & log2FoldChange_Antibiotics_control < 0, "DOWN", "NA")),
+         DE_Antibiotics.Heat = ifelse(padj_Antibiotics.Heat_control < 0.05 & log2FoldChange_Antibiotics.Heat_control > 0, "UP", 
+                            ifelse(padj_Antibiotics.Heat_control < 0.05 & log2FoldChange_Antibiotics.Heat_control < 0, "DOWN", "NA"))) %>% 
   left_join(gene_annotation, by = "ID")
+# 
 ```
 ```{r DE_master_results_store}
 # DE_results_coral <- DE_results
 # DE_results_symbiont <- DE_results
-write_csv(DE_results_symbiont, "./outputs/DESeq_results/tables/DE_results_symbiont.csv")
+write_csv(DE_results_coral, "./outputs/DESeq_results/tables/DE_results_coral.csv")
+```
+```{r DE_results_significant_DEGs}
+DE_results_sig_coral <- DE_results_coral %>%
+  filter(padj_Heat_control < 0.05 | padj_Antibiotics_control < 0.05 | padj_Antibiotics.Heat_control < 0.05)
+#
+DE_results_sig_coral %>% 
+  filter(DE_Heat == DE_Antibiotics.Heat & DE_Antibiotics == DE_Antibiotics.Heat) %>% 
+  write_csv(., path = "./outputs/DESeq_results/tables/DE_shared_treatments_coral.csv")
+#
+DE_results_sig_symbiont <- DE_results_symbiont %>%
+  filter(padj_Heat_control < 0.05 | padj_Antibiotics_control < 0.05 | padj_Antibiotics.Heat_control < 0.05)
+#
+DE_results_sig_symbiont %>% 
+  filter(DE_Heat == DE_Antibiotics.Heat & DE_Antibiotics == DE_Antibiotics.Heat) %>% 
+  write_csv(., path = "./outputs/DESeq_results/tables/DE_shared_treatments_symbiont.csv")
 ```
 
-
-### Assess similarity of responses across colonies
-```{r DEgenes_colony_comparison, message=FALSE}
-shared_DEGs_colonies <- DE %>%
-  unnest(sig) %>%
-  filter(Colony != "all") %>%
-  group_by(num, den) %>% View()
-  dplyr::count(ID, log2FoldChange > 0) %>%  # In how many colonies is same gene DE in same direction?
-  summarise(`1 colony` = sum(n==1), `2 colonies` = sum(n==2), `3 colonies` = sum(n==3), `4 colonies` = sum(n==4))
-```
 
 ### Assess similarity of responses across treatments
 ```{r DEgenes_treatment_comparison, message=FALSE}
 shared_DEGs_treatments <- DE %>%
   unnest(sig) %>%
-  #filter(Colony == "all") %>%
+  # filter(Colony == "all") %>%
   filter(den == "control") %>% 
   group_by(Colony) %>%
-  dplyr::count(ID, log2FoldChange > 0) %>% #View()
+  dplyr::count(ID, log2FoldChange > 0) %>% 
   summarise(`1 treatment` = sum(n==1), `2 treatments` = sum(n==2), `3 treatments` = sum(n==3))
 ```
 
+```{r}
+DE_results_coral %>% 
+  filter(padj_Heat_control < 0.05 | padj_Antibiotics_control < 0.05 | padj_Antibiotics.Heat_control < 0.05) %>% 
+  filter(DE_Heat == DE_Antibiotics.Heat & DE_Heat != "NA") %>% dplyr::count()
+```
+```{r}
+DE_results_sig_coral %>% filter(is.na(DE_Antibiotics)) %>% View()
+  dplyr::count(DE_Heat_Antibiotics)
+```
+
+```{r}
+DE_case_results <- DE_results_sig_coral %>%
+  mutate(DE_Heat_Antibiotics = ifelse(DE_Heat == "UP" & DE_Antibiotics == "UP", "UP_UP", 
+                                           ifelse(DE_Heat == "UP" & DE_Antibiotics == "DOWN", "UP_DOWN",
+                                                  ifelse(DE_Heat == "DOWN" & DE_Antibiotics == "UP", "DOWN_UP", 
+                                                         ifelse(DE_Heat == "DOWN" & DE_Antibiotics == "DOWN", "DOWN_DOWN", "NA")))),
+         #
+         DE_Heat_Antibiotics.Heat = ifelse(DE_Heat == "UP" & DE_Antibiotics.Heat == "UP", "UP_UP", 
+                                           ifelse(DE_Heat == "UP" & DE_Antibiotics.Heat == "DOWN", "UP_DOWN",
+                                                  ifelse(DE_Heat == "DOWN" & DE_Antibiotics.Heat == "UP", "DOWN_UP", 
+                                                         ifelse(DE_Heat == "DOWN" & DE_Antibiotics.Heat == "DOWN", "DOWN_DOWN", "NA")))),
+         #
+         DE_Antibiotics_Antibiotics.Heat = ifelse(DE_Antibiotics == "UP" & DE_Antibiotics.Heat == "UP", "UP_UP", 
+                                           ifelse(DE_Antibiotics == "UP" & DE_Antibiotics.Heat == "DOWN", "UP_DOWN",
+                                                  ifelse(DE_Antibiotics == "DOWN" & DE_Antibiotics.Heat == "UP", "DOWN_UP", 
+                                                         ifelse(DE_Antibiotics == "DOWN" & DE_Antibiotics.Heat == "DOWN", "DOWN_DOWN", "NA"))))) %>% 
+  
+  mutate(DE_All = ifelse(DE_Heat != "NA" & DE_Antibiotics != "NA" & DE_Antibiotics.Heat != "NA", "TRUE", "FALSE")) %>% 
+  
+  select(ID, contains("DE"))
+```
+```{r}
+DE_case_results %>% filter(is.na(DE_Antibiotics)) %>% View()
+```
 
 ```{r}
 ressig_heat <- DE$sig[DE$num == "Heat" & DE$den == "control" & DE$Colony == "all"][[1]]$ID
@@ -661,6 +707,16 @@ treatment_euler_down
 ggsave(plot = treatment_euler_down, filename = "./outputs/DESeq_results/figures/Euler_AXH_down.pdf", width = 80, height = 80, units = "mm", device = "pdf")
 ```
 
+### Assess similarity of responses across colonies
+```{r DEgenes_colony_comparison, message=FALSE}
+shared_DEGs_colonies <- DE %>%
+  unnest(sig) %>%
+  filter(Colony != "all") %>%
+  filter(den == "control") %>% 
+  group_by(num, den) %>%
+  dplyr::count(ID, log2FoldChange > 0) %>%  # In how many colonies is same gene DE in same direction?
+  summarise(`1 colony` = sum(n==1), `2 colonies` = sum(n==2), `3 colonies` = sum(n==3), `4 colonies` = sum(n==4))
+```
 ### DESeq results visualizations
 #### Volcano plots
 
@@ -740,41 +796,53 @@ Need to write out supplemental table 3 from here...
 #### Heat vs. control 
 ```{r heat signed logP}
 # Write overall Heat vs. control logP values to file for GO_MWU analysis
+logPfilepath <- paste0("./R/GO_MWU/logP", "_", "heat.control", "_", partner, ".txt")
 DE %>%
   filter(Colony == "all", num == "Heat", den == "control") %>%
   unnest(logP) %>%
   select(gene, logP) %>%
-  write.table(., file = "./R/GO_MWU/heat.control.logP.txt", row.names = FALSE, quote = FALSE, sep = ",")
+  write.table(., file = logPfilepath, row.names = FALSE, quote = FALSE, sep = ",")
+#
+logPfile <- paste0("logP", "_", "heat.control", "_", partner, ".txt")
 ```
 ```{r heat GO_MWU}
 # Run GO_MWU for Heat vs. control for Biological Process (BP) GO terms
-commandArgs <- function(...) c("heat.control.logP.txt", "BP")
+commandArgs <- function(...) c(logPfile, "BP")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Heat vs. control for Molecular Function GO terms
-commandArgs <- function(...) c("heat.control.logP.txt", "MF")
+commandArgs <- function(...) c(logPfile, "MF")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Heat vs. control for Cellular Component (CC) GO terms
-commandArgs <- function(...) c("heat.control.logP.txt", "CC")
+commandArgs <- function(...) c(logPfile, "CC")
 source("./R/GO_MWU/GO_MWU.R")
 ```
 ```{r heat.control_GO}
 heat.control.GO <- as.list(
-  c(BP = "./R/GO_MWU/MWU_BP_heat.control.logP.txt",
-    MF = "./R/GO_MWU/MWU_MF_heat.control.logP.txt",
-    CC = "./R/GO_MWU/MWU_CC_heat.control.logP.txt")
+  c(BP = "./R/GO_MWU/MWU_BP_logP_heat.control_coral.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_heat.control_coral.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_heat.control_coral.txt")
   ) %>% map(read.table, header = T) %>%
   bind_rows(.id = "ontology") %>%
   as_tibble() %>%
-  filter(p.adj < 0.01)
+  filter(p.adj < 0.05)
+#
+heat.control.GO_symbiont <- as.list(
+  c(BP = "./R/GO_MWU/MWU_BP_logP_heat.control_symbiont.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_heat.control_symbiont.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_heat.control_symbiont.txt")
+  ) %>% map(read.table, header = T) %>%
+  bind_rows(.id = "ontology") %>%
+  as_tibble() %>%
+  filter(p.adj < 0.05)
 
 heat.control.GO %>%
   select(ontology, delta.rank, p.adj, name, nseqs, level, term) %>%
   arrange(ontology, p.adj) %>% 
   write_csv(path = "./outputs/DESeq_results/GO_MWU/tables/heat.control.GO.csv")
 
-heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0) %>% 
+heat.control.GO %>% filter(p.adj < 0.05 & delta.rank >= 0) %>% 
   group_by(ontology) %>% 
   summarise(n = n())
 ```
@@ -790,41 +858,54 @@ source("./R/GO_MWU/GO_MWU_plot.R")
 #### Antibiotics vs. control 
 ```{r anti signed logP}
 # Write overall Antibiotics vs. control logP values to file for GO_MWU analysis
+logPfilepath <- paste0("./R/GO_MWU/logP", "_", "antibiotics.control", "_", partner, ".txt")
 DE %>%
   filter(Colony == "all", num == "Antibiotics", den == "control") %>%
   unnest(logP) %>%
   select(gene, logP) %>%
-  write.table(., file = "./R/GO_MWU/anti.control.logP.txt", row.names = FALSE, quote = FALSE, sep = ",")
+  write.table(., file = logPfilepath, row.names = FALSE, quote = FALSE, sep = ",")
+#
+logPfile <- paste0("logP", "_", "antibiotics.control", "_", partner, ".txt")
 ```
 ```{r anti GO_MWU}
 # Run GO_MWU for Antibiotics vs. control for Biological Process (BP) GO terms
-commandArgs <- function(...) c("anti.control.logP.txt", "BP")
+commandArgs <- function(...) c(logPfile, "BP")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Antibiotics vs. control for Molecular Function GO terms
-commandArgs <- function(...) c("anti.control.logP.txt", "MF")
+commandArgs <- function(...) c(logPfile, "MF")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Antibiotics vs. control for Cellular Component (CC) GO terms
-commandArgs <- function(...) c("anti.control.logP.txt", "CC")
+commandArgs <- function(...) c(logPfile, "CC")
 source("./R/GO_MWU/GO_MWU.R")
 ```
 ```{r anti.control_GO}
 anti.control.GO <- as.list(
-  c(BP = "./R/GO_MWU/MWU_BP_anti.control.logP.txt",
-    MF = "./R/GO_MWU/MWU_MF_anti.control.logP.txt",
-    CC = "./R/GO_MWU/MWU_CC_anti.control.logP.txt")
+  c(BP = "./R/GO_MWU/MWU_BP_logP_antibiotics.control_coral.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_antibiotics.control_coral.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_antibiotics.control_coral.txt")
   ) %>% map(read.table, header = T) %>%
   bind_rows(.id = "ontology") %>%
   as_tibble() %>%
-  filter(p.adj < 0.01)
+  filter(p.adj < 0.05)
+#
+anti.control.GO_symbiont <- as.list(
+  c(BP = "./R/GO_MWU/MWU_BP_logP_antibiotics.control_symbiont.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_antibiotics.control_symbiont.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_antibiotics.control_symbiont.txt")
+  ) %>% map(read.table, header = T) %>%
+  bind_rows(.id = "ontology") %>%
+  as_tibble() %>%
+  filter(p.adj < 0.05)
+
 
 anti.control.GO %>%
   select(ontology, delta.rank, p.adj, name, nseqs, level, term) %>%
-  arrange(ontology, p.adj) %>% 
-  write_csv(path = "./outputs/DESeq_results/GO_MWU/tables/anti.control.GO.csv")
+  arrange(ontology, p.adj) #%>% 
+  # write_csv(path = "./outputs/DESeq_results/GO_MWU/tables/anti.control.GO.csv")
 
-anti.control.GO %>% filter(p.adj < 0.01 & delta.rank <= 0) %>% 
+anti.control.GO %>% filter(p.adj < 0.05 & delta.rank <= 0) %>% 
   group_by(ontology) %>% 
   summarise(n = n())
 ```
@@ -840,41 +921,53 @@ source("./R/GO_MWU/GO_MWU_plot.R")
 #### Antibiotics.Heat vs. control 
 ```{r anti.heat signed logP}
 # Write overall Antibiotics.Heat vs. control logP values to file for GO_MWU analysis
+logPfilepath <- paste0("./R/GO_MWU/logP", "_", "antibiotics.heat.control", "_", partner, ".txt")
 DE %>%
   filter(Colony == "all", num == "Antibiotics.Heat", den == "control") %>%
   unnest(logP) %>%
   select(gene, logP) %>%
-  write.table(., file = "./R/GO_MWU/anti.heat.control.logP.txt", row.names = FALSE, quote = FALSE, sep = ",")
+  write.table(., file = logPfilepath, row.names = FALSE, quote = FALSE, sep = ",")
+#
+logPfile <- paste0("logP", "_", "antibiotics.heat.control", "_", partner, ".txt")
 ```
 ```{r anti.heat GO_MWU}
 # Run GO_MWU for Antibiotics.Heat vs. control for Biological Process (BP) GO terms
-commandArgs <- function(...) c("anti.heat.control.logP.txt", "BP")
+commandArgs <- function(...) c(logPfile, "BP")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Antibiotics.Heat vs. control for Molecular Function GO terms
-commandArgs <- function(...) c("anti.heat.control.logP.txt", "MF")
+commandArgs <- function(...) c(logPfile, "MF")
 source("./R/GO_MWU/GO_MWU.R")
 
 # Run GO_MWU for Antibiotics.Heat vs. control for Cellular Component (CC) GO terms
-commandArgs <- function(...) c("anti.heat.control.logP.txt", "CC")
+commandArgs <- function(...) c(logPfile, "CC")
 source("./R/GO_MWU/GO_MWU.R")
 ```
 ```{r anti.heat.control_GO}
 anti.heat.control.GO <- as.list(
-  c(BP = "./R/GO_MWU/MWU_BP_anti.heat.control.logP.txt",
-    MF = "./R/GO_MWU/MWU_MF_anti.heat.control.logP.txt",
-    CC = "./R/GO_MWU/MWU_CC_anti.heat.control.logP.txt")
+  c(BP = "./R/GO_MWU/MWU_BP_logP_antibiotics.heat.control_coral.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_antibiotics.heat.control_coral.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_antibiotics.heat.control_coral.txt")
   ) %>% map(read.table, header = T) %>%
   bind_rows(.id = "ontology") %>%
   as_tibble() %>%
-  filter(p.adj < 0.01)
+  filter(p.adj < 0.05)
+#
+anti.heat.control.GO_symbiont <- as.list(
+  c(BP = "./R/GO_MWU/MWU_BP_logP_antibiotics.heat.control_symbiont.txt",
+    MF = "./R/GO_MWU/MWU_MF_logP_antibiotics.heat.control_symbiont.txt",
+    CC = "./R/GO_MWU/MWU_CC_logP_antibiotics.heat.control_symbiont.txt")
+  ) %>% map(read.table, header = T) %>%
+  bind_rows(.id = "ontology") %>%
+  as_tibble() %>%
+  filter(p.adj < 0.05)
 
 anti.heat.control.GO %>%
   select(ontology, delta.rank, p.adj, name, nseqs, level, term) %>%
-  arrange(ontology, p.adj) %>% 
-  write_csv(path = "./outputs/DESeq_results/GO_MWU/tables/anti.heat.control.GO.csv")
+  arrange(ontology, p.adj) #%>% 
+  # write_csv(path = "./outputs/DESeq_results/GO_MWU/tables/anti.heat.control.GO.csv")
 
-anti.heat.control.GO %>% filter(p.adj < 0.01 & delta.rank >= 0 & ontology == "BP") %>% 
+anti.heat.control.GO %>% filter(p.adj < 0.05 & delta.rank >= 0 & ontology == "BP") %>% 
   group_by(ontology) %>% 
   summarise(n = n())
 ```
@@ -897,13 +990,25 @@ allGO <- bind_rows(.id = "contrast",
   select(contrast, ontology, delta.rank, name, p.adj) %>%
   arrange(contrast, ontology, sign(delta.rank), p.adj)
 
-write_csv(allGO, path = "./outputs/DESeq_results/GO_MWU/allGO.csv")
+write_csv(allGO, path = "./outputs/DESeq_results/GO_MWU/allGO_coral.csv")
+
+allGO_symbiont <- bind_rows(.id = "contrast",
+  heat.control = heat.control.GO_symbiont,
+  anti.control = anti.control.GO_symbiont,
+  anti.heat.control = anti.heat.control.GO_symbiont
+) %>%
+  select(contrast, ontology, delta.rank, name, p.adj) %>%
+  arrange(contrast, ontology, sign(delta.rank), p.adj)
+
+write_csv(allGO_symbiont, path = "./outputs/DESeq_results/GO_MWU/allGO_symbiont.csv")
 ```
+
 ### DESeq EuKaryotic Orthologous Groups (KOG) enrichment analysis
 ```{r KOG, results = 'hide'}
 # Using the signed log(p-values) from the differential expression analysis, we can analyze which KOG classifications are up- or down-regulated within each colony, and across all four colonies together
-# Ensure gene KOG annotation is present
-head(gene2kog)
+# Ensure gene KOG annotation is present, choose partner
+# gene2kog <- gene2kog_coral
+gene2kog <- gene2kog_symbiont
 # Run KOG.MWU analysis on all contrasts
 KOG <- DE %>%
   mutate(KOG = map(logP, ~ kog.mwu(., gene2kog)),
@@ -973,8 +1078,8 @@ KOG_treatments <- KOGheatmap(
   fontsize_row = 7,
   fontsize_col = 8)
 
-ggsave(filename = "./outputs/DESeq_results/KOGMWU/figures/KOG_treatment_heatmap.pdf", KOG_treatments, width = 112, height = 150, units = "mm")
-ggsave(filename = "./manuscript_figures/Fig1C_KOGheatmap.pdf", KOG_treatments, width = 112, height = 92, units = "mm")
+ggsave(filename = "./outputs/DESeq_results/KOGMWU/figures/KOG_treatment_heatmap_symbiont.pdf", KOG_treatments, width = 112, height = 92, units = "mm")
+# ggsave(filename = "./manuscript_figures/Fig1C_KOGheatmap.pdf", KOG_treatments, width = 112, height = 92, units = "mm")
 ```
 
 ## Weighted gene co-expression network analysis (WGCNA)
@@ -1047,14 +1152,14 @@ abline(h=MEDissThres, col = "red")
 ```
 ```{r merge_modules}
 # Call an automatic merging function
-# merge cutHeight = 0.3 because I want to group together modules with >85% similar module eigengene expression
+# merge cutHeight = 0.3 because I want to group together modules with >70% similar module eigengene expression
 mergedMods <- mergeCloseModules(datExpr, dynamicColors, cutHeight = 0.3, verbose = 5)
 # The merged module colors
 mergedColors <- mergedMods$colors
 table(mergedColors) 
 ```
 ```{r dendrogram_modules}
-pdf(file = "./outputs/WGCNA_results/dendrogram_coral.pdf", width = 8, height = 6)
+pdf(file = "./outputs/WGCNA_results/dendrogram_symbiont.pdf", width = 8, height = 6)
 # pdf(file = "./manuscript_figures/FigS##_WGCNA_dendrogram.pdf", width = 8, height = 6)
 # Plot the dendrogram and the module colors underneath
 plotDendroAndColors(dendro = geneTree, 
@@ -1071,7 +1176,7 @@ mergedMEs <- MEList$eigengenes
 ```{r choose_modules}
 moduleColors <- mergedColors#netColors#
 MEs1 <- mergedMEs#netMEs#
-MEs1 <- MEs1 %>% select(-MEgrey)
+# MEs1 <- MEs1 %>% select(-MEgrey)
 MEmodule_colors <- colnames(MEs1)
 module_colors <- gsub("ME", "", colnames(MEs1))
 colnames(MEs1) <- module_colors
@@ -1119,19 +1224,19 @@ hubs <- chooseTopHubInEachModule(datExpr,
                          power=sft$powerEstimate, # 10
                          # power = 10,
                          type = "signed")
-hub_genes <- gene_annotation_coral[hubs, ]
+hub_genes <- gene_annotation[hubs, ]
 hub_genes$module <- names(hubs)
 row.names(hub_genes) <- NULL
 hub_genes <- hub_genes %>% dplyr::select(module, everything())
-write_csv(hub_genes, path = "./outputs/WGCNA_results/hub_genes_coral.csv")
+write_csv(hub_genes, path = "./outputs/WGCNA_results/hub_genes_symbiont.csv")
 ```
 ```{r sig_hubs}
 sig_hubs <- hub_genes %>%
-  filter(module %in% uniqModules) %>%
+  filter(module %in% sigModules) %>%
   dplyr::select(module, ID, Gene_Info) %>% 
   dplyr::rename("hub gene" = ID, "UniProt best match" = Gene_Info) 
-write_csv(sig_hubs, path = "./outputs/WGCNA-results/sig_hub_genes_table.csv")
-write_excel_csv(sig_hubs, path = "./manuscript_figures/Table3.csv")
+# write_csv(sig_hubs, path = "./outputs/WGCNA_results/sig_hub_genes_table.csv")
+write_excel_csv(sig_hubs, path = "./manuscript_figures/Table2_symbiont.csv")
 ```
 ```{r datkME}
 #this section is adapted from Rachel Wright's GitHub: https://github.com/rachelwright8/Ahya-White-Syndromes/
@@ -1152,7 +1257,7 @@ modkME$kME[modkME$moduleColor!=module] <- 0  #also need to change column names f
 modkME <- modkME %>% dplyr::select(., -moduleColor)
 # write csv
 #write.csv(modkME, file = paste("./outputs/WGCNA-results/tables/", module,"_kme.csv",sep=""), quote=F, row.names=F)
-write.csv(modkME, file = paste("./R/GO_MWU/", module,"_kme.txt",sep=""), quote=F, row.names=F)
+write.csv(modkME, file = paste("./R/GO_MWU/", module,"_kme_", partner, ".txt",sep=""), quote=F, row.names=F)
 #repeat for each module
 }
 ```
@@ -1651,14 +1756,14 @@ cn = colnames(moduleTraitCor)
 ```
 ```{r ME_treatment_ComplexHeatmap}
 # pdf(file = "./outputs/WGCNA-results/figures/ME_complexheatmap_treatments.pdf", width = 6.5, height = 6)
-# pdf(file = "./manuscript_figures/Fig4A_ME_heatmap.pdf", width = 6, height = 6)
+pdf(file = "./manuscript_figures/Fig4B_ME_heatmap_symbiont.pdf", width = 6, height = 6)
 me_treatment_heatmap <- Heatmap(moduleTraitCor,
                       #col = col_fun_cor,
                       cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", starMatrix_treatment[i, j]), x, y, gp = gpar(fontsize = 12))},
                       cluster_rows = hclustME,
                       top_annotation = treatment_annotation,
                       left_annotation = module_annotation,
-                      # right_annotation = module_barplot,
+                      right_annotation = module_barplot,
                       bottom_annotation = HeatmapAnnotation(text = anno_text(cn,
                                                                              rot = 330,
                                                                              offset = unit(1, "npc"),
@@ -1690,6 +1795,14 @@ me_treatment_heatmap <- Heatmap(moduleTraitCor,
 draw(me_treatment_heatmap,
      show_annotation_legend = FALSE, heatmap_legend_side = "left"
      )
+
+# me_treatment_heatmap_coral <- me_treatment_heatmap
+# me_treatment_heatmap_symbiont <- me_treatment_heatmap
+# draw(me_treatment_heatmap_coral,
+#      show_annotation_legend = FALSE, heatmap_legend_side = "left"
+#      )
+# Vertical concatenation
+# ht_list = ht1 %v% ht2 
 ```
 #### Module-bacteria correlation heatmap
 ```{r ME_bacteria_textmatrix}
@@ -1780,7 +1893,7 @@ module_barplot <- HeatmapAnnotation("# genes" = anno_barplot(moddf$module_size,
                                                   gp = gpar(fill = as.character(moddf$module_colors)),
                                                   bar_width = 0.8,
                                                   axis_param = list(side = "top",
-                                                      at = c(0, 1000, 2000, 3000, 4000, 5000),
+                                                      #at = c(0, 1000, 2000, 3000, 4000, 5000),
                                                       # labels = c("zero", "half", "one"),
                                                       labels_rot = 45)),
                                     #module_sizes$moduleColors)),
@@ -1788,8 +1901,8 @@ module_barplot <- HeatmapAnnotation("# genes" = anno_barplot(moddf$module_size,
                                     show_legend = FALSE,
                                     annotation_name_side = "top",
                                     annotation_name_rot = "0",
-                                    annotation_name_gp = gpar(fontsize = 14, fontface = "plain"),
-                                    width = unit(3.5, "cm")
+                                    annotation_name_gp = gpar(fontsize = 12, fontface = "plain"),
+                                    width = unit(2.5, "cm")
                                     )
 ```
 ```{r ME_KOG_ComplexHeatmap}

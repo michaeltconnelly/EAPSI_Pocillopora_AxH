@@ -27,10 +27,12 @@ sum(QC_summary$rawCounts)
 ```
 ```{r tidydata}
 QC_summary <- QC_summary %>%
-  pivot_longer(., c(rawCounts, trimmedCounts, singleMapped, geneCounted), names_to = "pipeline_step", values_to = "read_count") %>% 
+  pivot_longer(., rawCounts:geneCounted_symbiont, names_to = "pipeline_step", values_to = "read_count") %>%
+  mutate(partner = ifelse(str_detect(pipeline_step, "symbiont"), "symbiont", "coral")) %>% 
   left_join(samples[ ,1:6], ., by = "SampleID")
-QC_summary$pipeline_step <- factor(QC_summary$pipeline_step, levels = c("rawCounts", "trimmedCounts", "singleMapped", "geneCounted"), ordered = TRUE)
 QC_summary$Treatment <- factor(QC_summary$Treatment, levels = c("control", "Heat", "Antibiotics", "Antibiotics.Heat"), ordered = TRUE)
+#
+QC_summary$pipeline_step <- factor(QC_summary$pipeline_step, levels = c("rawCounts", "trimmedCounts", "singleMapped_coral", "geneCounted_coral", "unMapped_symbiont", "singleMapped_symbiont", "geneCounted_symbiont"), ordered = TRUE)
 ```
 
 
@@ -55,11 +57,12 @@ pipeQC_counts <- QC_summary %>%
   ggplot(aes(pipeline_step, read_count, color = Treatment, shape = Colony, fill = Treatment)) +
   geom_path(aes(group = SampleID), show.legend = FALSE) +
   geom_point(size = 2, color = "black", alpha = 0.5, stroke = 0.5, show.legend = FALSE) + 
+  facet_grid(~partner, scales = "free") +
   scale_y_continuous(limits = c(0, 2.5e7), breaks = c(0, 5e6, 1e7, 1.5e7, 2e7, 2.5e7)) +
   scale_color_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   scale_fill_manual(values = condcolors_AxH) +
-  theme(axis.text.x = element_text(angle = 345), panel.grid.major = element_line(color = "grey92")) +
+  theme(axis.text.x = element_text(angle = 330), panel.grid.major = element_line(color = "grey92")) +
   ylab("read count") +
   xlab("pipeline step") + 
   ggtitle("read counts")
@@ -76,12 +79,15 @@ pipeQC_props <- QC_summary %>%
   ggplot(aes(pipeline_step, proportion, color = Treatment, shape = Colony, fill = Treatment)) +
   geom_path(aes(group = SampleID), show.legend = TRUE) +
   geom_point(size = 2, color = "black", alpha = 0.5, stroke = 0.5, show.legend = TRUE) + 
+  facet_grid(~partner, scales = "free") +
   scale_y_continuous(limits = c(0, 1)) +
   scale_color_manual(values = condcolors_AxH) +
   scale_shape_manual(values = colshapes) + 
   scale_fill_manual(values = condcolors_AxH) +
-  guides(shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5))) +
-  theme(axis.text.x = element_text(angle = 345), panel.grid.major = element_line(color = "grey92")) +
+  theme(axis.text.x = element_text(angle = 330), panel.grid.major = element_line(color = "grey92")) +
+  guides(color = guide_legend(override.aes = list(color = condcolors_AxH, alpha = 1, stroke = 1)),
+           fill = guide_legend(override.aes = list(fill = condcolors_AxH, shape = 21, alpha = 1, stroke = 0.5)),
+           shape = guide_legend(override.aes = list(shape = colshapes, alpha = 1, stroke = 0.5))) +
   ylab("proportion raw reads") +
   xlab("pipeline step") + 
   ggtitle("read proportions")
@@ -89,6 +95,6 @@ pipeQC_props
 ```
 ```{r}
 qcfig <- (pipeQC_counts | pipeQC_props) + plot_annotation(tag_levels = "A")
-ggsave(qcfig, filename = "./manuscript_figures/FigS5_readcounts.pdf", width = 169, height = 80, units = "mm", device = "pdf")
+ggsave(qcfig, filename = "./manuscript_figures/FigS5_readcounts.pdf", width = 220, height = 90, units = "mm", device = "pdf")
 ```
 
